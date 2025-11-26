@@ -1,0 +1,21 @@
+{
+  "name": "FC Perfumaria - Essência Brasileira",
+  "short_name": "FC Perfumes",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#1B263B",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/BIXdM6M.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.imgur.com/BIXdM6M.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
