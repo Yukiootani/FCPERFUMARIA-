@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Carrinho | FC Perfumaria</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #FDFBF7;
+            --primary-color: #1B263B; /* Azul Marinho */
+            --accent-color: #Cca43b; /* Bronze */
+            --text-color: #333333;
+            --light-text: #666;
+            --border-color: #e0e0e0;
+            --whatsapp-green: #25D366;
+            --error-color: #dc3545;
+        }
+        body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); }
+        
+        header { background-color: #fff; padding: 1rem; border-bottom: 3px solid var(--accent-color); text-align: center; }
+        header a { color: var(--primary-color); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; }
+        
+        main { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        
+        h1 { font-family: 'Playfair Display', serif; color: var(--primary-color); text-align: center; margin-bottom: 30px; }
+        
+        /* LISTA DE ITENS */
+        #cart-items-container { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        
+        .cart-item { display: flex; gap: 15px; border-bottom: 1px solid var(--border-color); padding: 20px; align-items: center; }
+        .cart-item:last-child { border-bottom: none; }
+        
+        .cart-item-image { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
+        
+        .cart-item-info { flex: 1; }
+        .cart-item-info h3 { margin: 0 0 5px 0; font-size: 1em; font-weight: 700; color: var(--primary-color); }
+        .cart-item-info p { margin: 2px 0; font-size: 0.85em; color: var(--light-text); }
+        .variant-text { color: var(--accent-color) !important; font-weight: 500; }
+        
+        .cart-item-price { font-weight: 700; color: var(--text-color); font-size: 1.1em; }
+        
+        .cart-item-remove { color: var(--error-color); font-size: 0.8em; cursor: pointer; text-decoration: underline; margin-top: 5px; display: inline-block; }
+        
+        /* QUANTIDADE */
+        .quantity-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .qty-btn { background: #f5f5f5; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; color: var(--primary-color); }
+        .qty-display { font-weight: bold; min-width: 20px; text-align: center; }
+        
+        /* RESUMO E CHECKOUT */
+        #cart-summary { margin-top: 30px; background-color: #fff; padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+        .summary-total { font-size: 1.5em; font-weight: 700; color: var(--primary-color); margin-bottom: 20px; font-family: 'Playfair Display', serif; }
+        
+        .checkout-button { 
+            display: block; 
+            background-color: var(--whatsapp-green); 
+            color: white; 
+            padding: 15px; 
+            text-decoration: none; 
+            font-size: 1.1em; 
+            font-weight: bold; 
+            border-radius: 5px; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .checkout-button:hover { background-color: #1e7e34; transform: translateY(-2px); }
+        
+        /* MENSAGEM VAZIO/SUCESSO */
+        #empty-cart-message { text-align: center; padding: 50px; color: #999; font-style: italic; }
+        
+        #success-message { display: none; text-align: center; padding: 40px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .success-icon { font-size: 50px; color: var(--accent-color); margin-bottom: 20px; }
+        .back-btn { display: inline-block; margin-top: 20px; color: var(--primary-color); text-decoration: none; font-weight: bold; border-bottom: 2px solid var(--accent-color); }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Continuar Comprando</a>
+    </header>
+
+    <main>
+        <div id="cart-view">
+            <h1>Seu Pedido</h1>
+            <div id="cart-items-container">
+                <p id="empty-cart-message">Carregando itens...</p>
+            </div>
+
+            <div id="cart-summary" style="display: none;">
+                <div class="summary-total">
+                    Total Estimado: <span id="cart-total">¥0</span>
+                </div>
+                <a href="#" id="whatsapp-checkout-btn" class="checkout-button">
+                    <i class="fab fa-whatsapp"></i> Finalizar Pedido no WhatsApp
+                </a>
+                <p style="font-size: 0.8em; color: #999; margin-top: 15px;">O pagamento e a entrega serão combinados diretamente no chat.</p>
+            </div>
+        </div>
+        
+        <div id="success-message">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2 style="font-family: 'Playfair Display'; color: var(--primary-color);">Pedido Iniciado!</h2>
+            <p>Você será redirecionado para o WhatsApp para confirmar os detalhes.</p>
+            <a href="index.html" class="back-btn">Voltar para a Loja</a>
+        </div>
+    </main>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // CONFIGURAÇÃO FC PERFUMARIA
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs",
+            authDomain: "fc-perfumaria-309fb.firebaseapp.com",
+            projectId: "fc-perfumaria-309fb",
+            storageBucket: "fc-perfumaria-309fb.firebasestorage.app",
+            messagingSenderId: "311935363734",
+            appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // SEU NÚMERO DE TESTE (MANTIDO)
+        const WHATSAPP_NUMBER = "818074558624"; 
+        
+        const container = document.getElementById('cart-items-container');
+        const summary = document.getElementById('cart-summary');
+        const totalEl = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('whatsapp-checkout-btn');
+        const view = document.getElementById('cart-view');
+        const success = document.getElementById('success-message');
+        
+        let productCache = {};
+
+        function getCart() { return JSON.parse(localStorage.getItem('whatsappCart')) || { items: {} }; }
+        function saveCart(cart) { localStorage.setItem('whatsappCart', JSON.stringify(cart)); }
+
+        async function getProductData(id) {
+            if (productCache[id]) return productCache[id];
+            try { const doc = await db.collection("products").doc(id).get(); if(doc.exists){ productCache[id]=doc.data(); return doc.data(); } } catch(e){}
+            return null;
+        }
+
+        async function renderCart() {
+            const cart = getCart();
+            const items = cart.items;
+            const itemIds = Object.keys(items);
+            
+            if (itemIds.length === 0) {
+                container.innerHTML = '<p id="empty-cart-message">Seu carrinho está vazio.</p>';
+                summary.style.display = 'none';
+                return;
+            }
+            
+            summary.style.display = 'block';
+            container.innerHTML = '';
+            
+            let total = 0;
+            // Mensagem personalizada para Perfumaria
+            let msg = "Olá! Gostaria de fazer um pedido na *FC Perfumaria*:\n\n";
+            
+            // Carrega dados atualizados do Firebase para checar estoque
+            const productSnapshots = await Promise.all(Object.values(items).map(i => getProductData(i.id)));
+
+            for (let i = 0; i < itemIds.length; i++) {
+                const itemId = itemIds[i];
+                const item = items[itemId];
+                const product = productSnapshots[i];
+                
+                // Validação de Estoque em Tempo Real
+                let maxStock = 999;
+                let isDeleted = false;
+                
+                if(!product) { isDeleted = true; }
+                else if (item.color && item.size) { // color = Linha, size = Volume
+                    if(product.variantes && product.variantes[item.color]) {
+                        maxStock = product.variantes[item.color][item.size] || 0;
+                    } else { maxStock = 0; }
+                } else {
+                    maxStock = product.estoqueTotal || 0;
+                }
+                
+                // Se for sob encomenda, estoque é "infinito"
+                if(product && product.source === 'sob-encomenda') maxStock = 999;
+
+                if (isDeleted || maxStock === 0) {
+                    container.innerHTML += `<div class="cart-item" style="background:#fff0f0; color:red;"><p>Item "${item.name}" indisponível e removido.</p></div>`;
+                    delete cart.items[itemId];
+                    saveCart(cart);
+                    continue;
+                }
+                
+                if (item.quantity > maxStock) item.quantity = maxStock;
+
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                const pf = item.price.toLocaleString('ja-JP');
+                
+                // Texto da variante adaptado (Linha / Volume)
+                let variantDisplay = '';
+                if(item.color) variantDisplay += `Versão: ${item.color}`; // Ex: Versão: Gold
+                if(item.size) variantDisplay += ` | Vol: ${item.size}`;   // Ex: | Vol: 100ml
+                
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" class="cart-item-image">
+                        <div class="cart-item-info">
+                            <h3>${item.name}</h3>
+                            <p class="variant-text">${variantDisplay}</p>
+                            <div class="quantity-control">
+                                <button class="qty-btn qty-dec" data-id="${itemId}">-</button>
+                                <span class="qty-display">${item.quantity}</span>
+                                <button class="qty-btn qty-inc" data-id="${itemId}" ${item.quantity >= maxStock ? 'disabled' : ''}>+</button>
+                            </div>
+                            <span class="cart-item-remove" data-id="${itemId}">Remover item</span>
+                        </div>
+                        <div class="cart-item-price">¥${pf}</div>
+                    </div>
+                `;
+                
+                msg += `🔹 *${item.quantity}x ${item.name}*\n   (${variantDisplay})\n   Valor: ¥${pf}\n\n`;
+            }
+
+            totalEl.textContent = `¥${total.toLocaleString('ja-JP')}`;
+            msg += `*Total Estimado: ¥${total.toLocaleString('ja-JP')}*`;
+            msg += `\n\nAguardo confirmação sobre o pagamento e entrega.`;
+            
+            checkoutBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+        }
+
+        // Eventos de clique (Aumentar/Diminuir/Remover)
+        container.addEventListener('click', (e) => {
+            const cart = getCart();
+            const id = e.target.dataset.id;
+            
+            if (e.target.classList.contains('qty-inc')) {
+                cart.items[id].quantity++;
+                saveCart(cart); renderCart();
+            }
+            if (e.target.classList.contains('qty-dec')) {
+                if(cart.items[id].quantity > 1) {
+                    cart.items[id].quantity--;
+                    saveCart(cart); renderCart();
+                }
+            }
+            if (e.target.classList.contains('cart-item-remove')) {
+                if(confirm("Remover este item?")) {
+                    delete cart.items[id];
+                    saveCart(cart); renderCart();
+                }
+            }
+        });
+
+        checkoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('whatsappCart');
+            view.style.display = 'none';
+            success.style.display = 'block';
+        });
+
+        document.addEventListener('DOMContentLoaded', renderCart);
+    </script>
+</body>
+</html>
