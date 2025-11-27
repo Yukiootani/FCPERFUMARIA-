@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <meta name="theme-color" content="#1B263B">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
+    
     <title>FC Perfumaria</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL --- */
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 120px; }
         
+        /* HEADER */
         header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); }
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* BOTÃO ANDROID (Só aparece se o navegador permitir) */
+        /* BOTÃO INSTALAR (Android) */
         #install-app-btn { 
             display: none; 
             width: 100%; 
@@ -33,9 +37,9 @@
             letter-spacing: 1px;
         }
 
-        /* FAIXA IPHONE (Só aparece no iOS) */
+        /* BANNER IOS (iPhone) */
         #ios-install-banner {
-            display: none; /* Controlado via JS */
+            display: none;
             position: fixed;
             bottom: 0;
             left: 0;
@@ -50,7 +54,6 @@
             color: #333;
             font-size: 0.9em;
         }
-        #ios-install-banner p { margin: 0; line-height: 1.5; }
         #ios-install-banner i { color: #007AFF; font-size: 1.2em; margin: 0 5px; }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
 
@@ -120,7 +123,7 @@
 
         <h2 id="collection-title" class="section-title">Loja Oficial</h2>
         
-        <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando catálogo...</div>
+        <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando...</div>
         <div id="products-grid"></div>
         <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
     </main>
@@ -152,29 +155,25 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- LÓGICA DE INSTALAÇÃO (ANDROID & IPHONE) ---
+        // --- Lógica PWA (Instalação) ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-app-btn');
         const iosBanner = document.getElementById('ios-install-banner');
         
-        // Android
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'block';
+            e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block';
         });
         installBtn.addEventListener('click', () => {
             installBtn.style.display = 'none';
             if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
         });
 
-        // Detecção iOS (iPhone)
-        const isIos = () => { return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()); };
+        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
-
+        
         if (isIos() && !isInStandaloneMode()) {
             iosBanner.style.display = 'block';
-            document.getElementById('cart-icon').style.bottom = '100px'; // Sobe o carrinho para não tapar
+            document.getElementById('cart-icon').style.bottom = '100px';
         }
         document.getElementById('close-ios-banner').addEventListener('click', () => {
             iosBanner.style.display = 'none';
@@ -183,7 +182,7 @@
 
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
 
-        // --- CÓDIGO DA LOJA (Mantido) ---
+        // --- Lógica "NUCLEAR" de Carregamento (A que funcionou) ---
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
         const headerEl = document.getElementById('main-header');
@@ -194,30 +193,47 @@
         async function fetchAllProducts() {
             loadingMsg.style.display = 'block'; grid.innerHTML = '';
             try {
+                // SEM FILTROS NO BANCO (Evita erros de índice)
                 const snap = await db.collection("products").get();
                 if(snap.empty){ loadingMsg.style.display = 'none'; grid.innerHTML = '<p style="text-align:center; color:#999;">Loja vazia.</p>'; return; }
+                
                 allProducts = [];
-                snap.forEach(d => { let data = d.data(); data.searchSource = (data.source || '').toLowerCase().replace(' ', '-'); data.searchSecao = (data.secao || '').toLowerCase(); allProducts.push({ id: d.id, ...data }); });
+                snap.forEach(d => { 
+                    let data = d.data();
+                    // Prepara dados para busca flexível
+                    data.searchSource = (data.source || '').toLowerCase().replace(' ', '-');
+                    data.searchSecao = (data.secao || '').toLowerCase();
+                    allProducts.push({ id: d.id, ...data }); 
+                });
                 renderProducts();
-            } catch(e) { loadingMsg.style.color = 'red'; loadingMsg.innerHTML = "Erro: " + e.message; }
+            } catch(e) { 
+                console.error(e); loadingMsg.style.color = 'red'; loadingMsg.innerHTML = "Erro de conexão (Tente recarregar)"; 
+            }
         }
 
         function renderProducts() {
             loadingMsg.style.display = 'none'; grid.innerHTML = '';
+            
             let filtered = allProducts.filter(p => {
                 let filterClean = currentFilter.toLowerCase().replace(' ', '-');
+                // Lógica permissiva (Se não tiver source, mostra em todos)
                 let matchSource = p.searchSource.includes(filterClean) || p.searchSource === '';
                 let matchSecao = true;
                 if (currentSecao !== 'todos') matchSecao = p.searchSecao === currentSecao;
                 return matchSource && matchSecao;
             });
-            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#999;">Nenhum item com este filtro.</p>'; return; }
+
+            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#999;">Nenhum item nesta seção.</p>'; return; }
+
+            // Ordena por data (Mais novos primeiro)
             filtered.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
             filtered.forEach(p => {
                 const pf = (p.price||0).toLocaleString('ja-JP');
                 let badge = '';
                 if(p.isFeatured === 'novo') badge = '<span class="badge badge-novo">Lançamento</span>';
                 if((p.estoqueTotal||0) <= 0 && p.source === 'pronta-entrega') badge = '<span class="badge badge-esgotado">Esgotado</span>';
+                
                 const card = document.createElement('a'); card.href = `detalhes.html?id=${p.id}`; card.className = 'product-card';
                 card.innerHTML = `${badge}<div class="product-image-container"><img src="${p.imageUrl||'https://via.placeholder.com/400'}" class="product-image"></div><div class="product-info"><div><div class="product-category">${p.secao}</div><h3 class="product-name">${p.name}</h3></div><div><div class="product-price">¥${pf}</div><button class="details-button">Ver Detalhes</button></div></div>`;
                 grid.appendChild(card);
