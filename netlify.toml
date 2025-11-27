@@ -3,7 +3,7 @@
   publish = "."
   functions = "netlify/functions"
 
-# Garante que o celular sempre baixe a versão mais nova do App
+# Garante que o celular baixe as atualizações do App rápido
 [[headers]]
   for = "/sw.js"
   [headers.values]
