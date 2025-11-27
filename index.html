@@ -3,58 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <meta name="theme-color" content="#1B263B">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    
     <title>FC Perfumaria</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
+        /* --- ESTILO VISUAL --- */
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 120px; }
         
-        /* HEADER */
         header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); }
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* BOTÃO INSTALAR (Android) */
-        #install-app-btn { 
-            display: none; 
-            width: 100%; 
-            background-color: var(--primary-color); 
-            color: #fff; 
-            font-weight: bold; 
-            text-align: center; 
-            padding: 15px; 
-            border: none; 
-            cursor: pointer; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        /* Botão PWA */
+        #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* BANNER IOS (iPhone) */
-        #ios-install-banner {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.98);
-            border-top: 1px solid #ccc;
-            padding: 20px 15px;
-            text-align: center;
-            z-index: 3000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            color: #333;
-            font-size: 0.9em;
-        }
-        #ios-install-banner i { color: #007AFF; font-size: 1.2em; margin: 0 5px; }
+        /* Banner iOS */
+        #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; color: #333; font-size: 0.9em; }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
 
         #search-container { position: relative; margin: 20px auto; max-width: 600px; padding: 0 15px; }
@@ -89,9 +57,8 @@
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
-        .push-modal-content { background: #fff; width: 85%; max-width: 350px; padding: 30px; border-radius: 8px; text-align: center; }
-        .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        /* STATUS TEXT (Importante para sabermos onde trava) */
+        #status-text { font-size: 0.85em; color: #666; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -123,7 +90,11 @@
 
         <h2 id="collection-title" class="section-title">Loja Oficial</h2>
         
-        <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando...</div>
+        <div id="loading-message" style="text-align:center; padding:30px;">
+            <i class="fas fa-spinner fa-spin" style="font-size:30px; color:var(--accent-color);"></i>
+            <div id="status-text">Iniciando sistema...</div>
+        </div>
+        
         <div id="products-grid"></div>
         <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
     </main>
@@ -133,17 +104,7 @@
     
     <div id="ios-install-banner">
         <span id="close-ios-banner">&times;</span>
-        <p>Para instalar o App, toque em <strong>Compartilhar</strong> <i class="fas fa-share-square" style="color:#007AFF;"></i> e depois em <strong>Adicionar à Tela de Início</strong> <i class="far fa-plus-square"></i>.</p>
-    </div>
-
-    <div id="push-permission-modal">
-        <div class="push-modal-content">
-            <i class="fas fa-bell" style="font-size: 40px; color: var(--accent-color); margin-bottom:15px;"></i>
-            <h3 style="margin:0 0 10px 0; color:var(--primary-color);">Novidades</h3>
-            <p style="color:#666; font-size:0.9em;">Ative as notificações para receber ofertas.</p>
-            <button class="push-btn-allow" id="allow-push-btn">ATIVAR</button>
-            <button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" id="deny-push-btn">Agora não</button>
-        </div>
+        <p>Para instalar: Toque em <strong>Compartilhar</strong> <i class="fas fa-share-square" style="color:#007AFF;"></i> e <strong>Adicionar à Tela de Início</strong>.</p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -152,80 +113,85 @@
     <script>
         const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
         firebase.initializeApp(firebaseConfig);
+        
+        // Tenta ativar persistência para Mobile (ajuda na velocidade)
         const db = firebase.firestore();
+        db.enablePersistence().catch(err => console.log("Persistência desativada"));
+
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- Lógica PWA (Instalação) ---
-        let deferredPrompt;
-        const installBtn = document.getElementById('install-app-btn');
-        const iosBanner = document.getElementById('ios-install-banner');
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block';
-        });
-        installBtn.addEventListener('click', () => {
-            installBtn.style.display = 'none';
-            if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
-        });
-
-        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-        const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
-        
-        if (isIos() && !isInStandaloneMode()) {
-            iosBanner.style.display = 'block';
-            document.getElementById('cart-icon').style.bottom = '100px';
-        }
-        document.getElementById('close-ios-banner').addEventListener('click', () => {
-            iosBanner.style.display = 'none';
-            document.getElementById('cart-icon').style.bottom = '20px';
-        });
-
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
-
-        // --- Lógica "NUCLEAR" de Carregamento (A que funcionou) ---
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
+        const statusText = document.getElementById('status-text');
         const headerEl = document.getElementById('main-header');
-        let currentFilter = 'pronta-entrega', currentSecao = 'todos', allProducts = [];
+        
+        let currentFilter = 'pronta-entrega';
+        let currentSecao = 'todos';
+        let allProducts = []; 
 
         async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
 
+        // --- LÓGICA PASSO-A-PASSO ---
         async function fetchAllProducts() {
-            loadingMsg.style.display = 'block'; grid.innerHTML = '';
+            loadingMsg.style.display = 'block';
+            grid.innerHTML = '';
+            
             try {
-                // SEM FILTROS NO BANCO (Evita erros de índice)
-                const snap = await db.collection("products").get();
-                if(snap.empty){ loadingMsg.style.display = 'none'; grid.innerHTML = '<p style="text-align:center; color:#999;">Loja vazia.</p>'; return; }
+                statusText.textContent = "Conectando ao Banco de Dados...";
                 
+                // 1. Busca TUDO (Sem filtros para garantir que baixa)
+                const snap = await db.collection("products").get();
+                
+                if(snap.empty){
+                    statusText.textContent = "Conectado! Mas a loja está vazia.";
+                    return;
+                }
+
+                statusText.textContent = `Baixou ${snap.size} itens. Processando...`;
+
+                // 2. Salva na memória
                 allProducts = [];
-                snap.forEach(d => { 
+                snap.forEach(d => {
                     let data = d.data();
-                    // Prepara dados para busca flexível
+                    // Prepara dados para busca segura (sem maiúsculas/minúsculas)
                     data.searchSource = (data.source || '').toLowerCase().replace(' ', '-');
                     data.searchSecao = (data.secao || '').toLowerCase();
-                    allProducts.push({ id: d.id, ...data }); 
+                    allProducts.push({ id: d.id, ...data });
                 });
+
                 renderProducts();
-            } catch(e) { 
-                console.error(e); loadingMsg.style.color = 'red'; loadingMsg.innerHTML = "Erro de conexão (Tente recarregar)"; 
+                
+            } catch(e) {
+                console.error(e);
+                loadingMsg.style.color = 'red';
+                statusText.innerHTML = "ERRO: " + e.message + "<br>Tente recarregar.";
             }
         }
 
         function renderProducts() {
-            loadingMsg.style.display = 'none'; grid.innerHTML = '';
+            // Oculta loading apenas se tiver produtos para mostrar
+            statusText.textContent = "Filtrando produtos...";
             
             let filtered = allProducts.filter(p => {
                 let filterClean = currentFilter.toLowerCase().replace(' ', '-');
-                // Lógica permissiva (Se não tiver source, mostra em todos)
+                // Filtro super permissivo
                 let matchSource = p.searchSource.includes(filterClean) || p.searchSource === '';
                 let matchSecao = true;
                 if (currentSecao !== 'todos') matchSecao = p.searchSecao === currentSecao;
                 return matchSource && matchSecao;
             });
 
-            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#999;">Nenhum item nesta seção.</p>'; return; }
+            if (filtered.length === 0) {
+                loadingMsg.style.display = 'block'; // Mantém visível para mostrar o aviso
+                statusText.textContent = "Nenhum produto nesta categoria/filtro.";
+                grid.innerHTML = '';
+                return;
+            }
 
-            // Ordena por data (Mais novos primeiro)
+            // Se chegou aqui, TEM PRODUTO
+            loadingMsg.style.display = 'none'; 
+            grid.innerHTML = '';
+
             filtered.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
             filtered.forEach(p => {
@@ -240,14 +206,36 @@
             });
         }
 
-        document.querySelectorAll('.secao-button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.secao-button').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); currentSecao = b.dataset.secao; renderProducts(); }));
-        document.querySelectorAll('.filter-button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); currentFilter = b.dataset.filter; renderProducts(); }));
-        document.getElementById('search-input').addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); const cards = document.querySelectorAll('.product-card'); let hasResult = false; cards.forEach(c => { if(c.querySelector('.product-name').textContent.toLowerCase().includes(term)){c.style.display='flex';hasResult=true;}else{c.style.display='none';} }); document.getElementById('search-no-results').style.display = hasResult?'none':'block'; });
-        function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
-        let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
-        const pushModal = document.getElementById('push-permission-modal'); if(Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 3000); }
-        document.getElementById('allow-push-btn').addEventListener('click', async () => { pushModal.style.display = 'none'; if(messaging){ try { await Notification.requestPermission(); const token = await messaging.getToken({ vapidKey: 'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA' }); if(token) await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()}); } catch(e){} } });
-        document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none'); document.getElementById('notification-bell').addEventListener('click', () => { alert('Nenhuma notificação nova.'); });
+        // Botões
+        document.querySelectorAll('.secao-button').forEach(b => b.addEventListener('click', () => { 
+            document.querySelectorAll('.secao-button').forEach(btn => btn.classList.remove('active')); 
+            b.classList.add('active'); currentSecao = b.dataset.secao; renderProducts(); 
+        }));
+
+        document.querySelectorAll('.filter-button').forEach(b => b.addEventListener('click', () => { 
+            document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active')); 
+            b.classList.add('active'); currentFilter = b.dataset.filter; renderProducts(); 
+        }));
+
+        // Instalação PWA
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-app-btn');
+        const iosBanner = document.getElementById('ios-install-banner');
+        
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; });
+        installBtn.addEventListener('click', () => { installBtn.style.display = 'none'; if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } });
+
+        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        if (isIos() && !('standalone' in window.navigator && window.navigator.standalone)) {
+            iosBanner.style.display = 'block';
+            document.getElementById('cart-icon').style.bottom = '100px';
+        }
+        document.getElementById('close-ios-banner').addEventListener('click', () => {
+            iosBanner.style.display = 'none';
+            document.getElementById('cart-icon').style.bottom = '20px';
+        });
+
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
 
         document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchAllProducts(); });
     </script>
