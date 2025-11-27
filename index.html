@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL BRAZILIAN PREMIUM --- */
+        /* --- ESTILO VISUAL --- */
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 120px; }
         
@@ -24,14 +24,31 @@
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* SINO DE NOTIFICAÇÃO (Fixo no topo direito) */
-        #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        /* SINO DE NOTIFICAÇÃO (BLINDADO) */
+        #notification-bell { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            width: 45px; 
+            height: 45px; 
+            background-color: #fff; 
+            border-radius: 50%; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            z-index: 9999; /* Acima de tudo */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            border: 2px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
         #notification-bell:active { transform: scale(0.9); }
+        #notification-bell svg { width: 24px; height: 24px; fill: var(--primary-color); }
 
         /* BOTÃO INSTALAR ANDROID */
         #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* BANNER INSTALAR IPHONE */
+        /* BANNER IOS */
         #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; color: #333; font-size: 0.9em; }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
 
@@ -68,7 +85,7 @@
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 1000; }
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         
-        /* MODAL PUSH - ESTILO */
+        /* MODAL PUSH */
         #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
         .push-modal-content { background: #fff; width: 85%; max-width: 350px; padding: 30px; border-radius: 8px; text-align: center; }
         .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
@@ -82,7 +99,9 @@
         <div class="header-sub">Essência Brasileira no Japão</div>
     </header>
 
-    <div id="notification-bell"><i class="far fa-bell"></i></div>
+    <div id="notification-bell">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+    </div>
 
     <main>
         <div id="search-container"><input type="text" id="search-input" placeholder="Buscar perfume..."><i class="fas fa-search search-icon"></i></div>
@@ -135,7 +154,7 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- LÓGICA DE INSTALAÇÃO PWA ---
+        // --- PWA (Instalação) ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-app-btn');
         const iosBanner = document.getElementById('ios-install-banner');
@@ -157,7 +176,7 @@
 
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
 
-        // --- LÓGICA DA LOJA (Nuclear/Blindada) ---
+        // --- LOJA (Nuclear) ---
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
         const headerEl = document.getElementById('main-header');
@@ -185,7 +204,7 @@
                 if (currentSecao !== 'todos') matchSecao = p.searchSecao === currentSecao;
                 return matchSource && matchSecao;
             });
-            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#999;">Nenhum item.</p>'; return; }
+            if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#999;">Nenhum item nesta seção.</p>'; return; }
             filtered.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
             filtered.forEach(p => {
                 const pf = (p.price||0).toLocaleString('ja-JP');
@@ -204,14 +223,12 @@
         function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
         let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
-        // --- SISTEMA DE NOTIFICAÇÃO (AGRESSIVO E FUNCIONAL) ---
+        // --- SISTEMA DE NOTIFICAÇÃO (AGRESSIVO) ---
         async function requestPermission() {
-            if (!('Notification' in window)) { alert("Seu navegador não suporta notificações."); return; }
+            if (!('Notification' in window)) { alert("Este navegador não suporta notificações."); return; }
             if (Notification.permission === 'granted') { alert("Suas notificações já estão ativadas! 🔔"); return; }
-            if (Notification.permission === 'denied') { alert("Você bloqueou as notificações. Ative nas configurações do celular."); return; }
-
+            
             try {
-                // Solicita ao sistema
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted' && messaging) {
                     const token = await messaging.getToken({ vapidKey: 'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA' });
@@ -219,18 +236,18 @@
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
                         alert("Sucesso! Você receberá avisos.");
                     }
+                } else {
+                    alert("Para receber avisos, você precisa permitir nas configurações do navegador.");
                 }
             } catch(e) { console.log(e); }
         }
 
-        // 1. Tenta Automático ao abrir (Após 2s)
-        const pushModal = document.getElementById('push-permission-modal');
-        if('Notification' in window && Notification.permission === 'default') {
-            setTimeout(() => { pushModal.style.display = 'flex'; }, 2000);
-        }
-
-        // 2. Vínculos de Clique (Sino e Botão)
+        // Clique no Sino
         document.getElementById('notification-bell').addEventListener('click', requestPermission);
+        
+        // Tenta Automático
+        const pushModal = document.getElementById('push-permission-modal');
+        if(Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 2000); }
         
         document.getElementById('allow-push-btn').addEventListener('click', () => { 
             pushModal.style.display = 'none'; 
