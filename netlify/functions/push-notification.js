@@ -21,31 +21,31 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Ícone Oficial (O mesmo do App)
-    const iconUrl = 'https://i.imgur.com/BIXdM6M.png';
+    const title = data.title || "FC Perfumaria";
+    const body = data.body || "Nova oferta disponível!";
+    const icon = 'https://i.imgur.com/BIXdM6M.png';
+    const link = 'https://fcperfumaria.netlify.app';
 
     const message = {
-      // Dados visíveis básicos
+      // 1. Para iOS (Mostra automático)
       notification: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+        title: title,
+        body: body,
       },
-      // Configuração ESPECIAL para Web App (Chrome Android/PWA)
+      // 2. Para Android (Força o despertar)
+      data: {
+        title: title,
+        body: body,
+        icon: icon,
+        url: link,
+        force_display: "true" // Gatilho para nosso código
+      },
+      android: {
+        priority: 'high',
+      },
       webpush: {
-        headers: {
-          "Urgency": "high", // OBRIGA a acordar
-          "TTL": "4500"
-        },
-        notification: {
-          icon: iconUrl,
-          badge: iconUrl,
-          requireInteraction: true, // A mensagem fica na tela até clicar (Não some sozinha)
-          vibrate: [500, 200, 500], // Vibração Longa
-          click_action: 'https://fcperfumaria.netlify.app'
-        },
-        fcm_options: {
-          link: 'https://fcperfumaria.netlify.app'
-        }
+        headers: { Urgency: "high" },
+        fcm_options: { link: link }
       },
       tokens: tokens
     };
