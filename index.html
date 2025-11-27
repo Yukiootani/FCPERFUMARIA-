@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta name="theme-color" content="#1B263B">
     <link rel="manifest" href="manifest.json">
     <title>FC Perfumaria</title>
@@ -12,107 +11,78 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CSS BLINDADO (TRAVAMENTO DE TELA) --- */
-        * {
-            box-sizing: border-box; /* Garante que bordas não aumentem a largura */
-            -webkit-tap-highlight-color: transparent;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden; /* PROIBIDO ROLAR PARA O LADO */
-            position: relative;
-            font-family: 'Montserrat', sans-serif;
-            background-color: #FDFBF7; /* Cor de fundo */
-            color: #333;
-        }
-
-        body {
-            padding-bottom: 120px;
-            -webkit-font-smoothing: antialiased; /* Texto nítido no iPhone */
-        }
-        
+        /* --- CSS BLINDADO (Layout Travado) --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
+        body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
         :root { --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         
         /* HEADER */
-        header { 
-            background-color: #fff; 
-            color: var(--primary-color); 
-            padding: 1.5rem 1rem; 
-            text-align: center; 
-            border-bottom: 3px solid var(--accent-color); 
-            width: 100%;
-        }
-        .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
-        .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
+        header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); padding-top: max(1.5rem, env(safe-area-inset-top)); }
+        .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
+        .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
 
         /* SINO */
         #notification-bell { 
-            position: fixed; top: 20px; right: 20px; width: 45px; height: 45px; 
-            background-color: #fff; border-radius: 50%; z-index: 9999; 
+            position: fixed; top: max(15px, env(safe-area-inset-top)); right: 15px; 
+            width: 42px; height: 42px; background-color: #fff; border-radius: 50%; z-index: 9990; 
             display: flex; align-items: center; justify-content: center; cursor: pointer; 
             border: 2px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.15); 
         }
-        #notification-bell svg { width: 22px; height: 22px; fill: var(--primary-color); }
+        #notification-bell svg { width: 20px; height: 20px; fill: var(--primary-color); }
 
-        /* BOTÕES E BANNERS */
-        #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
-        #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); box-sizing: border-box; color: #333; font-size: 0.9em; }
+        /* MODAL DE MENSAGENS (INBOX) - NOVO */
+        #inbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 80px; backdrop-filter: blur(3px); }
+        .inbox-content { background: #fff; width: 90%; max-width: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .inbox-header { background: var(--primary-color); color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-family: 'Playfair Display', serif; letter-spacing: 1px; }
+        .close-inbox { font-size: 24px; cursor: pointer; line-height: 1; }
+        #inbox-list { list-style: none; max-height: 60vh; overflow-y: auto; padding: 0; }
+        .inbox-item { padding: 15px; border-bottom: 1px solid #eee; transition: background 0.2s; }
+        .inbox-item:last-child { border-bottom: none; }
+        .inbox-item h4 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1em; font-weight: 700; }
+        .inbox-item p { margin: 0; color: #666; font-size: 0.9em; line-height: 1.4; }
+        .inbox-date { font-size: 0.75em; color: #999; margin-top: 8px; text-align: right; display: block; }
+        .inbox-empty { padding: 30px; text-align: center; color: #999; font-style: italic; }
+
+        /* ELEMENTOS DO SITE */
+        #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; padding-top: max(15px, env(safe-area-inset-top)); }
+        #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; padding-bottom: max(20px, env(safe-area-inset-bottom)); text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); font-size: 0.9em; color: #333; }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
 
-        /* MAIN CONTENT */
-        main { 
-            width: 100%; 
-            max-width: 600px; /* Limita largura em telas grandes */
-            margin: 0 auto; 
-            padding: 0 15px; 
-            overflow: hidden; /* Garante que nada vaze */
-        }
-
+        main { width: 100%; max-width: 600px; margin: 0 auto; padding: 0 15px; overflow: hidden; }
         #search-container { position: relative; margin: 20px auto; width: 100%; }
-        #search-input { width: 100%; padding: 15px 45px 15px 20px; border: 1px solid #ddd; border-radius: 30px; font-size: 1em; outline: none; }
-        .search-icon { position: absolute; right: 35px; top: 50%; transform: translateY(-50%); color: var(--accent-color); }
+        #search-input { width: 100%; padding: 12px 40px 12px 20px; border: 1px solid #ddd; border-radius: 30px; font-size: 1em; outline: none; background: #fff; }
+        .search-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--accent-color); }
         
         #secao-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 20px 0; width: 100%; }
-        .secao-button { background-color: #fff; color: var(--text-color); padding: 10px 15px; border-radius: 25px; border: 1px solid #ddd; font-size: 0.85em; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .secao-button { background-color: #fff; color: var(--text-color); padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; font-size: 0.85em; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
         .secao-button.active { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600; }
 
-        #controls { display: flex; justify-content: center; margin-bottom: 20px; width: 100%; gap: 10px; }
-        .filter-button { background-color: transparent; color: var(--text-color); padding: 8px 12px; border: 1px solid var(--accent-color); border-radius: 4px; font-size: 0.8em; cursor: pointer; }
+        #controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; }
+        .filter-button { background-color: transparent; color: var(--text-color); padding: 8px 12px; border: 1px solid var(--accent-color); border-radius: 4px; font-size: 0.8em; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
         .filter-button.active { background-color: var(--accent-color); color: #fff; }
 
-        .section-title { font-family: 'Playfair Display', serif; font-size: 1.8em; color: var(--primary-color); text-align: center; margin: 30px 0; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 1.6em; color: var(--primary-color); text-align: center; margin: 20px 0; }
 
-        /* GRID PRODUTOS */
-        #products-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; /* 2 Colunas estritas */
-            gap: 15px; 
-            width: 100%;
-        }
-        
+        #products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 20px; }
         .product-card { background-color: #fff; border-radius: 8px; border: 1px solid #eee; overflow: hidden; text-decoration: none; color: var(--text-color); display: flex; flex-direction: column; position: relative; width: 100%; }
         .product-image-container { width: 100%; padding-top: 120%; position: relative; background-color: #f9f9f9; }
         .product-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .product-info { padding: 10px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
         .product-name { font-family: 'Playfair Display', serif; font-size: 1em; margin: 0 0 5px 0; color: var(--primary-color); line-height: 1.2; }
-        .product-price { font-weight: 700; margin-bottom: 10px; font-size: 0.95em; }
-        .details-button { background-color: var(--primary-color); color: #fff; padding: 10px; width: 100%; border-radius: 4px; border: none; font-weight: 600; font-size: 0.8em; }
-        
-        .badge { position: absolute; top: 10px; left: 10px; padding: 5px 10px; border-radius: 2px; font-size: 0.75em; font-weight: bold; color: white; z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
+        .product-price { font-weight: 700; margin-bottom: 8px; font-size: 0.95em; }
+        .details-button { background-color: var(--primary-color); color: #fff; padding: 8px; width: 100%; border-radius: 4px; border: none; font-weight: 600; font-size: 0.8em; }
+        .badge { position: absolute; top: 5px; left: 5px; padding: 4px 8px; border-radius: 2px; font-size: 0.65em; font-weight: bold; color: white; z-index: 10; text-transform: uppercase; }
         .badge-novo { background-color: var(--accent-color); }
-        .badge-esgotado { background-color: #666; right: 10px; left: auto; }
+        .badge-esgotado { background-color: #666; right: 5px; left: auto; }
 
-        footer { text-align: center; padding: 30px; margin-top: 40px; color: #666; border-top: 1px solid #eee; }
-        #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 1000; }
-        #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
+        footer { text-align: center; padding: 30px; margin-top: 20px; color: #666; border-top: 1px solid #eee; font-size: 0.8em; }
+        #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
+        #cart-count { position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         
-        /* MODAL PUSH */
-        #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
-        .push-modal-content { background: #fff; width: 85%; max-width: 350px; padding: 30px; border-radius: 8px; text-align: center; }
+        #push-permission-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
+        .push-modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px; border-radius: 8px; text-align: center; }
         .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
@@ -124,8 +94,20 @@
         <div class="header-sub">Essência Brasileira no Japão</div>
     </header>
 
-    <div id="notification-bell">
+    <div id="notification-bell" onclick="handleBellClick()">
         <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
+    </div>
+
+    <div id="inbox-modal">
+        <div class="inbox-content">
+            <div class="inbox-header">
+                <span>Novidades</span>
+                <span class="close-inbox" onclick="document.getElementById('inbox-modal').style.display='none'">&times;</span>
+            </div>
+            <ul id="inbox-list">
+                <li class="inbox-empty">Carregando...</li>
+            </ul>
+        </div>
     </div>
 
     <main>
@@ -149,7 +131,7 @@
         
         <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando catálogo...</div>
         <div id="products-grid"></div>
-        <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
+        <p id="search-no-results" style="display:none; text-align:center; color:#999; padding:20px;">Nenhum produto encontrado.</p>
     </main>
 
     <footer><p>© 2025 FC Perfumaria</p></footer>
@@ -179,6 +161,7 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
+        // --- PWA ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-app-btn');
         const iosBanner = document.getElementById('ios-install-banner');
@@ -189,6 +172,7 @@
         document.getElementById('close-ios-banner').addEventListener('click', () => { iosBanner.style.display = 'none'; document.getElementById('cart-icon').style.bottom = '20px'; });
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
 
+        // --- LOJA ---
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
         const headerEl = document.getElementById('main-header');
@@ -211,8 +195,7 @@
             loadingMsg.style.display = 'none'; grid.innerHTML = '';
             let filtered = allProducts.filter(p => {
                 let matchSource = p.searchSource.includes(currentFilter.toLowerCase().replace(' ', '-')) || p.searchSource === '';
-                let matchSecao = true;
-                if (currentSecao !== 'todos') matchSecao = p.searchSecao === currentSecao;
+                let matchSecao = currentSecao === 'todos' || p.searchSecao === currentSecao;
                 return matchSource && matchSecao;
             });
             if (filtered.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#999; grid-column:1/-1; padding:20px;">Nenhum item aqui.</p>'; return; }
@@ -233,25 +216,62 @@
         function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
         let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
+        // --- SISTEMA DE SINO INTELIGENTE (PERMISSÃO OU INBOX) ---
+        async function handleBellClick() {
+            // Verifica se já tem permissão
+            if (Notification.permission === 'granted') {
+                openInbox(); // Já aceitou? Abre o Inbox!
+            } else {
+                requestPermission(); // Não aceitou? Pede permissão!
+            }
+        }
+
         async function requestPermission() {
-            if (!('Notification' in window)) { alert("Sem suporte a notificações."); return; }
-            if (Notification.permission === 'granted') { alert("Tudo pronto! Avisos já ativados. 🔔"); return; }
+            if (!('Notification' in window)) { alert("Sem suporte."); return; }
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted' && messaging) {
                     const token = await messaging.getToken({ vapidKey: 'BOdgxsn6TEz_y5Ub-xPuqvTHa6NkNzfhk6GlA7-UCoKMyIwBIffbOo2NQjPy27H_G5Qj0x4XgOF1gXyAvkS7_V8' });
                     if(token) {
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-                        alert("Sucesso! Avisos ativados.");
+                        alert("Sucesso! Avisos ativados. Clique no sino para ver as mensagens.");
                     }
+                } else {
+                    alert("Para receber avisos, ative nas configurações.");
                 }
             } catch(e) { console.log(e); }
         }
-        document.getElementById('notification-bell').addEventListener('click', requestPermission);
+
+        async function openInbox() {
+            const modal = document.getElementById('inbox-modal');
+            const list = document.getElementById('inbox-list');
+            modal.style.display = 'flex';
+            list.innerHTML = '<li class="inbox-empty">Buscando mensagens...</li>';
+
+            try {
+                const snap = await db.collection('site_messages').orderBy('createdAt', 'desc').limit(10).get();
+                list.innerHTML = '';
+                if (snap.empty) {
+                    list.innerHTML = '<li class="inbox-empty">Nenhuma mensagem recente.</li>';
+                    return;
+                }
+                snap.forEach(doc => {
+                    const m = doc.data();
+                    const date = m.createdAt ? m.createdAt.toDate().toLocaleDateString('pt-BR') : '';
+                    const li = document.createElement('li');
+                    li.className = 'inbox-item';
+                    li.innerHTML = `<h4>${m.title}</h4><p>${m.body}</p><span class="inbox-date">${date}</span>`;
+                    list.appendChild(li);
+                });
+            } catch (e) {
+                list.innerHTML = '<li class="inbox-empty">Erro ao carregar.</li>';
+            }
+        }
+
         const pushModal = document.getElementById('push-permission-modal');
-        if('Notification' in window && Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 2000); }
+        if('Notification' in window && Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 3000); }
         document.getElementById('allow-push-btn').addEventListener('click', () => { pushModal.style.display = 'none'; requestPermission(); });
-        document.getElementById('deny-push-btn').addEventListener('click', () => { pushModal.style.display = 'none'; });
+        document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none');
 
         document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchAllProducts(); });
     </script>
