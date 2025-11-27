@@ -1,14 +1,27 @@
-self.addEventListener('install', (e) => {
-    console.log('[FC Perfumaria] Service Worker Instalado');
-    self.skipWaiting();
+const CACHE_NAME = 'fc-perfumaria-v1';
+
+self.addEventListener('install', (event) => {
+  // Força o SW a ativar imediatamente
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-    console.log('[FC Perfumaria] Service Worker Ativo');
-    return self.clients.claim();
+self.addEventListener('activate', (event) => {
+  // Limpa caches antigos se houver
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+  return self.clients.claim();
 });
 
-self.addEventListener('fetch', (e) => {
-    // Estratégia simples: Apenas busca na rede (Network Only) para garantir dados frescos de estoque
-    e.respondWith(fetch(e.request));
+self.addEventListener('fetch', (event) => {
+  // Busca sempre na rede para garantir estoque atualizado
+  event.respondWith(fetch(event.request));
 });
