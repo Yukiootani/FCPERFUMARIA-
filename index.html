@@ -24,7 +24,7 @@
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* SINO DE NOTIFICAÇÃO (BLINDADO) */
+        /* SINO DE NOTIFICAÇÃO (SVG para garantir que aparece) */
         #notification-bell { 
             position: fixed; 
             top: 20px; 
@@ -34,7 +34,7 @@
             background-color: #fff; 
             border-radius: 50%; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-            z-index: 9999; /* Acima de tudo */
+            z-index: 9999; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -223,31 +223,32 @@
         function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
         let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
-        // --- SISTEMA DE NOTIFICAÇÃO (AGRESSIVO) ---
+        // --- NOTIFICAÇÕES COM SUA CHAVE NOVA ---
         async function requestPermission() {
-            if (!('Notification' in window)) { alert("Este navegador não suporta notificações."); return; }
+            if (!('Notification' in window)) { alert("Seu navegador não suporta notificações."); return; }
             if (Notification.permission === 'granted') { alert("Suas notificações já estão ativadas! 🔔"); return; }
-            
+            if (Notification.permission === 'denied') { alert("Você bloqueou as notificações. Ative nas configurações do celular."); return; }
+
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted' && messaging) {
-                    const token = await messaging.getToken({ vapidKey: 'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA' });
+                    // AQUI ESTÁ A CHAVE NOVA QUE VOCÊ ME DEU:
+                    const token = await messaging.getToken({ vapidKey: 'BOdgxsn6TEz_y5Ub-xPuqvTHa6NkNzfhk6GlA7-UCoKMyIwBIffbOo2NQjPy27H_G5Qj0x4XgOF1gXyAvkS7_V8' });
                     if(token) {
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
                         alert("Sucesso! Você receberá avisos.");
                     }
-                } else {
-                    alert("Para receber avisos, você precisa permitir nas configurações do navegador.");
                 }
             } catch(e) { console.log(e); }
         }
 
-        // Clique no Sino
+        // Eventos
         document.getElementById('notification-bell').addEventListener('click', requestPermission);
         
-        // Tenta Automático
         const pushModal = document.getElementById('push-permission-modal');
-        if(Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 2000); }
+        if('Notification' in window && Notification.permission === 'default') {
+            setTimeout(() => { pushModal.style.display = 'flex'; }, 2000);
+        }
         
         document.getElementById('allow-push-btn').addEventListener('click', () => { 
             pushModal.style.display = 'none'; 
