@@ -13,29 +13,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// MODO BACKGROUND (Tela Bloqueada)
+// O Segredo: Lidar com a mensagem em background manualmente
 messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Background Push:', payload);
+  console.log('[FC Perfumaria] Push Recebido:', payload);
 
-  const notificationTitle = payload.notification.title;
+  // Tenta pegar do DATA (Android) ou do Notification (padrão)
+  const notificationTitle = payload.data.title || payload.notification.title;
+  const notificationBody = payload.data.body || payload.notification.body;
+  const notificationIcon = payload.data.icon || 'https://i.imgur.com/BIXdM6M.png';
+  const targetUrl = payload.data.url || '/';
+
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: 'https://i.imgur.com/BIXdM6M.png', // Ícone Oficial
-    badge: 'https://i.imgur.com/BIXdM6M.png',
-    vibrate: [500, 200, 500],
-    requireInteraction: true, // Fica na tela
+    body: notificationBody,
+    icon: notificationIcon,
+    // Removi 'badge' pois causa erro se não for monocromático no Android
+    vibrate: [200, 100, 200],
+    tag: 'fc-promo-' + Date.now(), // Garante que não substitua a anterior
+    renotify: true,
     data: {
-        url: 'https://fcperfumaria.netlify.app'
+        url: targetUrl
     }
   };
 
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// CLIQUE (Abre o site)
+// Clique na notificação
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
-    clients.openWindow('https://fcperfumaria.netlify.app')
+    clients.openWindow(event.notification.data.url)
   );
 });
