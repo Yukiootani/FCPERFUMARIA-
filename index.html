@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta name="theme-color" content="#1B263B"> <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1B263B">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     
@@ -13,75 +13,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --bg-color: #FDFBF7; /* Off-White */
-            --primary-color: #1B263B; /* Azul Marinho */
-            --accent-color: #Cca43b; /* Bronze */
-            --text-color: #333333; 
-            --light-text: #666; 
-            --border-color: #e0e0e0; 
-            --whatsapp-green: #25D366; 
-        }
-        
+        :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
         
-        /* HEADER - LIMPO */
         header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); position: relative; }
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); line-height: 1.2; }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
         .header-img { max-height: 70px; display: block; margin: 0 auto 8px auto; }
 
-        /* NOTIFICAÇÃO E CARRINHO */
         #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
         main { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
 
-        /* BUSCA */
         #search-container { position: relative; margin-bottom: 25px; max-width: 600px; margin-left: auto; margin-right: auto; }
         #search-input { width: 100%; padding: 15px 45px 15px 20px; border: 1px solid #ddd; border-radius: 30px; font-size: 1em; outline: none; transition: 0.3s; background: #fff; font-family: 'Montserrat', sans-serif; }
         #search-input:focus { border-color: var(--accent-color); box-shadow: 0 0 8px rgba(204, 164, 59, 0.2); }
         .search-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--accent-color); }
         
-        /* FILTROS DE CATEGORIA */
         #secao-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
         .secao-button { background-color: #fff; color: var(--text-color); padding: 10px 18px; border-radius: 25px; border: 1px solid #ddd; font-size: 0.9em; font-weight: 500; cursor: pointer; transition: all 0.3s; font-family: 'Montserrat', sans-serif; }
         .secao-button.active { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600; box-shadow: 0 4px 10px rgba(27, 38, 59, 0.3); }
 
-        /* FILTRO PRONTA ENTREGA */
         #controls { display: flex; justify-content: center; margin-bottom: 20px; }
         .filter-button { background-color: transparent; color: var(--text-color); padding: 8px 15px; border: 1px solid var(--accent-color); border-radius: 4px; font-size: 0.85em; cursor: pointer; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .filter-button.active { background-color: var(--accent-color); color: #fff; }
 
         .section-title { font-family: 'Playfair Display', serif; font-size: 1.8em; color: var(--primary-color); margin: 30px 0 20px 0; text-align: center; }
 
-        /* GRADE DE PRODUTOS */
         #products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        
         .product-card { background-color: #fff; border-radius: 8px; border: 1px solid #eee; overflow: hidden; text-decoration: none; color: var(--text-color); transition: transform 0.3s; position: relative; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
-        
         .product-image-container { width: 100%; padding-top: 120%; position: relative; background-color: #f9f9f9; overflow: hidden; }
         .product-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-        
         .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
         .product-name { font-family: 'Playfair Display', serif; font-size: 1.1em; margin: 0 0 5px 0; color: var(--primary-color); line-height: 1.2; }
         .product-category { font-size: 0.75em; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .product-price { font-size: 1.1em; font-weight: 700; color: var(--text-color); margin-bottom: 12px; }
-        
         .details-button { background-color: var(--primary-color); color: #fff; padding: 12px 0; width: 100%; border-radius: 4px; font-weight: 600; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; border: none; cursor: pointer; transition: 0.3s; margin-top: auto; }
         
-        /* BADGES */
         .badge { position: absolute; top: 10px; left: 10px; padding: 5px 10px; border-radius: 2px; font-size: 0.75em; font-weight: bold; color: white; z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
         .badge-novo { background-color: var(--accent-color); }
         .badge-destaque { background-color: var(--primary-color); }
         .badge-esgotado { background-color: #666; right: 10px; left: auto; }
 
         footer { text-align: center; padding: 30px; margin-top: 40px; color: var(--light-text); font-size: 0.85em; background: #fff; border-top: 1px solid #eee; }
-        
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); cursor: pointer; z-index: 1000; text-decoration: none; transition: transform 0.2s; }
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; display: none; }
-
-        /* MODAIS */
+        
         #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
         .push-modal-content { background: #fff; width: 85%; max-width: 350px; padding: 30px; border-radius: 8px; text-align: center; }
         .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
@@ -150,7 +127,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
     
     <script>
-        // CONFIGURAÇÃO FC PERFUMARIA
         const firebaseConfig = {
             apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs",
             authDomain: "fc-perfumaria-309fb.firebaseapp.com",
@@ -170,7 +146,6 @@
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos';
 
-        // Carregar Configurações (Logo)
         async function fetchSiteConfig(){
             try{
                 const d = await db.collection("configuracoes").doc("siteInfo").get();
@@ -180,15 +155,22 @@
             } catch(e){}
         }
 
-        // Buscar Produtos (Modo Produção - Limpo)
         async function fetchProducts() {
             loadingMsg.style.display = 'block';
             loadingMsg.textContent = 'Carregando essências...';
+            loadingMsg.style.color = 'var(--accent-color)';
             grid.innerHTML = '';
             
             try {
                 let q = db.collection("products");
-                if(currentSecao !== 'todos') q = q.where("secao", "==", currentSecao);
+                
+                // --- LÓGICA CRÍTICA PARA NÃO TRAVAR ---
+                if(currentSecao !== 'todos') {
+                    // Se escolheu categoria, usa o Índice Mestre (Secao + Source + CreatedAt)
+                    q = q.where("secao", "==", currentSecao);
+                }
+                
+                // Em todos os casos, filtra por disponibilidade e data
                 q = q.where("source", "==", currentFilter).orderBy("createdAt", "desc");
                 
                 const snap = await q.get();
@@ -233,13 +215,20 @@
                 
             } catch(e) {
                 console.error(e);
+                // AQUI ESTÁ A PROTEÇÃO: SE DER ERRO, ELE MOSTRA O LINK
+                loadingMsg.style.display = 'block';
                 loadingMsg.style.color = 'red';
-                // Caso extremo de erro
-                loadingMsg.innerHTML = `Erro de conexão. Tente atualizar a página.`;
+                loadingMsg.innerHTML = `
+                    <div style="background:#fff0f0; padding:20px; border:1px solid red; border-radius:5px; margin-top:20px;">
+                    <strong>⚠️ AÇÃO NECESSÁRIA</strong><br><br>
+                    O site precisa de um ajuste simples no Banco de Dados para a página "Todos" funcionar.<br><br>
+                    <small>Erro: ${e.message}</small><br><br>
+                    ${e.message.includes('https://') ? `<a href="${e.message.match(/https:\/\/[^\s]+/)[0]}" target="_blank" style="background:#007bff; color:white; padding:12px; border-radius:5px; text-decoration:none; display:block; text-align:center; font-weight:bold;">CLIQUE AQUI PARA RESOLVER AGORA</a>` : ''}
+                    </div>
+                `;
             }
         }
 
-        // Filtros
         document.querySelectorAll('.secao-button').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.secao-button').forEach(b => b.classList.remove('active'));
@@ -260,7 +249,6 @@
             });
         });
 
-        // Busca
         document.getElementById('search-input').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const cards = document.querySelectorAll('.product-card');
@@ -273,7 +261,6 @@
             document.getElementById('search-no-results').style.display = hasResult ? 'none' : 'block';
         });
 
-        // Carrinho Icone
         function updateCartIcon(){
             const c = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}};
             let q = 0; Object.values(c.items).forEach(i => q += i.quantity);
@@ -282,7 +269,6 @@
             else badge.style.display = 'none';
         }
 
-        // Push Notification
         const pushModal = document.getElementById('push-permission-modal');
         if(Notification.permission === 'default') {
             setTimeout(() => { pushModal.style.display = 'flex'; }, 3000);
@@ -300,7 +286,6 @@
         document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none');
         document.getElementById('notification-bell').addEventListener('click', () => { alert('Nenhuma notificação nova.'); });
 
-        // Navegação Secreta para Admin
         let tapCount = 0;
         headerEl.addEventListener('click', () => {
             tapCount++;
