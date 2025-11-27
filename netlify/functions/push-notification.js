@@ -15,34 +15,35 @@ exports.handler = async function(event, context) {
   try {
     const data = JSON.parse(event.body);
     const db = admin.firestore();
-    
-    // 1. Pega os tokens
     const snapshot = await db.collection('push_tokens').get();
+    
     if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
+
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // 2. O LINK DEVE SER O DA SUA LOJA ATUAL
-    const lojaLink = 'https://fcperfumaria.netlify.app'; 
-    const iconUrl = 'https://i.imgur.com/BIXdM6M.png'; // Ícone universal
-
-    // 3. ESTRUTURA CLÁSSICA (Igual ao 3 Marias)
-    // Removemos o bloco 'android' e focamos no 'webpush' que funciona no Chrome Android
+    // Configuração Híbrida (iOS + Android Lock Screen)
     const message = {
+      // 1. Para iOS (Apple lê isso e exibe)
       notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+        body: data.body || "Nova oferta disponível!"
       },
+      // 2. Para Android/Chrome (Configuração Completa de WebPush)
       webpush: {
         headers: {
-          "Urgency": "high"
+          "Urgency": "high", // Obriga o servidor a entregar rápido
+          "TTL": "4500"
         },
         notification: {
-          icon: iconUrl,
-          requireInteraction: true, // Obriga o usuário a interagir
-          click_action: lojaLink
+          icon: 'https://i.imgur.com/BIXdM6M.png',
+          badge: 'https://i.imgur.com/BIXdM6M.png', // Ícone pequeno na barra
+          vibrate: [500, 200, 500], // VIBRAÇÃO FORTE (Meio segundo, pausa, meio segundo)
+          requireInteraction: true, // Fica na tela até o usuário tocar (Acorda a tela)
+          click_action: 'https://fcperfumaria.netlify.app',
+          tag: 'fc-notification-' + Date.now() // Evita agrupar e esconder
         },
         fcm_options: {
-          link: lojaLink
+          link: 'https://fcperfumaria.netlify.app'
         }
       },
       tokens: tokens
