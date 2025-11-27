@@ -3,197 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1B263B">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
-    <title>FC Perfumaria</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+    <title>Diagnóstico FC Perfumaria</title>
     <style>
-        :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
-        body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
-        
-        header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); }
-        .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
-        .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
-        .header-img { max-height: 70px; display: block; margin: 0 auto 8px auto; }
-
-        #search-container { position: relative; margin: 20px auto; max-width: 600px; padding: 0 15px; }
-        #search-input { width: 100%; padding: 15px 45px 15px 20px; border: 1px solid #ddd; border-radius: 30px; font-size: 1em; outline: none; }
-        .search-icon { position: absolute; right: 35px; top: 50%; transform: translateY(-50%); color: var(--accent-color); }
-        
-        #secao-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; padding: 0 10px; }
-        .secao-button { background-color: #fff; color: var(--text-color); padding: 10px 18px; border-radius: 25px; border: 1px solid #ddd; font-size: 0.9em; font-weight: 500; cursor: pointer; transition: all 0.3s; }
-        .secao-button.active { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600; }
-
-        #controls { display: flex; justify-content: center; margin-bottom: 20px; }
-        .filter-button { background-color: transparent; color: var(--text-color); padding: 8px 15px; border: 1px solid var(--accent-color); border-radius: 4px; font-size: 0.85em; cursor: pointer; margin: 0 5px; }
-        .filter-button.active { background-color: var(--accent-color); color: #fff; }
-
-        .section-title { font-family: 'Playfair Display', serif; font-size: 1.8em; color: var(--primary-color); text-align: center; margin: 30px 0; }
-
-        #products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 15px; max-width: 1200px; margin: 0 auto; }
-        .product-card { background-color: #fff; border-radius: 8px; border: 1px solid #eee; overflow: hidden; text-decoration: none; color: var(--text-color); display: flex; flex-direction: column; }
-        .product-image-container { width: 100%; padding-top: 120%; position: relative; background-color: #f9f9f9; }
-        .product-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-        .product-name { font-family: 'Playfair Display', serif; font-size: 1.1em; margin: 0 0 5px 0; color: var(--primary-color); }
-        .product-price { font-weight: 700; margin-bottom: 10px; }
-        .details-button { background-color: var(--primary-color); color: #fff; padding: 10px; width: 100%; border-radius: 4px; border: none; font-weight: 600; }
-        
-        .badge { position: absolute; top: 10px; left: 10px; padding: 5px 10px; border-radius: 2px; font-size: 0.75em; font-weight: bold; color: white; z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
-        .badge-novo { background-color: var(--accent-color); }
-        .badge-esgotado { background-color: #666; right: 10px; left: auto; }
-
-        footer { text-align: center; padding: 30px; margin-top: 40px; border-top: 1px solid #eee; color: #666; }
-        #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 1000; }
-        #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
-        
-        #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
-        .push-modal-content { background: #fff; width: 85%; max-width: 350px; padding: 30px; border-radius: 8px; text-align: center; }
-        .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        
-        #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        body { font-family: sans-serif; padding: 20px; background: #fff; color: #333; }
+        h2 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .box { padding: 15px; border: 1px solid #ccc; margin-bottom: 15px; border-radius: 5px; background: #f9f9f9; }
+        .log { font-family: monospace; font-size: 13px; margin-bottom: 5px; }
+        .error { color: red; font-weight: bold; background: #ffe6e6; padding: 10px; border: 1px solid red; }
+        .success { color: green; font-weight: bold; background: #e6ffe6; padding: 10px; border: 1px solid green; }
+        button { padding: 15px; font-size: 16px; width: 100%; background: #333; color: white; border: none; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <header id="main-header">
-        <h1 class="header-logo-text">FC PERFUMARIA</h1>
-        <div class="header-sub">Essência Brasileira no Japão</div>
-    </header>
+    <h2>🕵️ Modo Diagnóstico</h2>
+    <p>Testando conexão com o Firebase...</p>
 
-    <div id="notification-bell"><i class="far fa-bell"></i></div>
-
-    <main>
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Buscar perfume...">
-            <i class="fas fa-search search-icon"></i>
-        </div>
-
-        <div id="secao-filters">
-            <button class="secao-button active" data-secao="todos">Todos</button>
-            <button class="secao-button" data-secao="feminino">Feminino</button>
-            <button class="secao-button" data-secao="masculino">Masculino</button>
-            <button class="secao-button" data-secao="unissex">Unissex</button>
-            <button class="secao-button" data-secao="infantil">Infantil</button>
-            <button class="secao-button" data-secao="kits">Kits</button>
-        </div>
-
-        <div id="controls">
-            <button class="filter-button active" data-filter="pronta-entrega">Pronta Entrega</button>
-            <button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button>
-        </div>
-
-        <h2 id="collection-title" class="section-title">Coleção Oficial</h2>
-        <div style="text-align: center; color: #999; font-size: 0.9em; margin-bottom: 20px;" id="filter-details">Envio imediato para todo o Japão.</div>
-
-        <div id="products-grid"></div>
-        <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando essências...</div>
-        <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
-    </main>
-
-    <footer><p>© 2025 FC Perfumaria</p></footer>
-    <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
-    
-    <div id="push-permission-modal">
-        <div class="push-modal-content">
-            <i class="fas fa-bell" style="font-size: 40px; color: var(--accent-color); margin-bottom:15px;"></i>
-            <h3 style="margin:0 0 10px 0; color:var(--primary-color);">Novidades</h3>
-            <p style="color:#666; font-size:0.9em;">Ative as notificações para receber ofertas.</p>
-            <button class="push-btn-allow" id="allow-push-btn">ATIVAR</button>
-            <button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" id="deny-push-btn">Agora não</button>
-        </div>
-    </div>
+    <div id="status-area">Iniciando teste...</div>
+    <div id="results-area"></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", 
+            authDomain: "fc-perfumaria-309fb.firebaseapp.com", 
+            projectId: "fc-perfumaria-309fb", 
+            storageBucket: "fc-perfumaria-309fb.firebasestorage.app", 
+            messagingSenderId: "311935363734", 
+            appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" 
+        };
 
-        const grid = document.getElementById('products-grid');
-        const loadingMsg = document.getElementById('loading-message');
-        const headerEl = document.getElementById('main-header');
-        
-        let currentFilter = 'pronta-entrega';
-        let currentSecao = 'todos';
+        const statusDiv = document.getElementById('status-area');
+        const resDiv = document.getElementById('results-area');
 
-        async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
-
-        async function fetchProducts() {
-            loadingMsg.style.display = 'block';
-            grid.innerHTML = '';
-            
-            try {
-                // ESTRATÉGIA SEGURA:
-                // 1. Busca APENAS filtrando por "Pronta Entrega" ou "Encomenda". (Isso NÃO precisa de índice complexo)
-                // 2. O filtro de categoria (Masculino/Feminino) e a ordenação são feitos NO CELULAR.
-                
-                const snap = await db.collection("products")
-                    .where("source", "==", currentFilter)
-                    .get();
-                
-                if(snap.empty){
-                    loadingMsg.style.display = 'none';
-                    grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#999;">Nenhum item encontrado.</p>';
-                    return;
-                }
-
-                let products = [];
-                snap.forEach(d => {
-                    const data = d.data();
-                    // FILTRO MANUAL DE CATEGORIA
-                    if (currentSecao !== 'todos' && data.secao !== currentSecao) {
-                        return; // Pula este item se não for da seção certa
-                    }
-                    products.push({ id: d.id, ...data });
-                });
-
-                if(products.length === 0){
-                    loadingMsg.style.display = 'none';
-                    grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#999;">Nenhum item nesta categoria.</p>';
-                    return;
-                }
-
-                // ORDENAÇÃO MANUAL POR DATA (Mais novos primeiro)
-                products.sort((a, b) => {
-                    const dateA = a.createdAt ? a.createdAt.seconds : 0;
-                    const dateB = b.createdAt ? b.createdAt.seconds : 0;
-                    return dateB - dateA;
-                });
-
-                products.forEach(p => {
-                    const pf = (p.price||0).toLocaleString('ja-JP');
-                    let badge = '';
-                    if(p.isFeatured === 'novo') badge = '<span class="badge badge-novo">Lançamento</span>';
-                    if((p.estoqueTotal||0) <= 0 && p.source === 'pronta-entrega') badge = '<span class="badge" style="background:#666; right:10px; left:auto;">Esgotado</span>';
-                    
-                    const card = document.createElement('a'); card.href = `detalhes.html?id=${p.id}`; card.className = 'product-card';
-                    card.innerHTML = `${badge}<div class="product-image-container"><img src="${p.imageUrl||'https://via.placeholder.com/400'}" class="product-image"></div><div class="product-info"><div><div class="product-category">${p.secao}</div><h3 class="product-name">${p.name}</h3></div><div><div class="product-price">¥${pf}</div><button class="details-button">Ver Detalhes</button></div></div>`;
-                    grid.appendChild(card);
-                });
-                loadingMsg.style.display = 'none';
-            } catch(e) {
-                console.error(e);
-                loadingMsg.style.color = 'red';
-                loadingMsg.textContent = "Erro de conexão: " + e.message;
-            }
+        function log(msg, type = 'log') {
+            statusDiv.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
         }
 
-        document.querySelectorAll('.secao-button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.secao-button').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); currentSecao = b.dataset.secao; document.getElementById('collection-title').textContent = b.textContent; fetchProducts(); }));
-        document.querySelectorAll('.filter-button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); currentFilter = b.dataset.filter; document.getElementById('filter-details').textContent = currentFilter === 'pronta-entrega' ? 'Envio imediato para todo o Japão.' : 'Sob encomenda (15-20 dias).'; fetchProducts(); }));
-        document.getElementById('search-input').addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); const cards = document.querySelectorAll('.product-card'); let hasResult = false; cards.forEach(c => { if(c.querySelector('.product-name').textContent.toLowerCase().includes(term)){c.style.display='flex';hasResult=true;}else{c.style.display='none';} }); document.getElementById('search-no-results').style.display = hasResult?'none':'block'; });
-        function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
-        let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
-        const pushModal = document.getElementById('push-permission-modal'); if(Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 3000); }
-        document.getElementById('allow-push-btn').addEventListener('click', async () => { pushModal.style.display = 'none'; if(messaging){ try { await Notification.requestPermission(); const token = await messaging.getToken({ vapidKey: 'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA' }); if(token) await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()}); } catch(e){} } });
-        document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none'); document.getElementById('notification-bell').addEventListener('click', () => { alert('Nenhuma notificação nova.'); });
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            log("✅ Firebase iniciado.");
 
-        document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchProducts(); });
+            // TESTE 1: Conexão Simples (Sem filtros)
+            log("⏳ Teste 1: Lendo 1 produto qualquer...");
+            
+            db.collection("products").limit(1).get()
+            .then(snap => {
+                if (snap.empty) {
+                    log("⚠️ Teste 1 OK: Conectou, mas coleção vazia.", "warning");
+                } else {
+                    log("✅ Teste 1 OK: Leu banco de dados.", "success");
+                }
+                // Se passou do 1, tenta o TESTE 2 (Com filtros da Home)
+                runTest2(db);
+            })
+            .catch(err => {
+                console.error(err);
+                log(`❌ ERRO FATAL NO TESTE 1: ${err.message}`, "error");
+                checkCommonErrors(err);
+            });
+
+        } catch (e) {
+            log(`❌ Erro de Configuração: ${e.message}`, "error");
+        }
+
+        function runTest2(db) {
+            log("<hr>⏳ Teste 2: Filtro da Home (Pronta Entrega + Data)...");
+            
+            // Simula exatamente o que a Home tenta fazer
+            db.collection("products")
+                .where("source", "==", "pronta-entrega")
+                .orderBy("createdAt", "desc")
+                .get()
+            .then(snap => {
+                log(`✅ Teste 2 OK: Encontrados ${snap.size} produtos para Home.`, "success");
+                resDiv.innerHTML = "<h3>🎉 O SITE DEVERIA ESTAR FUNCIONANDO!</h3>Se você vê isso, o problema era cache ou código anterior.";
+                snap.forEach(d => {
+                    resDiv.innerHTML += `<div class="box">${d.data().name} (R$ ${d.data().price})</div>`;
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                log(`❌ ERRO NO TESTE 2: ${err.message}`, "error");
+                checkCommonErrors(err);
+            });
+        }
+
+        function checkCommonErrors(err) {
+            if (err.message.includes("permission")) {
+                resDiv.innerHTML += `<div class="error">🔐 PROBLEMA DE PERMISSÃO<br>O Firebase está bloqueando o site. Verifique a aba RULES.</div>`;
+            }
+            if (err.message.includes("index")) {
+                const link = err.message.match(/https:\/\/[^\s]+/);
+                if (link) {
+                    resDiv.innerHTML += `<div class="error">📉 FALTA UM ÍNDICE<br><a href="${link[0]}" target="_blank" style="background:white; padding:10px; display:block; margin-top:10px; text-align:center; font-weight:bold; border:2px solid red;">CLIQUE AQUI PARA CRIAR O ÍNDICE</a></div>`;
+                }
+            }
+        }
     </script>
 </body>
 </html>
