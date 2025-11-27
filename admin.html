@@ -8,10 +8,10 @@
     
     <style>
         :root { 
-            --bg-color: #FDFBF7; /* Off-White/Areia */
-            --primary-color: #1B263B; /* Azul Marinho Profundo */
-            --accent-color: #Cca43b; /* Bronze/Cobre */
-            --text-color: #333333; /* Cinza Chumbo */
+            --bg-color: #FDFBF7; 
+            --primary-color: #1B263B; 
+            --accent-color: #Cca43b; 
+            --text-color: #333333; 
             --border-color: #e0e0e0; 
             --error-color: #dc3545; 
         }
@@ -41,12 +41,9 @@
         .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; }
         .edit-btn { background-color: var(--accent-color); color: #fff; font-size: 0.8em; padding: 5px 8px; }
         
-        /* Estilos das Variantes (Marca/Volume) */
         #variants-container { border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; background: #f9f9f9; }
         .variant-entry { border-bottom: 1px dashed var(--border-color); padding-bottom: 15px; margin-bottom: 15px; }
-        .variant-row { margin-bottom: 10px; }
         .variant-size-stock-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .variant-size-stock-group label { font-size: 0.8em; color: #666; margin-bottom: 0; }
         .variant-size-stock-group div { text-align: center; }
         .variant-size-stock-group input { width: 60px; padding: 5px; text-align: center; }
         
@@ -55,11 +52,8 @@
         #btnLogout { background-color: #777; margin-top: 20px; }
         #logo-preview { max-width: 200px; display: block; margin: 10px auto; }
         
-        /* Paineis Extras */
         #push-panel { background-color: #fff8e1; border: 1px solid #ffe082; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
         #push-panel h3 { color: #f57f17; border-bottom-color: #f57f17; }
-        #reviews-panel { background-color: #e3f2fd; border: 1px solid #bbdefb; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        #reviews-panel h3 { color: #0d47a1; border-bottom-color: #0d47a1; }
     </style>
 </head>
 <body>
@@ -80,27 +74,21 @@
             <div id="status"></div>
 
             <div id="push-panel">
-                <h3>📢 Notificações App</h3>
-                <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Chegou Malbec!">
-                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;" placeholder="Ex: Aproveite o estoque renovado..."></textarea>
-                <label>Link de Destino:</label><input type="text" id="push-link" value="https://fcperfumaria.netlify.app">
-                <button id="btn-send-push" style="background-color: #f57f17; margin-top: 10px;">🚀 Enviar Notificação</button>
-                <h4 style="margin-top: 20px;">Histórico Recente</h4>
+                <h3>📢 Enviar Notificação (Teste Diagnóstico)</h3>
+                <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Chegou Reposição!">
+                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;" placeholder="Ex: Corra para ver..."></textarea>
+                <button id="btn-send-push" style="background-color: #f57f17; margin-top: 10px;">🚀 Enviar Agora</button>
+                <h4 style="margin-top: 20px;">Histórico</h4>
                 <div class="table-container"><table id="messages-table"><thead><tr><th>Data</th><th>Título</th><th>Ação</th></tr></thead><tbody id="messages-list"></tbody></table></div>
             </div>
 
             <hr>
 
             <form id="product-form">
-                <h3 id="form-title">Novo Perfume / Produto</h3>
+                <h3 id="form-title">Novo Produto</h3>
                 <input type="hidden" id="productId"> 
-                
-                <label>Nome do Produto:</label>
-                <input type="text" id="name" placeholder="Ex: Malbec Gold" required>
-                
-                <label>Preço (¥):</label>
-                <input type="number" id="price" placeholder="Ex: 12000" required>
-                
+                <label>Nome:</label><input type="text" id="name" required>
+                <label>Preço (¥):</label><input type="number" id="price" required>
                 <label>Categoria:</label>
                 <select id="secao" required>
                     <option value="">Selecione...</option>
@@ -108,59 +96,23 @@
                     <option value="masculino">Masculino</option>
                     <option value="unissex">Unissex</option>
                     <option value="infantil">Infantil</option>
-                    <option value="kits">Kits & Presentes</option>
+                    <option value="kits">Kits</option>
                 </select>
-                
-                <label>Descrição / Notas Olfativas:</label>
-                <textarea id="description" rows="4" placeholder="Descreva as notas e detalhes do perfume..."></textarea>
-                
-                <label>Variações (Marcas e Volumes):</label>
-                <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Adicione uma linha para cada marca/tipo e coloque o estoque nos tamanhos correspondentes.</div>
-                <div id="variants-container"></div>
-                <button type="button" id="add-variant-btn" style="margin-top:5px; background-color: var(--accent-color);">+ Adicionar Marca/Linha</button>
-                
-                <label>Disponibilidade:</label>
-                <select id="source" required>
-                    <option value="pronta-entrega">Pronta Entrega</option>
-                    <option value="sob-encomenda">Sob Encomenda</option>
-                </select>
-                
-                <label>Selo Especial:</label>
-                <select id="isFeatured">
-                    <option value="nenhum">Nenhum</option>
-                    <option value="novo">✨ Lançamento</option>
-                    <option value="destaque">🔥 Mais Vendido</option>
-                </select>
-                
-                <label>Foto Principal:</label>
-                <input type="file" id="imageUrl">
-                
-                <label>Vídeo (Opcional):</label>
-                <input type="file" id="videoUrl">
-                
-                <label>Galeria (Mais fotos):</label>
-                <input type="file" id="galeria" multiple>
-                
+                <label>Descrição:</label><textarea id="description" rows="4"></textarea>
+                <label>Variantes (Marca/Volume):</label><div id="variants-container"></div>
+                <button type="button" id="add-variant-btn" style="margin-top:5px; background-color: var(--accent-color);">+ Adicionar Linha</button>
+                <label>Disponibilidade:</label><select id="source" required><option value="pronta-entrega">Pronta Entrega</option><option value="sob-encomenda">Sob Encomenda</option></select>
+                <label>Selo:</label><select id="isFeatured"><option value="nenhum">Nenhum</option><option value="novo">Lançamento</option><option value="destaque">Destaque</option></select>
+                <label>Foto:</label><input type="file" id="imageUrl">
                 <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
-                <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar Edição</button>
+                <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar</button>
             </form>
             
-            <form id="logo-form">
-                <h3>Logo da Loja</h3>
-                <img id="logo-preview">
-                <input type="file" id="logo-upload">
-                <button type="submit" id="save-logo-btn">Atualizar Logo</button>
-            </form>
+            <form id="logo-form"><h3>Logo</h3><img id="logo-preview"><input type="file" id="logo-upload"><button type="submit" id="save-logo-btn">Atualizar Logo</button></form>
             
-            <h2>Lista de Produtos</h2>
-            <div class="table-container">
-                <table id="products-table">
-                    <thead><tr><th>Foto</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Estoque Total</th><th>Ações</th></tr></thead>
-                    <tbody id="products-list"></tbody>
-                </table>
-            </div>
-            
-            <button id="btnLogout">Sair do Sistema</button>
+            <h2>Produtos</h2>
+            <div class="table-container"><table id="products-table"><thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Estoque</th><th>Ações</th></tr></thead><tbody id="products-list"></tbody></table></div>
+            <button id="btnLogout">Sair</button>
         </section>
     </div>
 
@@ -170,21 +122,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
-        // CONFIGURAÇÃO NOVA - FC PERFUMARIA
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs",
-            authDomain: "fc-perfumaria-309fb.firebaseapp.com",
-            projectId: "fc-perfumaria-309fb",
-            storageBucket: "fc-perfumaria-309fb.firebasestorage.app",
-            messagingSenderId: "311935363734",
-            appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
 
-        async function uploadFile(file, path) {
-            const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL();
-        }
+        async function uploadFile(file, path) { const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL(); }
 
         document.addEventListener('DOMContentLoaded', () => {
             const loginForm = document.getElementById('loginForm');
@@ -210,167 +152,110 @@
             });
 
             const productsList = document.getElementById('products-list');
-            
             async function fetchProducts() {
                 try {
-                    productsList.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
+                    productsList.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
                     const snap = await db.collection("products").orderBy("createdAt", "desc").get();
                     let h = '';
                     snap.forEach(doc => {
                         let p = doc.data();
-                        h += `<tr>
-                            <td><img src="${p.imageUrl||''}" class="thumb"></td>
-                            <td>${p.name}</td>
-                            <td>${p.secao||'-'}</td>
-                            <td>¥${p.price}</td>
-                            <td>${p.estoqueTotal||0}</td>
-                            <td><button class="edit-btn" data-id="${doc.id}">Editar</button> <button class="delete-btn" data-id="${doc.id}">X</button></td>
-                        </tr>`;
+                        h += `<tr><td><img src="${p.imageUrl||''}" class="thumb"></td><td>${p.name}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td><td><button class="edit-btn" data-id="${doc.id}">Editar</button> <button class="delete-btn" data-id="${doc.id}">X</button></td></tr>`;
                     });
-                    productsList.innerHTML = h || '<tr><td colspan="6">Nenhum produto cadastrado</td></tr>';
+                    productsList.innerHTML = h || '<tr><td colspan="5">Vazio</td></tr>';
                 } catch(e) { showStatus(statusDiv, e.message, 'error'); }
             }
 
-            document.getElementById('product-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const saveBtn = document.getElementById('save-btn'); saveBtn.disabled = true;
-                if(!document.getElementById('secao').value) { showStatus(statusDiv,"Escolha a Categoria!","error"); saveBtn.disabled=false; return; }
-                
-                showStatus(statusDiv, "Salvando produto...", "loading");
-                const id = document.getElementById('productId').value || `pid_${Date.now()}`;
-                
-                try {
-                    let img=oldImageUrl, vid=oldVideoUrl, gal=oldGaleria;
-                    const fImg = document.getElementById('imageUrl').files[0];
-                    const fVid = document.getElementById('videoUrl').files[0];
-                    const fGal = document.getElementById('galeria').files;
-                    
-                    if(fImg) img = await uploadFile(fImg, `products/${id}/capa`);
-                    if(fVid) vid = await uploadFile(fVid, `products/${id}/video`);
-                    if(fGal.length > 0) { gal = []; for(let f of fGal) gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`)); }
-                    
-                    let v = getVariants();
-                    let data = { 
-                        name: document.getElementById('name').value, 
-                        price: parseFloat(document.getElementById('price').value), 
-                        secao: document.getElementById('secao').value, 
-                        description: document.getElementById('description').value, 
-                        variantes: v, 
-                        estoqueTotal: calcTotal(v), 
-                        source: document.getElementById('source').value, 
-                        isFeatured: document.getElementById('isFeatured').value, 
-                        imageUrl: img, videoUrl: vid, galeria: gal 
-                    };
-                    
-                    if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
-                    else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
-                    
-                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Produto Salvo com Sucesso!", "success");
-                } catch(err) { showStatus(statusDiv, err.message, 'error'); } finally { saveBtn.disabled = false; }
-            });
-
-            productsList.addEventListener('click', async (e) => {
-                let id = e.target.dataset.id;
-                if(e.target.classList.contains('delete-btn') && confirm("Tem certeza que deseja apagar?")) { await db.collection("products").doc(e.target.dataset.id).delete(); fetchProducts(); }
-                if(e.target.classList.contains('edit-btn')) {
-                    let d = await db.collection("products").doc(e.target.dataset.id).get(); let p = d.data();
-                    document.getElementById('productId').value = d.id; 
-                    document.getElementById('name').value = p.name; 
-                    document.getElementById('price').value = p.price; 
-                    document.getElementById('secao').value = p.secao; 
-                    document.getElementById('description').value = p.description; 
-                    setVariants(p.variantes); 
-                    document.getElementById('source').value = p.source; 
-                    document.getElementById('isFeatured').value = p.isFeatured; 
-                    oldImageUrl = p.imageUrl; oldVideoUrl = p.videoUrl; oldGaleria = p.galeria||[];
-                    document.getElementById('form-title').textContent = "Editando Perfume"; document.getElementById('save-btn').textContent = "Atualizar Produto"; document.getElementById('cancel-edit-btn').style.display="block"; window.scrollTo(0,0);
-                }
-            });
-
-            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
-            function cancelEditMode() { 
-                document.getElementById('productId').value = ''; 
-                document.getElementById('product-form').reset(); 
-                document.getElementById('variants-container').innerHTML = ''; 
-                oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = []; 
-                document.getElementById('form-title').textContent = "Novo Perfume"; 
-                document.getElementById('save-btn').textContent = "Salvar Produto"; 
-                document.getElementById('cancel-edit-btn').style.display = "none"; 
-            }
-
-            // --- Lógica de Variantes para Perfumaria (Marca + Volume) ---
-            const variantsContainer = document.getElementById('variants-container');
-            
-            document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
-            
-            function createVariantEntry(marca='', s={'30ml':0, '50ml':0, '75ml':0, '100ml':0}) { 
-                const div = document.createElement('div'); 
-                div.className = 'variant-entry'; 
-                
-                // Input para Marca (Ex: Natura, Kayak, etc)
-                const brandInput = `<input type="text" placeholder="Marca/Linha (Ex: Natura, Malbec...)" value="${marca}" class="brand-input" style="margin-bottom:10px; font-weight:bold;">`;
-                
-                // Inputs de Volume fixos
-                const volumesHTML = `
-                    <div class="variant-size-stock-group">
-                        <div><label>30ml</label><input type="number" data-vol="30ml" value="${s['30ml']||0}"></div>
-                        <div><label>50ml</label><input type="number" data-vol="50ml" value="${s['50ml']||0}"></div>
-                        <div><label>75ml</label><input type="number" data-vol="75ml" value="${s['75ml']||0}"></div>
-                        <div><label>100ml</label><input type="number" data-vol="100ml" value="${s['100ml']||0}"></div>
-                        <div><label>Outro</label><input type="number" data-vol="unico" value="${s['unico']||0}"></div>
-                    </div>
-                `;
-                
-                div.innerHTML = `${brandInput}${volumesHTML}<button type="button" class="delete-btn" style="margin-top:10px" onclick="this.parentElement.remove()">Remover Linha</button>`; 
-                variantsContainer.appendChild(div); 
-            }
-            
-            function getVariants(){ 
-                let v = {}; 
-                variantsContainer.querySelectorAll('.variant-entry').forEach(e => { 
-                    let marca = e.querySelector('.brand-input').value.trim();
-                    if(marca){
-                        let st = {}; 
-                        e.querySelectorAll('input[type=number]').forEach(i => st[i.dataset.vol] = parseInt(i.value)||0); 
-                        v[marca] = st; // Ex: { "Natura": { "50ml": 10, "100ml": 5 } }
-                    } 
-                }); 
-                return v; 
-            }
-            
-            function calcTotal(v){ let t=0; for(let c in v)for(let s in v[c])t+=v[c][s]; return t; }
-            function setVariants(v){ variantsContainer.innerHTML=''; if(v)for(let c in v)createVariantEntry(c,v[c]); }
-
-            // Mensagens / Push
+            // --- ENVIO DE NOTIFICAÇÃO COM DEBUG ---
             const btnSendPush = document.getElementById('btn-send-push');
             const messagesList = document.getElementById('messages-list');
+            
             async function fetchMessages() {
                 try {
-                    const snap = await db.collection('site_messages').orderBy('createdAt', 'desc').limit(10).get();
+                    const snap = await db.collection('site_messages').orderBy('createdAt', 'desc').limit(5).get();
                     let h = ''; snap.forEach(d => { const m=d.data(); h+=`<tr><td>${m.createdAt?m.createdAt.toDate().toLocaleDateString('pt-BR'):'-'}</td><td>${m.title}</td><td><button class="delete-btn del-msg" data-id="${d.id}">X</button></td></tr>`; });
                     messagesList.innerHTML = h;
                     document.querySelectorAll('.del-msg').forEach(b => b.addEventListener('click', async (e) => { if(confirm("Apagar?")){ await db.collection('site_messages').doc(e.target.dataset.id).delete(); fetchMessages(); } }));
                 } catch(e){}
             }
+
             if(btnSendPush) {
                 btnSendPush.addEventListener('click', async () => {
-                    const title = document.getElementById('push-title').value, body = document.getElementById('push-body').value, link = document.getElementById('push-link').value;
-                    if(!title || !body) return alert("Preencha título e mensagem!");
-                    if(!confirm("Enviar notificação para todos?")) return;
-                    showStatus(statusDiv, "Enviando...", "loading");
+                    const title = document.getElementById('push-title').value;
+                    const body = document.getElementById('push-body').value;
+                    
+                    if(!title || !body) return alert("Escreva algo!");
+                    
+                    btnSendPush.disabled = true;
+                    btnSendPush.textContent = "Enviando...";
+                    
                     try {
-                        await db.collection('site_messages').add({ title, body, link, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                        // Chamada ao Backend (Netlify Functions) - Ajustaremos o link depois
-                        await fetch('/.netlify/functions/push-notification', { method: 'POST', body: JSON.stringify({ title, body, link }) });
-                        showStatus(statusDiv, "Notificação Enviada!", "success"); fetchMessages();
-                    } catch(e) { showStatus(statusDiv, "Salvo (Erro no disparo): " + e.message, "error"); }
+                        // 1. Tenta Chamar o Servidor Netlify
+                        const response = await fetch('/.netlify/functions/push-notification', { 
+                            method: 'POST', 
+                            body: JSON.stringify({ title, body }) 
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            throw new Error("Erro no Servidor: " + (result.error || JSON.stringify(result)));
+                        }
+
+                        // 2. Se sucesso, salva no histórico
+                        await db.collection('site_messages').add({ title, body, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                        
+                        alert(`SUCESSO! \nEnviados: ${result.enviados}\nFalhas: ${result.falhas}`);
+                        fetchMessages();
+                        
+                    } catch(e) {
+                        alert("ERRO NO ENVIO:\n" + e.message);
+                    } finally {
+                        btnSendPush.disabled = false;
+                        btnSendPush.textContent = "🚀 Enviar Agora";
+                    }
                 });
             }
 
-            // Logo
+            // --- RESTO DO CÓDIGO (PRODUTOS) ---
+            document.getElementById('product-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const saveBtn = document.getElementById('save-btn'); saveBtn.disabled = true;
+                const id = document.getElementById('productId').value || `pid_${Date.now()}`;
+                try {
+                    let img=oldImageUrl; const fImg = document.getElementById('imageUrl').files[0];
+                    if(fImg) img = await uploadFile(fImg, `products/${id}/capa`);
+                    let v = getVariants();
+                    let data = { name: document.getElementById('name').value, price: parseFloat(document.getElementById('price').value), secao: document.getElementById('secao').value, description: document.getElementById('description').value, variantes: v, estoqueTotal: calcTotal(v), source: document.getElementById('source').value, isFeatured: document.getElementById('isFeatured').value, imageUrl: img };
+                    if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
+                    else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
+                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
+                } catch(err) { alert(err.message); } finally { saveBtn.disabled = false; }
+            });
+
+            const variantsContainer = document.getElementById('variants-container');
+            document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
+            function createVariantEntry(marca='', s={'30ml':0, '50ml':0, '75ml':0, '100ml':0}) { 
+                const div = document.createElement('div'); div.className = 'variant-entry'; 
+                div.innerHTML = `<input type="text" placeholder="Marca" value="${marca}" class="brand-input" style="margin-bottom:5px;"><div class="variant-size-stock-group"><div><label>30ml</label><input type="number" data-vol="30ml" value="${s['30ml']||0}"></div><div><label>50ml</label><input type="number" data-vol="50ml" value="${s['50ml']||0}"></div><div><label>75ml</label><input type="number" data-vol="75ml" value="${s['75ml']||0}"></div><div><label>100ml</label><input type="number" data-vol="100ml" value="${s['100ml']||0}"></div></div><button type="button" class="delete-btn" onclick="this.parentElement.remove()">X</button>`; variantsContainer.appendChild(div); 
+            }
+            function getVariants(){ let v={}; variantsContainer.querySelectorAll('.variant-entry').forEach(e=>{ let m=e.querySelector('.brand-input').value; if(m){let s={}; e.querySelectorAll('input[type=number]').forEach(i=>s[i.dataset.vol]=parseInt(i.value)||0); v[m]=s;} }); return v; }
+            function calcTotal(v){ let t=0; for(let c in v)for(let s in v[c])t+=v[c][s]; return t; }
+            function setVariants(v){ variantsContainer.innerHTML=''; if(v)for(let c in v)createVariantEntry(c,v[c]); }
+            
+            productsList.addEventListener('click', async (e) => {
+                if(e.target.classList.contains('delete-btn') && confirm("Apagar?")) { await db.collection("products").doc(e.target.dataset.id).delete(); fetchProducts(); }
+                if(e.target.classList.contains('edit-btn')) {
+                    let d = await db.collection("products").doc(e.target.dataset.id).get(); let p = d.data();
+                    document.getElementById('productId').value = d.id; document.getElementById('name').value = p.name; document.getElementById('price').value = p.price; document.getElementById('secao').value = p.secao; document.getElementById('description').value = p.description; setVariants(p.variantes); document.getElementById('source').value = p.source; document.getElementById('isFeatured').value = p.isFeatured; oldImageUrl = p.imageUrl;
+                    document.getElementById('save-btn').textContent = "Atualizar"; document.getElementById('cancel-edit-btn').style.display="block"; window.scrollTo(0,0);
+                }
+            });
+            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
+            function cancelEditMode() { document.getElementById('productId').value = ''; document.getElementById('product-form').reset(); document.getElementById('variants-container').innerHTML = ''; oldImageUrl = ''; document.getElementById('save-btn').textContent = "Salvar Produto"; document.getElementById('cancel-edit-btn').style.display = "none"; }
+            
             const logoForm = document.getElementById('logo-form'); const logoUpload = document.getElementById('logo-upload'); const logoPrev = document.getElementById('logo-preview');
             async function loadSiteConfig() { try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists) logoPrev.src=d.data().logoUrl; }catch(e){} }
-            logoForm.addEventListener('submit', async (e) => { e.preventDefault(); const f=logoUpload.files[0]; if(f){ showStatus(statusDiv,"Enviando...","loading"); try{ const u=await uploadFile(f,"configuracoes/logo_principal"); await db.collection("configuracoes").doc("siteInfo").set({logoUrl:u},{merge:true}); logoPrev.src=u; showStatus(statusDiv,"Salvo!","success"); }catch(e){alert(e.message)} } });
+            logoForm.addEventListener('submit', async (e) => { e.preventDefault(); const f=logoUpload.files[0]; if(f){ try{ const u=await uploadFile(f,"configuracoes/logo_principal"); await db.collection("configuracoes").doc("siteInfo").set({logoUrl:u},{merge:true}); logoPrev.src=u; alert("Logo salvo!"); }catch(e){alert(e.message)} } });
         });
     </script>
 </body>
