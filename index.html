@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL --- */
+        /* CSS BRAZILIAN PREMIUM */
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 120px; }
         
@@ -18,7 +18,7 @@
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Botão PWA */
+        /* Botão Instalar Android */
         #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Banner iOS */
@@ -57,8 +57,8 @@
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        /* STATUS TEXT (Importante para sabermos onde trava) */
-        #status-text { font-size: 0.85em; color: #666; margin-top: 10px; font-weight: bold; }
+        /* Loading Style */
+        #loading-message { text-align: center; padding: 20px; color: var(--accent-color); font-weight: bold; }
     </style>
 </head>
 <body>
@@ -90,11 +90,7 @@
 
         <h2 id="collection-title" class="section-title">Loja Oficial</h2>
         
-        <div id="loading-message" style="text-align:center; padding:30px;">
-            <i class="fas fa-spinner fa-spin" style="font-size:30px; color:var(--accent-color);"></i>
-            <div id="status-text">Iniciando sistema...</div>
-        </div>
-        
+        <div id="loading-message">Conectando ao catálogo...</div>
         <div id="products-grid"></div>
         <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
     </main>
@@ -110,50 +106,49 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+
     <script>
+        // 1. CONFIGURAÇÃO (Não mexer)
         const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
-        firebase.initializeApp(firebaseConfig);
         
-        // Tenta ativar persistência para Mobile (ajuda na velocidade)
-        const db = firebase.firestore();
-        db.enablePersistence().catch(err => console.log("Persistência desativada"));
+        // 2. INICIALIZAÇÃO SEGURA
+        try {
+            firebase.initializeApp(firebaseConfig);
+            var db = firebase.firestore();
+            var messaging = null;
+            try { if (firebase.messaging.isSupported()) messaging = firebase.messaging(); } catch (e) {}
+        } catch (err) {
+            document.getElementById('loading-message').innerHTML = "Erro Fatal Firebase: " + err.message;
+        }
 
-        let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
-
+        // Variáveis Globais
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
-        const statusText = document.getElementById('status-text');
         const headerEl = document.getElementById('main-header');
-        
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos';
-        let allProducts = []; 
+        let allProducts = [];
 
-        async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
-
-        // --- LÓGICA PASSO-A-PASSO ---
+        // 3. FUNÇÃO PRINCIPAL DE CARREGAMENTO (NUCLEAR)
         async function fetchAllProducts() {
             loadingMsg.style.display = 'block';
+            loadingMsg.textContent = "Baixando produtos...";
             grid.innerHTML = '';
             
             try {
-                statusText.textContent = "Conectando ao Banco de Dados...";
-                
-                // 1. Busca TUDO (Sem filtros para garantir que baixa)
+                // Busca bruta: pega tudo, sem filtros no banco
                 const snap = await db.collection("products").get();
                 
                 if(snap.empty){
-                    statusText.textContent = "Conectado! Mas a loja está vazia.";
+                    loadingMsg.textContent = "Loja vazia (Nenhum produto cadastrado).";
                     return;
                 }
 
-                statusText.textContent = `Baixou ${snap.size} itens. Processando...`;
-
-                // 2. Salva na memória
+                // Salva na memória
                 allProducts = [];
                 snap.forEach(d => {
                     let data = d.data();
-                    // Prepara dados para busca segura (sem maiúsculas/minúsculas)
+                    // Cria campos de busca seguros (minúsculo)
                     data.searchSource = (data.source || '').toLowerCase().replace(' ', '-');
                     data.searchSecao = (data.secao || '').toLowerCase();
                     allProducts.push({ id: d.id, ...data });
@@ -164,17 +159,18 @@
             } catch(e) {
                 console.error(e);
                 loadingMsg.style.color = 'red';
-                statusText.innerHTML = "ERRO: " + e.message + "<br>Tente recarregar.";
+                loadingMsg.innerHTML = "Erro de Conexão:<br>" + e.message;
             }
         }
 
+        // 4. FUNÇÃO DE DESENHO (FILTRO LOCAL)
         function renderProducts() {
-            // Oculta loading apenas se tiver produtos para mostrar
-            statusText.textContent = "Filtrando produtos...";
-            
+            loadingMsg.style.display = 'none';
+            grid.innerHTML = '';
+
             let filtered = allProducts.filter(p => {
                 let filterClean = currentFilter.toLowerCase().replace(' ', '-');
-                // Filtro super permissivo
+                // Se o produto não tiver source, assume que é visível
                 let matchSource = p.searchSource.includes(filterClean) || p.searchSource === '';
                 let matchSecao = true;
                 if (currentSecao !== 'todos') matchSecao = p.searchSecao === currentSecao;
@@ -182,16 +178,11 @@
             });
 
             if (filtered.length === 0) {
-                loadingMsg.style.display = 'block'; // Mantém visível para mostrar o aviso
-                statusText.textContent = "Nenhum produto nesta categoria/filtro.";
-                grid.innerHTML = '';
+                grid.innerHTML = '<p style="text-align:center; color:#999; grid-column: 1/-1;">Nenhum item encontrado nesta seção.</p>';
                 return;
             }
 
-            // Se chegou aqui, TEM PRODUTO
-            loadingMsg.style.display = 'none'; 
-            grid.innerHTML = '';
-
+            // Ordena por data (mais recente primeiro)
             filtered.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
             filtered.forEach(p => {
@@ -206,7 +197,11 @@
             });
         }
 
-        // Botões
+        // 5. AUXILIARES
+        async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
+        function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
+
+        // 6. EVENTOS DE CLIQUE
         document.querySelectorAll('.secao-button').forEach(b => b.addEventListener('click', () => { 
             document.querySelectorAll('.secao-button').forEach(btn => btn.classList.remove('active')); 
             b.classList.add('active'); currentSecao = b.dataset.secao; renderProducts(); 
@@ -217,27 +212,53 @@
             b.classList.add('active'); currentFilter = b.dataset.filter; renderProducts(); 
         }));
 
-        // Instalação PWA
-        let deferredPrompt;
-        const installBtn = document.getElementById('install-app-btn');
-        const iosBanner = document.getElementById('ios-install-banner');
-        
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; });
-        installBtn.addEventListener('click', () => { installBtn.style.display = 'none'; if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } });
-
-        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-        if (isIos() && !('standalone' in window.navigator && window.navigator.standalone)) {
-            iosBanner.style.display = 'block';
-            document.getElementById('cart-icon').style.bottom = '100px';
-        }
-        document.getElementById('close-ios-banner').addEventListener('click', () => {
-            iosBanner.style.display = 'none';
-            document.getElementById('cart-icon').style.bottom = '20px';
+        document.getElementById('search-input').addEventListener('input', (e) => { 
+            const term = e.target.value.toLowerCase(); 
+            const cards = document.querySelectorAll('.product-card'); 
+            let hasResult = false; 
+            cards.forEach(c => { 
+                if(c.querySelector('.product-name').textContent.toLowerCase().includes(term)){c.style.display='flex';hasResult=true;}
+                else{c.style.display='none';} 
+            }); 
+            document.getElementById('search-no-results').style.display = hasResult?'none':'block'; 
         });
 
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
+        // 7. PWA / INSTALAÇÃO
+        // Separado e protegido com try/catch para não travar a loja
+        try {
+            let deferredPrompt;
+            const installBtn = document.getElementById('install-app-btn');
+            const iosBanner = document.getElementById('ios-install-banner');
+            
+            window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'block'; });
+            installBtn.addEventListener('click', () => { installBtn.style.display = 'none'; if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; } });
 
-        document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchAllProducts(); });
+            const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+            const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+            
+            if (isIos() && !isInStandaloneMode()) {
+                iosBanner.style.display = 'block';
+                document.getElementById('cart-icon').style.bottom = '100px';
+            }
+            document.getElementById('close-ios-banner').addEventListener('click', () => {
+                iosBanner.style.display = 'none';
+                document.getElementById('cart-icon').style.bottom = '20px';
+            });
+
+            if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); }); }
+        } catch(errPwa) {
+            console.log("Erro PWA (Ignorado):", errPwa);
+        }
+
+        // Navegação Secreta
+        let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', ()=>{ 
+            fetchSiteConfig(); 
+            updateCartIcon(); 
+            fetchAllProducts(); 
+        });
     </script>
 </body>
 </html>
