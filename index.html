@@ -13,7 +13,7 @@
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-color); color: var(--text-color); padding-bottom: 80px; }
         
-        header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); position: relative; }
+        header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); }
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.85em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
         .header-img { max-height: 70px; display: block; margin: 0 auto 8px auto; }
@@ -48,9 +48,11 @@
         footer { text-align: center; padding: 30px; margin-top: 40px; color: #666; border-top: 1px solid #eee; }
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 1000; }
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
-        #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         
-        #status-text { font-size: 0.8em; color: #999; margin-top: 10px; }
+        #push-permission-modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
+        .push-modal-content { background: #fff; width: 85%; max-width: 350px; padding: 30px; border-radius: 8px; text-align: center; }
+        .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        #notification-bell { position: fixed; top: 15px; right: 15px; font-size: 24px; color: var(--primary-color); cursor: pointer; z-index: 2000; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -81,11 +83,10 @@
             <button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button>
         </div>
 
-        <h2 id="collection-title" class="section-title">Coleção Oficial</h2>
+        <h2 id="collection-title" class="section-title">Loja Oficial</h2>
         
-        <div id="loading-message" style="text-align:center; padding:20px;">
-            <strong style="color:var(--accent-color);">Carregando...</strong>
-            <div id="status-text">Iniciando conexão...</div>
+        <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">
+            Carregando catálogo...
         </div>
         
         <div id="products-grid"></div>
@@ -94,6 +95,16 @@
 
     <footer><p>© 2025 FC Perfumaria</p></footer>
     <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
+    
+    <div id="push-permission-modal">
+        <div class="push-modal-content">
+            <i class="fas fa-bell" style="font-size: 40px; color: var(--accent-color); margin-bottom:15px;"></i>
+            <h3 style="margin:0 0 10px 0; color:var(--primary-color);">Novidades</h3>
+            <p style="color:#666; font-size:0.9em;">Ative as notificações para receber ofertas.</p>
+            <button class="push-btn-allow" id="allow-push-btn">ATIVAR</button>
+            <button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" id="deny-push-btn">Agora não</button>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -106,73 +117,81 @@
 
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
-        const statusText = document.getElementById('status-text');
         const headerEl = document.getElementById('main-header');
         
         let currentFilter = 'pronta-entrega';
         let currentSecao = 'todos';
+        let allProducts = []; // Armazena tudo
 
         async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
 
-        // --- SISTEMA HÍBRIDO (FAIL-SAFE) ---
-        async function fetchProducts() {
+        // --- SISTEMA NUCLEAR: BAIXA TUDO SEM FILTROS ---
+        async function fetchAllProducts() {
             loadingMsg.style.display = 'block';
             grid.innerHTML = '';
-            statusText.textContent = "Buscando produtos...";
             
             try {
-                // TENTATIVA 1: Busca Otimizada (Usa índices)
-                let q = db.collection("products");
-                if(currentSecao !== 'todos') q = q.where("secao", "==", currentSecao);
-                q = q.where("source", "==", currentFilter).orderBy("createdAt", "desc");
+                // AQUI ESTÁ O SEGREDO: .get() puro. Sem where, sem orderBy.
+                const snap = await db.collection("products").get();
                 
-                const snap = await q.get();
-                renderSnap(snap);
+                if(snap.empty){
+                    loadingMsg.style.display = 'none';
+                    grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#999;">Nenhum produto cadastrado no sistema.</p>';
+                    return;
+                }
+
+                // Salva na memória do celular
+                allProducts = [];
+                snap.forEach(d => {
+                    allProducts.push({ id: d.id, ...d.data() });
+                });
+
+                // Agora filtra localmente
+                renderProducts();
                 
             } catch(e) {
-                // TENTATIVA 2 (Se a 1 falhar): Busca Segura (Sem ordenação)
-                console.log("Tentativa 1 falhou (Índice?), tentando modo seguro...");
-                statusText.textContent = "Tentando modo de segurança...";
-                
-                try {
-                    let qSafe = db.collection("products").where("source", "==", currentFilter);
-                    // NÃO usa 'orderBy' nem 'where secao' aqui para garantir que funciona sem índice
-                    const snapSafe = await qSafe.get();
-                    
-                    // Filtra e Ordena na Mão (Javascript)
-                    let docs = [];
-                    snapSafe.forEach(d => docs.push({ id: d.id, ...d.data() }));
-                    
-                    // 1. Filtrar Categoria
-                    if(currentSecao !== 'todos') {
-                        docs = docs.filter(p => p.secao === currentSecao);
-                    }
-                    // 2. Ordenar Data
-                    docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-                    
-                    renderManual(docs);
-                    
-                } catch(err2) {
-                    statusText.innerHTML = `<span style="color:red">Erro fatal: ${err2.message}</span>`;
-                }
+                console.error(e);
+                loadingMsg.style.color = 'red';
+                loadingMsg.innerHTML = "Erro de conexão: " + e.message;
             }
         }
 
-        function renderSnap(snap) {
-            if(snap.empty){ showEmpty(); return; }
-            let docs = [];
-            snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-            renderManual(docs);
-        }
-
-        function renderManual(products) {
-            if(products.length === 0) { showEmpty(); return; }
+        function renderProducts() {
             loadingMsg.style.display = 'none';
-            
-            products.forEach(p => {
+            grid.innerHTML = '';
+
+            // Lógica de Filtro no Celular (Javascript)
+            let filtered = allProducts.filter(p => {
+                const pSource = p.source || 'pronta-entrega'; 
+                const pSecao = p.secao || 'outros';
+
+                // Filtro 1: Pronta Entrega ou Encomenda
+                if (pSource !== currentFilter) return false;
+
+                // Filtro 2: Categoria
+                if (currentSecao !== 'todos' && pSecao !== currentSecao) return false;
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#999;">Nenhum item nesta categoria.</p>';
+                return;
+            }
+
+            // Ordena por Data (Mais recente primeiro)
+            filtered.sort((a, b) => {
+                const dateA = a.createdAt ? a.createdAt.seconds : 0;
+                const dateB = b.createdAt ? b.createdAt.seconds : 0;
+                return dateB - dateA;
+            });
+
+            // Desenha na tela
+            filtered.forEach(p => {
                 const pf = (p.price||0).toLocaleString('ja-JP');
                 let badge = '';
                 if(p.isFeatured === 'novo') badge = '<span class="badge badge-novo">Lançamento</span>';
+                if((p.estoqueTotal||0) <= 0 && p.source === 'pronta-entrega') badge = '<span class="badge" style="background:#666; right:10px; left:auto;">Esgotado</span>';
                 
                 const card = document.createElement('a'); card.href = `detalhes.html?id=${p.id}`; card.className = 'product-card';
                 card.innerHTML = `${badge}<div class="product-image-container"><img src="${p.imageUrl||'https://via.placeholder.com/400'}" class="product-image"></div><div class="product-info"><div><div class="product-category">${p.secao}</div><h3 class="product-name">${p.name}</h3></div><div><div class="product-price">¥${pf}</div><button class="details-button">Ver Detalhes</button></div></div>`;
@@ -180,17 +199,36 @@
             });
         }
 
-        function showEmpty() {
-            loadingMsg.style.display = 'none';
-            grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:#999;">Nenhum item encontrado.</p>';
-        }
+        // Botões de Ação
+        document.querySelectorAll('.secao-button').forEach(b => b.addEventListener('click', () => { 
+            document.querySelectorAll('.secao-button').forEach(btn => btn.classList.remove('active')); 
+            b.classList.add('active'); 
+            currentSecao = b.dataset.secao; 
+            renderProducts(); // Filtra na hora, sem internet
+        }));
 
-        document.querySelectorAll('.secao-button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.secao-button').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); currentSecao = b.dataset.secao; document.getElementById('collection-title').textContent = b.textContent; fetchProducts(); }));
-        document.querySelectorAll('.filter-button').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active')); b.classList.add('active'); currentFilter = b.dataset.filter; document.getElementById('filter-details').textContent = currentFilter === 'pronta-entrega' ? 'Envio imediato para todo o Japão.' : 'Sob encomenda (15-20 dias).'; fetchProducts(); }));
-        document.getElementById('search-input').addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); const cards = document.querySelectorAll('.product-card'); let hasResult = false; cards.forEach(c => { if(c.querySelector('.product-name').textContent.toLowerCase().includes(term)){c.style.display='flex';hasResult=true;}else{c.style.display='none';} }); document.getElementById('search-no-results').style.display = hasResult?'none':'block'; });
+        document.querySelectorAll('.filter-button').forEach(b => b.addEventListener('click', () => { 
+            document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active')); 
+            b.classList.add('active'); 
+            currentFilter = b.dataset.filter; 
+            renderProducts(); 
+        }));
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+            let hasResult = false;
+            cards.forEach(c => { if(c.querySelector('.product-name').textContent.toLowerCase().includes(term)){c.style.display='flex';hasResult=true;}else{c.style.display='none';} });
+            document.getElementById('search-no-results').style.display = hasResult?'none':'block';
+        });
+
         function updateCartIcon(){ const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}}; let q=0; Object.values(c.items).forEach(i=>q+=i.quantity); const b=document.getElementById('cart-count'); if(q>0){b.textContent=q;b.style.display='flex';}else{b.style.display='none';} }
         let tapCount=0; headerEl.addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
-        document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchProducts(); });
+        const pushModal = document.getElementById('push-permission-modal'); if(Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 3000); }
+        document.getElementById('allow-push-btn').addEventListener('click', async () => { pushModal.style.display = 'none'; if(messaging){ try { await Notification.requestPermission(); const token = await messaging.getToken({ vapidKey: 'BInIXSUQdmOW6xyauTrERRsEgA0QtupR2fmDrhIckU-QA2sLBCJQnKsJk1eK40esRAW3EGYWQMz1WOnVHaIsPPA' }); if(token) await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()}); } catch(e){} } });
+        document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none'); document.getElementById('notification-bell').addEventListener('click', () => { alert('Nenhuma notificação nova.'); });
+
+        document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchAllProducts(); });
     </script>
 </body>
 </html>
