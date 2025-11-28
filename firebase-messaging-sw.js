@@ -13,21 +13,44 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// LÓGICA DE TELA BLOQUEADA (BACKGROUND)
+// RECEBE A MENSAGEM INVISÍVEL (DATA) E TORNA ELA VISÍVEL
 messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Background Push:', payload);
+  console.log('[FC Perfumaria] Data Push:', payload);
 
-  const notificationTitle = payload.notification.title;
+  // Pega os dados brutos
+  const title = payload.data.title;
+  const body = payload.data.body;
+  const icon = payload.data.icon;
+  const url = payload.data.url;
+
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
-    data: { url: 'https://fcperfumaria.netlify.app' }
+    body: body,
+    icon: icon,
+    badge: icon, // Ícone monocromático pequeno
+    vibrate: [200, 100, 200, 100, 200, 100, 200], // Vibração longa para chamar atenção
+    tag: 'fc-notification-' + payload.data.timestamp, // Tag única
+    renotify: true, // Obriga a tocar som
+    requireInteraction: true, // Não some até clicar
+    data: {
+        url: url
+    }
   };
 
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(title, notificationOptions);
 });
 
+// CLIQUE NA NOTIFICAÇÃO
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  event.waitUntil(clients.openWindow('https://fcperfumaria.netlify.app'));
+  event.waitUntil(
+    clients.matchAll({type: 'window', includeUncontrolled: true}).then(function(clientList) {
+      if (clientList.length > 0) {
+        let client = clientList[0];
+        if ('focus' in client) return client.focus();
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(event.notification.data.url);
+      }
+    })
+  );
 });
