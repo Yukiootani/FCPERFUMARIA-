@@ -13,14 +13,35 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// SEM 'onBackgroundMessage' 
-// Deixamos o navegador ler as instruções que vieram no pacote 'webpush' do servidor.
-// Isso é mais estável no Android.
+// 🚨 CORREÇÃO CRÍTICA 🚨
+// Esse código impede que o Android mostre a mensagem genérica "Site atualizado..."
+messaging.onBackgroundMessage(function(payload) {
+  console.log('[FC Perfumaria] Background:', payload);
+
+  // Pega os dados manuais que enviamos no 'data'
+  const title = payload.data.custom_title || 'FC Perfumaria';
+  const body = payload.data.custom_body || 'Nova novidade!';
+  
+  const notificationOptions = {
+    body: body,
+    icon: 'https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png', // Ícone Padrão Google (Não falha)
+    tag: 'fc-promo-' + Date.now(),
+    renotify: true,
+    requireInteraction: true,
+    vibrate: [300, 100, 300], // Vibração
+    data: {
+      url: payload.data.custom_url || 'https://fcperfumaria.netlify.app'
+    }
+  };
+
+  // RETORNA A PROMESSA (Isso avisa o Android que terminamos e ele exibe o texto correto)
+  return self.registration.showNotification(title, notificationOptions);
+});
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
-    clients.matchAll({type: 'window'}).then( windowClients => {
+    clients.matchAll({type: 'window'}).then(windowClients => {
       for (var i = 0; i < windowClients.length; i++) {
         var client = windowClients[i];
         if (client.url.includes('fcperfumaria') && 'focus' in client) {
@@ -28,7 +49,7 @@ self.addEventListener('notificationclick', function(event) {
         }
       }
       if (clients.openWindow) {
-        return clients.openWindow('https://fcperfumaria.netlify.app');
+        return clients.openWindow(event.notification.data.url);
       }
     })
   );
