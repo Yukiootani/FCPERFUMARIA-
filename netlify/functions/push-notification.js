@@ -21,25 +21,25 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // ESTRUTURA HÍBRIDA (A Chave do Sucesso)
+    // LÓGICA 3 MARIAS (WEB PURE)
+    // Sem configurações de Android Nativo, apenas WebPush padrão.
     const message = {
-      // 1. Para iOS (Display Automático)
       notification: {
         title: data.title || "FC Perfumaria",
         body: data.body || "Nova oferta!"
       },
-      // 2. Para Android (Dados para o Service Worker montar a notificação vibratória)
-      data: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!",
-        icon: 'https://i.imgur.com/BIXdM6M.png',
-        url: 'https://fcperfumaria.netlify.app'
-      },
-      // 3. Configurações de Prioridade
-      android: { priority: 'high' },
-      webpush: { 
-        headers: { "Urgency": "high" },
-        fcm_options: { link: 'https://fcperfumaria.netlify.app' }
+      webpush: {
+        headers: {
+          "Urgency": "high"
+        },
+        notification: {
+          icon: 'https://i.imgur.com/BIXdM6M.png',
+          requireInteraction: true, // Obriga a ficar na tela
+          click_action: 'https://fcperfumaria.netlify.app'
+        },
+        fcm_options: {
+          link: 'https://fcperfumaria.netlify.app'
+        }
       },
       tokens: tokens
     };
