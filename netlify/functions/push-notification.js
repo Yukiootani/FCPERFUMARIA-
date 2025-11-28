@@ -21,30 +21,42 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    const title = data.title || "FC Perfumaria";
-    const body = data.body || "Nova oferta disponível!";
-    const link = 'https://fcperfumaria.netlify.app';
+    // Ícone seguro
+    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
+    const linkLoja = 'https://fcperfumaria.netlify.app';
 
     const message = {
-      // 1. iOS (Usa isso)
+      // 1. O QUE O IOS LÊ
       notification: {
-        title: title,
-        body: body
+        title: data.title || "FC Perfumaria",
+        body: data.body || "Nova oferta disponível!"
       },
-      // 2. Android (Vai ler daqui para montar manual)
-      data: {
-        custom_title: title,
-        custom_body: body,
-        custom_url: link
+      // 2. O QUE O ANDROID LÊ
+      android: {
+        priority: 'high',
+        notification: {
+          icon: 'stock_ticker_update', // Ícone nativo do sistema
+          color: '#1B263B',
+          click_action: linkLoja
+        }
       },
-      // 3. Prioridade
-      android: { priority: 'high' },
+      // 3. CONFIGURAÇÃO WEB (Chrome)
+      webpush: {
+        headers: { "Urgency": "high" },
+        notification: {
+          icon: iconUrl,
+          badge: iconUrl,
+          requireInteraction: true, // Fica na tela
+          click_action: linkLoja
+        },
+        fcm_options: { link: linkLoja }
+      },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
 
-    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
+    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount, falhas: response.failureCount }) };
 
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
