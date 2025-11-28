@@ -16,41 +16,46 @@ exports.handler = async function(event, context) {
     const data = JSON.parse(event.body);
     const db = admin.firestore();
     
-    // Pega tokens
+    // 1. Busca tokens
     const snapshot = await db.collection('push_tokens').get();
     if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
+
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Ícone seguro (Hospedado em CDN rápido)
-    const icon = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
-    const link = 'https://fcperfumaria.netlify.app';
+    // Link da FC Perfumaria
+    const linkLoja = 'https://fcperfumaria.netlify.app';
 
-    // CONFIGURAÇÃO NATIVA (WEB STANDARD)
+    // 🚨 ESTRUTURA HÍBRIDA (IGUAL AO 3 MARIAS) 🚨
     const message = {
-      notification: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+      notification: { 
+        title: data.title, 
+        body: data.body 
       },
-      webpush: {
-        headers: {
-          "Urgency": "high"
-        },
-        fcm_options: {
-          link: link
-        },
+      // Configuração específica para acordar o Android
+      android: {
+        priority: 'high',
         notification: {
-          icon: icon,
-          click_action: link
+          sound: 'default',
+          click_action: data.link || linkLoja
         }
+      },
+      // Configuração para Web (PC/iPhone/PWA)
+      webpush: { 
+        headers: {
+          Urgency: "high"
+        },
+        fcm_options: { 
+          link: data.link || linkLoja 
+        } 
       },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-
-    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
+    return { statusCode: 200, body: JSON.stringify({ success: true, count: response.successCount }) };
 
   } catch (error) {
+    console.error(error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
