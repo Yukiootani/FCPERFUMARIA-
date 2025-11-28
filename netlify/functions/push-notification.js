@@ -1,20 +1,10 @@
 var admin = require("firebase-admin");
 
-// Função para limpar a chave (Essencial no Netlify)
-function getServiceAccount() {
-  try {
-    if (!process.env.FIREBASE_SERVICE_ACCOUNT) return null;
-    let rawKey = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (typeof rawKey === 'string') { return JSON.parse(rawKey); }
-    return rawKey;
-  } catch (e) { console.error("Erro chave:", e); return null; }
-}
-
 if (admin.apps.length === 0) {
-  const serviceAccount = getServiceAccount();
-  if (serviceAccount) {
-    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-  }
+  var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
 }
 
 exports.handler = async function(event, context) {
@@ -23,54 +13,46 @@ exports.handler = async function(event, context) {
   try {
     const data = JSON.parse(event.body);
     const db = admin.firestore();
-    
-    // Busca tokens
     const snapshot = await db.collection('push_tokens').get();
-    if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
+    
+    if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Nenhum cliente." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
     
-    // Link e Ícone
+    // Link da FC Perfumaria
     const linkLoja = 'https://fcperfumaria.netlify.app';
-    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
 
-    // MENSAGEM HÍBRIDA (Cobre todas as bases)
+    // 🚨 ESTRUTURA EXATA DO 3 MARIAS 🚨
     const message = {
-      notification: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Oferta Especial"
+      notification: { 
+        title: data.title, 
+        body: data.body 
       },
-      // Configuração específica para Android Nativo/Chrome
+      // Configuração específica para acordar o Android
       android: {
         priority: 'high',
         notification: {
-          icon: 'stock_ticker_update', // Ícone de sistema
-          color: '#1B263B',
-          default_sound: true,
-          click_action: linkLoja
+          sound: 'default',
+          click_action: data.link || linkLoja
         }
       },
-      // Configuração Web (PWA)
-      webpush: {
+      // Configuração para Web (PC/iPhone)
+      webpush: { 
         headers: {
-          "Urgency": "high"
+          Urgency: "high"
         },
-        notification: {
-          icon: iconUrl,
-          requireInteraction: true,
-          click_action: linkLoja
-        },
-        fcm_options: {
-          link: linkLoja
-        }
+        fcm_options: { 
+          link: data.link || linkLoja 
+        } 
       },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
+    return { statusCode: 200, body: JSON.stringify({ success: true, count: response.successCount }) };
 
   } catch (error) {
+    console.error(error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
