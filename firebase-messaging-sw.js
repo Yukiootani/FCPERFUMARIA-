@@ -13,44 +13,16 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// 🚨 CORREÇÃO CRÍTICA 🚨
-// Esse código impede que o Android mostre a mensagem genérica "Site atualizado..."
-messaging.onBackgroundMessage(function(payload) {
+// O Android precisa deste evento para saber o que fazer em background
+messaging.onBackgroundMessage((payload) => {
   console.log('[FC Perfumaria] Background:', payload);
-
-  // Pega os dados manuais que enviamos no 'data'
-  const title = payload.data.custom_title || 'FC Perfumaria';
-  const body = payload.data.custom_body || 'Nova novidade!';
   
+  // Se o navegador não mostrar sozinho, forçamos aqui
+  const notificationTitle = payload.notification.title;
   const notificationOptions = {
-    body: body,
-    icon: 'https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png', // Ícone Padrão Google (Não falha)
-    tag: 'fc-promo-' + Date.now(),
-    renotify: true,
-    requireInteraction: true,
-    vibrate: [300, 100, 300], // Vibração
-    data: {
-      url: payload.data.custom_url || 'https://fcperfumaria.netlify.app'
-    }
+    body: payload.notification.body,
+    icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png'
   };
 
-  // RETORNA A PROMESSA (Isso avisa o Android que terminamos e ele exibe o texto correto)
-  return self.registration.showNotification(title, notificationOptions);
-});
-
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({type: 'window'}).then(windowClients => {
-      for (var i = 0; i < windowClients.length; i++) {
-        var client = windowClients[i];
-        if (client.url.includes('fcperfumaria') && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
-      }
-    })
-  );
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
