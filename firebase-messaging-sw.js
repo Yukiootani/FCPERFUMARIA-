@@ -13,29 +13,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// CORREÇÃO: Lê os dados manuais (DATA) para evitar a mensagem genérica
+// LÓGICA DE TELA BLOQUEADA (BACKGROUND)
 messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Background:', payload);
+  console.log('[FC Perfumaria] Background Push:', payload);
 
-  // Pega do DATA (que mandamos como custom_*) ou fallback para notification
-  const title = payload.data.custom_title || payload.notification.title || 'FC Perfumaria';
-  const body = payload.data.custom_body || payload.notification.body || 'Nova novidade!';
-  const icon = payload.data.custom_icon || 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
-  
+  const notificationTitle = payload.notification.title;
   const notificationOptions = {
-    body: body,
-    icon: icon,
-    badge: icon,
-    vibrate: [500, 200, 500], // Vibra forte
-    tag: 'fc-push-' + Date.now(), // Tag única
-    renotify: true, // Toca som mesmo se tiver outra
-    requireInteraction: true, // Fica na tela
-    data: {
-        url: payload.data.click_action || 'https://fcperfumaria.netlify.app'
-    }
+    body: payload.notification.body,
+    icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
+    data: { url: 'https://fcperfumaria.netlify.app' }
   };
 
-  return self.registration.showNotification(title, notificationOptions);
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 self.addEventListener('notificationclick', function(event) {
