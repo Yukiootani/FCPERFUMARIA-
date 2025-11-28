@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO BLINDADO (Visual Novo) --- */
+        /* --- CSS BLINDADO --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -107,34 +107,24 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // 🚨 AQUI ESTÁ A LIGAÇÃO MÁGICA (REGISTRO SW) 🚨
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    // 1. Registra o Arquivo de Notificação (O Motor)
-                    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                    
-                    // 2. Amarra o Firebase a esse Motor (Essencial para Android)
-                    if (messaging) {
-                        messaging.useServiceWorker(reg);
-                    }
-                    
-                    // 3. Registra o Arquivo do Site (Para instalar)
-                    navigator.serviceWorker.register('/sw.js');
-                    console.log("Service Workers OK");
-                } catch (err) { console.log("SW Error:", err); }
-            });
-        }
+        function clearBadge() { try { if ('setAppBadge' in navigator) navigator.setAppBadge(0); if ('clearAppBadge' in navigator) navigator.clearAppBadge(); } catch(e) { } }
+        clearBadge(); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') clearBadge(); });
 
         // PWA
         let deferredPrompt; const installBtn=document.getElementById('install-app-btn'); const iosBanner=document.getElementById('ios-install-banner');
-        window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='block'; tryShowPopup();});
+        window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='block';}); // Removed tryShowPopup here to avoid conflict
         installBtn.addEventListener('click',()=>{installBtn.style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}});
         const isIos=()=>{return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())};
         if(isIos()&&!('standalone' in window.navigator && window.navigator.standalone)){iosBanner.style.display='block';document.getElementById('cart-icon').style.bottom='100px';}
         document.getElementById('close-ios-banner').addEventListener('click',()=>{iosBanner.style.display='none';document.getElementById('cart-icon').style.bottom='20px';});
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try { navigator.serviceWorker.register('/sw.js'); } catch(e){}
+            });
+        }
 
-        // LOJA (Nuclear)
+        // LOJA (NUCLEAR)
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message');
         let currentFilter='pronta-entrega', currentSecao='todos', allProducts=[];
         async function fetchSiteConfig(){try{const d=await db.collection("configuracoes").doc("siteInfo").get();if(d.exists&&d.data().logoUrl) document.querySelector('.header-logo-text').innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`;}catch(e){}}
@@ -149,7 +139,6 @@
                 renderProducts();
             } catch(e) { loadingMsg.style.color='red'; loadingMsg.innerHTML="Erro de conexão."; }
         }
-
         function renderProducts() {
             loadingMsg.style.display='none'; grid.innerHTML='';
             let filtered = allProducts.filter(p => {
@@ -174,7 +163,7 @@
         function updateCartIcon(){const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}};let q=0;Object.values(c.items).forEach(i=>q+=i.quantity);const b=document.getElementById('cart-count');if(q>0){b.textContent=q;b.style.display='flex'}else{b.style.display='none'}}
         let tapCount=0; document.getElementById('main-header').addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
-        // --- NOTIFICAÇÕES ---
+        // NOTIFICAÇÃO (LÓGICA 3 MARIAS COM TIMEOUT)
         async function handleBellClick() {
             if (Notification.permission === 'granted') { openInbox(); } else { requestPermission(); }
         }
@@ -212,14 +201,9 @@
         document.getElementById('notification-bell').addEventListener('click', handleBellClick);
         document.getElementById('inbox-modal').addEventListener('click', (e) => { if(e.target.id === 'inbox-modal') e.target.style.display = 'none'; });
         
-        // POPUP AUTOMÁTICO IMEDIATO
         const pushModal = document.getElementById('push-permission-modal');
-        function tryShowPopup() {
-            if('Notification' in window && Notification.permission === 'default') { pushModal.style.display = 'flex'; }
-        }
-        // Executa agora!
-        tryShowPopup();
-
+        // TIMEOUT DE 3 SEGUNDOS (Segurança para Android não travar)
+        if('Notification' in window && Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 3000); }
         document.getElementById('allow-push-btn').addEventListener('click', () => { pushModal.style.display = 'none'; requestPermission(); });
         document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none');
 
