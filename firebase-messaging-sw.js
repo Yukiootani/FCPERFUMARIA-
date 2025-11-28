@@ -13,8 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Apenas registra o recebimento no console.
-// Deixa o Sistema Operacional (Android/iOS) exibir a notificação padrão.
+// Background: Apenas loga. Deixa o Sistema Operacional exibir a notificação que mandamos no 'webpush'.
 messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Notificação Recebida:', payload);
+  console.log('[FC Perfumaria] Push:', payload);
 });
