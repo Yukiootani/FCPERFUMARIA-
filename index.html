@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta name="theme-color" content="#1B263B">
     <link rel="manifest" href="manifest.json">
     <title>FC Perfumaria</title>
@@ -12,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL (IDÊNTICO AO 3 MARIAS) --- */
+        /* --- CSS BLINDADO --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -39,7 +38,7 @@
         .inbox-date { font-size: 0.75em; color: #999; margin-top: 8px; text-align: right; display: block; }
         .inbox-empty { padding: 30px; text-align: center; color: #999; font-style: italic; }
 
-        /* OUTROS */
+        /* ELEMENTOS */
         #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; padding-top: max(15px, env(safe-area-inset-top)); }
         #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; padding-bottom: max(20px, env(safe-area-inset-bottom)); text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); font-size: 0.9em; color: #333; }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
@@ -112,14 +111,12 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- LIMPEZA DE BADGE AGRESSIVA ---
         function clearBadge() {
             try {
                 if ('setAppBadge' in navigator) navigator.setAppBadge(0);
                 if ('clearAppBadge' in navigator) navigator.clearAppBadge();
-            } catch(e) { console.log("Badge error", e); }
+            } catch(e) { }
         }
-        // Limpa no Load e no Foco da tela
         clearBadge();
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') clearBadge(); });
 
@@ -130,15 +127,9 @@
         const isIos=()=>{return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())};
         if(isIos()&&!('standalone' in window.navigator && window.navigator.standalone)){iosBanner.style.display='block';document.getElementById('cart-icon').style.bottom='100px';}
         document.getElementById('close-ios-banner').addEventListener('click',()=>{iosBanner.style.display='none';document.getElementById('cart-icon').style.bottom='20px';});
-        
-        // SW Register
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try { navigator.serviceWorker.register('/sw.js'); } catch(e){}
-            });
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }
 
-        // LOJA (Nuclear)
+        // LOJA (NUCLEAR)
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message');
         let currentFilter='pronta-entrega', currentSecao='todos', allProducts=[];
         async function fetchSiteConfig(){try{const d=await db.collection("configuracoes").doc("siteInfo").get();if(d.exists&&d.data().logoUrl) document.querySelector('.header-logo-text').innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`;}catch(e){}}
@@ -178,9 +169,8 @@
         function updateCartIcon(){const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}};let q=0;Object.values(c.items).forEach(i=>q+=i.quantity);const b=document.getElementById('cart-count');if(q>0){b.textContent=q;b.style.display='flex'}else{b.style.display='none'}}
         let tapCount=0; document.getElementById('main-header').addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
-        // --- SINO E NOTIFICAÇÕES ---
+        // --- NOTIFICAÇÃO ---
         async function handleBellClick() {
-            clearBadge(); // Força limpar número ao clicar
             if (Notification.permission === 'granted') { openInbox(); } else { requestPermission(); }
         }
         async function requestPermission() {
@@ -188,12 +178,16 @@
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted' && messaging) {
+                    // FEEDBACK VISUAL (Isso é o que você pediu!)
+                    const btn = document.getElementById('allow-push-btn');
+                    if(btn) btn.textContent = "CONFIGURANDO... ⏳";
+                    
                     const token = await messaging.getToken({ vapidKey: 'BOdgxsn6TEz_y5Ub-xPuqvTHa6NkNzfhk6GlA7-UCoKMyIwBIffbOo2NQjPy27H_G5Qj0x4XgOF1gXyAvkS7_V8' });
                     if(token) {
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-                        alert("Sucesso! Avisos ativados.");
+                        alert("SUCESSO! Avisos ativados.");
                     }
-                } else { alert("Notificações bloqueadas."); }
+                }
             } catch(e) { console.log(e); }
         }
         async function openInbox() {
@@ -218,8 +212,13 @@
         document.getElementById('inbox-modal').addEventListener('click', (e) => { if(e.target.id === 'inbox-modal') e.target.style.display = 'none'; });
         
         const pushModal = document.getElementById('push-permission-modal');
-        if('Notification' in window && Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 2000); }
-        document.getElementById('allow-push-btn').addEventListener('click', () => { pushModal.style.display = 'none'; requestPermission(); });
+        // Acelerei para 500ms para parecer instantâneo no Android
+        if('Notification' in window && Notification.permission === 'default') { setTimeout(() => { pushModal.style.display = 'flex'; }, 500); }
+        
+        document.getElementById('allow-push-btn').addEventListener('click', () => { 
+            // Não fecha o modal na hora, espera a resposta
+            requestPermission().then(() => { pushModal.style.display = 'none'; });
+        });
         document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none');
 
         document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchAllProducts(); });
