@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS TRAVADO E RESPONSIVO */
+        /* ESTILOS (Mantidos iguais ao aprovado) */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -21,11 +21,9 @@
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
         .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* SINO */
         #notification-bell { position: fixed; top: max(15px, env(safe-area-inset-top)); right: 15px; width: 42px; height: 42px; background-color: #fff; border-radius: 50%; z-index: 9990; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         #notification-bell svg { width: 20px; height: 20px; fill: var(--primary-color); }
 
-        /* INBOX */
         #inbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: flex-start; justify-content: center; padding-top: 80px; backdrop-filter: blur(3px); }
         .inbox-content { background: #fff; width: 90%; max-width: 400px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: slideDown 0.3s ease; }
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -38,7 +36,6 @@
         .inbox-date { font-size: 0.75em; color: #999; margin-top: 8px; text-align: right; display: block; }
         .inbox-empty { padding: 30px; text-align: center; color: #999; font-style: italic; }
 
-        /* OUTROS */
         #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; padding-top: max(15px, env(safe-area-inset-top)); }
         #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(255, 255, 255, 0.98); border-top: 1px solid #ccc; padding: 20px 15px; padding-bottom: max(20px, env(safe-area-inset-bottom)); text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); font-size: 0.9em; color: #333; }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; color: #888; }
@@ -47,17 +44,13 @@
         #search-container { position: relative; margin: 20px auto; width: 100%; }
         #search-input { width: 100%; padding: 12px 40px 12px 20px; border: 1px solid #ddd; border-radius: 30px; font-size: 1em; outline: none; background: #fff; }
         .search-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--accent-color); }
-        
         #secao-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 20px 0; width: 100%; }
         .secao-button { background-color: #fff; color: var(--text-color); padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; font-size: 0.85em; font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
         .secao-button.active { background-color: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: 600; }
-
         #controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; width: 100%; }
         .filter-button { background-color: transparent; color: var(--text-color); padding: 8px 12px; border: 1px solid var(--accent-color); border-radius: 4px; font-size: 0.8em; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
         .filter-button.active { background-color: var(--accent-color); color: #fff; }
-
         .section-title { font-family: 'Playfair Display', serif; font-size: 1.6em; color: var(--primary-color); text-align: center; margin: 20px 0; }
-
         #products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 20px; }
         .product-card { background-color: #fff; border-radius: 8px; border: 1px solid #eee; overflow: hidden; text-decoration: none; color: var(--text-color); display: flex; flex-direction: column; position: relative; width: 100%; }
         .product-image-container { width: 100%; padding-top: 120%; position: relative; background-color: #f9f9f9; }
@@ -69,7 +62,6 @@
         .badge { position: absolute; top: 5px; left: 5px; padding: 4px 8px; border-radius: 2px; font-size: 0.65em; font-weight: bold; color: white; z-index: 10; text-transform: uppercase; }
         .badge-novo { background-color: var(--accent-color); }
         .badge-esgotado { background-color: #666; right: 5px; left: auto; }
-
         footer { text-align: center; padding: 30px; margin-top: 20px; color: #666; border-top: 1px solid #eee; font-size: 0.8em; }
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
         #cart-count { position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
@@ -81,63 +73,22 @@
 </head>
 <body>
     <button id="install-app-btn">📲 INSTALAR APLICATIVO</button>
-
-    <header id="main-header">
-        <h1 class="header-logo-text">FC PERFUMARIA</h1>
-        <div class="header-sub">Essência Brasileira no Japão</div>
-    </header>
-
-    <div id="notification-bell" onclick="handleBellClick()">
-        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-    </div>
-
-    <div id="inbox-modal">
-        <div class="inbox-content">
-            <div class="inbox-header"><span>Novidades</span><span class="close-inbox" onclick="document.getElementById('inbox-modal').style.display='none'">&times;</span></div>
-            <ul id="inbox-list"><li class="inbox-empty">Carregando...</li></ul>
-        </div>
-    </div>
-
+    <header id="main-header"><h1 class="header-logo-text">FC PERFUMARIA</h1><div class="header-sub">Essência Brasileira no Japão</div></header>
+    <div id="notification-bell" onclick="handleBellClick()"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg></div>
+    <div id="inbox-modal"><div class="inbox-content"><div class="inbox-header"><span>Novidades</span><span class="close-inbox" onclick="document.getElementById('inbox-modal').style.display='none'">&times;</span></div><ul id="inbox-list"><li class="inbox-empty">Carregando...</li></ul></div></div>
     <main>
         <div id="search-container"><input type="text" id="search-input" placeholder="Buscar perfume..."><i class="fas fa-search search-icon"></i></div>
-
-        <div id="secao-filters">
-            <button class="secao-button active" data-secao="todos">Todos</button>
-            <button class="secao-button" data-secao="feminino">Feminino</button>
-            <button class="secao-button" data-secao="masculino">Masculino</button>
-            <button class="secao-button" data-secao="unissex">Unissex</button>
-            <button class="secao-button" data-secao="infantil">Infantil</button>
-            <button class="secao-button" data-secao="kits">Kits</button>
-        </div>
-
-        <div id="controls">
-            <button class="filter-button active" data-filter="pronta-entrega">Pronta Entrega</button>
-            <button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button>
-        </div>
-
+        <div id="secao-filters"><button class="secao-button active" data-secao="todos">Todos</button><button class="secao-button" data-secao="feminino">Feminino</button><button class="secao-button" data-secao="masculino">Masculino</button><button class="secao-button" data-secao="unissex">Unissex</button><button class="secao-button" data-secao="infantil">Infantil</button><button class="secao-button" data-secao="kits">Kits</button></div>
+        <div id="controls"><button class="filter-button active" data-filter="pronta-entrega">Pronta Entrega</button><button class="filter-button" data-filter="sob-encomenda">Sob Encomenda</button></div>
         <h2 id="collection-title" class="section-title">Loja Oficial</h2>
         <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando catálogo...</div>
         <div id="products-grid"></div>
-        <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
+        <p id="search-no-results" style="display:none; text-align:center; color:#999; padding:20px;">Nenhum produto encontrado.</p>
     </main>
-
     <footer><p>© 2025 FC Perfumaria</p></footer>
     <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
-    
-    <div id="ios-install-banner">
-        <span id="close-ios-banner">&times;</span>
-        <p>Para instalar: Toque em <strong>Compartilhar</strong> <i class="fas fa-share-square" style="color:#007AFF;"></i> e <strong>Adicionar à Tela de Início</strong>.</p>
-    </div>
-
-    <div id="push-permission-modal">
-        <div class="push-modal-content">
-            <i class="fas fa-bell" style="font-size: 40px; color: var(--accent-color); margin-bottom:15px;"></i>
-            <h3 style="margin:0 0 10px 0; color:var(--primary-color);">Ativar Avisos?</h3>
-            <p style="color:#666; font-size:0.9em;">Receba ofertas e novidades direto no celular.</p>
-            <button class="push-btn-allow" id="allow-push-btn">SIM, ATIVAR</button>
-            <button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" id="deny-push-btn">Agora não</button>
-        </div>
-    </div>
+    <div id="ios-install-banner"><span id="close-ios-banner">&times;</span><p>Para instalar: Toque em <strong>Compartilhar</strong> <i class="fas fa-share-square" style="color:#007AFF;"></i> e <strong>Adicionar à Tela de Início</strong>.</p></div>
+    <div id="push-permission-modal"><div class="push-modal-content"><i class="fas fa-bell" style="font-size: 40px; color: var(--accent-color); margin-bottom:15px;"></i><h3 style="margin:0 0 10px 0; color:var(--primary-color);">Ativar Avisos?</h3><p style="color:#666; font-size:0.9em;">Receba ofertas e novidades direto no celular.</p><button class="push-btn-allow" id="allow-push-btn">SIM, ATIVAR</button><button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" id="deny-push-btn">Agora não</button></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -148,15 +99,32 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- CLEAR BADGE (LIMPA O NÚMERO VERMELHO) ---
-        function clearBadge() {
-            if ('setAppBadge' in navigator) navigator.setAppBadge(0);
-            if ('clearAppBadge' in navigator) navigator.clearAppBadge();
+        // --- CORREÇÃO PWA: Registro Explícito para Android ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    if (messaging) { messaging.useServiceWorker(reg); }
+                    navigator.serviceWorker.register('/sw.js');
+                } catch (err) { console.log('SW Error:', err); }
+            });
         }
-        // Limpa ao carregar a página
-        clearBadge();
 
-        // PWA
+        // --- ESCUTA DE PRIMEIRO PLANO (FOREGROUND) ---
+        // Se a mensagem chegar com o site aberto, avisa o usuário
+        if (messaging) {
+            messaging.onMessage((payload) => {
+                console.log('Mensagem Foreground:', payload);
+                const title = payload.notification.title || "Nova Mensagem";
+                const body = payload.notification.body || "Veja as novidades!";
+                // Mostra um alerta nativo ou customizado
+                alert(`🔔 ${title}\n\n${body}`);
+                // Atualiza o Inbox se estiver aberto
+                if(document.getElementById('inbox-modal').style.display === 'flex') openInbox();
+            });
+        }
+
+        // --- PWA UI ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-app-btn');
         const iosBanner = document.getElementById('ios-install-banner');
@@ -165,25 +133,13 @@
         const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
         if (isIos() && !('standalone' in window.navigator && window.navigator.standalone)) { iosBanner.style.display = 'block'; document.getElementById('cart-icon').style.bottom = '100px'; }
         document.getElementById('close-ios-banner').addEventListener('click', () => { iosBanner.style.display = 'none'; document.getElementById('cart-icon').style.bottom = '20px'; });
-        
-        // PWA - Registro do Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                    if (messaging) messaging.useServiceWorker(reg);
-                    navigator.serviceWorker.register('/sw.js');
-                } catch (err) { console.log('SW Error:', err); }
-            });
-        }
 
-        // LOJA
+        // --- LOJA ---
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
-        const headerEl = document.getElementById('main-header');
         let currentFilter = 'pronta-entrega', currentSecao = 'todos', allProducts = [];
 
-        async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) headerEl.innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
+        async function fetchSiteConfig(){ try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists&&d.data().logoUrl) document.querySelector('.header-logo-text').innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`; }catch(e){} }
 
         async function fetchAllProducts() {
             loadingMsg.style.display = 'block'; grid.innerHTML = '';
@@ -223,7 +179,6 @@
 
         // --- SISTEMA SINO + INBOX ---
         async function handleBellClick() {
-            clearBadge(); // Limpa o número vermelho ao clicar
             if (Notification.permission === 'granted') { openInbox(); } else { requestPermission(); }
         }
 
@@ -237,7 +192,7 @@
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
                         alert("Sucesso! Clique no sino para ver as mensagens.");
                     }
-                }
+                } else { alert("Ative as notificações nas configurações."); }
             } catch(e) { console.log(e); }
         }
 
