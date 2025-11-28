@@ -21,42 +21,24 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Ícone seguro (Google) para garantir que o Android não bloqueie o download da imagem
-    const iconUrl = 'https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png';
+    const title = data.title || "FC Perfumaria";
+    const body = data.body || "Nova oferta disponível!";
     const link = 'https://fcperfumaria.netlify.app';
 
     const message = {
-      // 1. Configuração Base (Para iOS)
+      // 1. iOS (Usa isso)
       notification: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+        title: title,
+        body: body
       },
-      
-      // 2. Configuração Android Chrome (AQUI ESTÁ A MÁGICA)
-      // Mandamos as ordens de vibração direto no pacote
-      webpush: {
-        headers: {
-          "Urgency": "high",
-          "TTL": "4500"
-        },
-        notification: {
-          title: data.title || "FC Perfumaria",
-          body: data.body || "Nova oferta!",
-          icon: iconUrl,
-          badge: iconUrl,
-          
-          // OBRIGA A TELA A ACENDER/VIBRAR
-          vibrate: [200, 100, 200, 100, 200, 100, 200],
-          requireInteraction: true, // A notificação não some sozinha
-          renotify: true, // Toca o som mesmo se tiver outra
-          tag: 'fc-alert-' + Date.now(), // Tag única para forçar novo alerta
-          
-          click_action: link
-        },
-        fcm_options: {
-          link: link
-        }
+      // 2. Android (Vai ler daqui para montar manual)
+      data: {
+        custom_title: title,
+        custom_body: body,
+        custom_url: link
       },
+      // 3. Prioridade
+      android: { priority: 'high' },
       tokens: tokens
     };
 
