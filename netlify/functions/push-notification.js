@@ -5,7 +5,7 @@ if (admin.apps.length === 0) {
     try {
       var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Erro Credencial:", e); }
   }
 }
 
@@ -21,27 +21,31 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // ESTRUTURA UNIVERSAL (WEB PUSH STANDARD)
+    // DADOS DA MENSAGEM
+    const title = data.title || "FC Perfumaria";
+    const body = data.body || "Nova oferta disponível!";
+    const icon = "https://cdn-icons-png.flaticon.com/512/2771/2771401.png";
+    const link = "https://fcperfumaria.netlify.app";
+
     const message = {
-      // Dados visuais para iOS e Chrome Desktop
+      // 1. IOS (Lê daqui automático)
       notification: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Oferta Especial"
+        title: title,
+        body: body
       },
-      // Dados extras para o nosso Service Worker do Android montar
+      // 2. ANDROID (Nosso script vai ler daqui)
       data: {
-        title: data.title,
-        body: data.body,
-        url: data.link || 'https://fcperfumaria.netlify.app'
+        title: title,
+        body: body,
+        icon: icon,
+        url: link,
+        click_action: link // Necessário para alguns Androids antigos
       },
-      // Configuração de prioridade Web
-      webpush: {
-        headers: {
-          "Urgency": "high"
-        },
-        fcm_options: {
-          link: 'https://fcperfumaria.netlify.app'
-        }
+      // Prioridade Máxima
+      android: { priority: "high" },
+      webpush: { 
+        headers: { "Urgency": "high" },
+        fcm_options: { link: link }
       },
       tokens: tokens
     };
