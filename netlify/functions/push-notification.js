@@ -1,5 +1,6 @@
 var admin = require("firebase-admin");
 
+// Conexão segura (Lógica 3 Marias)
 function getServiceAccount() {
   try {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT) return null;
@@ -27,41 +28,48 @@ exports.handler = async function(event, context) {
     if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
-    const link = 'https://fcperfumaria.netlify.app';
+    
+    // Ícone seguro
+    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
+    const linkLoja = 'https://fcperfumaria.netlify.app';
 
-    // ESTRUTURA UNIVERSAL (iOS + Android Nativo)
+    // 🚨 ESTRUTURA EXATA DO 3 MARIAS 🚨
     const message = {
-      // Campo obrigatório para iOS mostrar na tela bloqueada
-      notification: {
-        title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+      // 1. Notificação Básica
+      notification: { 
+        title: data.title, 
+        body: data.body 
       },
-      // Configurações para Chrome/Android
-      webpush: {
+      
+      // 2. Configuração ANDROID (Do jeito que estava no 3 Marias)
+      android: {
+        priority: 'high',
+        notification: {
+          sound: 'default',
+          icon: 'stock_ticker_update', // Ícone nativo seguro
+          click_action: linkLoja
+        }
+      },
+      
+      // 3. Configuração WEB
+      webpush: { 
         headers: {
           "Urgency": "high"
         },
         notification: {
-          icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
-          click_action: link
+          icon: iconUrl,
+          click_action: linkLoja
         },
-        fcm_options: {
-          link: link
-        }
+        fcm_options: { 
+          link: linkLoja 
+        } 
       },
+      
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-
-    return { 
-      statusCode: 200, 
-      body: JSON.stringify({ 
-        success: true, 
-        enviados: response.successCount, 
-        falhas: response.failureCount 
-      }) 
-    };
+    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
 
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
