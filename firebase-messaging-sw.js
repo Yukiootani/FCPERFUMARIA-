@@ -13,47 +13,25 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// --- LÓGICA CLÁSSICA (V8) PARA ANDROID ---
+// LÓGICA SIMPLES (Background)
+// Se a notificação vier com o campo 'notification' preenchido, o navegador mostra sozinho.
+// Esse código serve apenas para logar e garantir o recebimento.
 messaging.setBackgroundMessageHandler(function(payload) {
   console.log('[FC Perfumaria] Background:', payload);
-
-  // Garante que pegamos os dados, venham eles de onde vierem
-  const title = payload.data.title || payload.notification.title || 'FC Perfumaria';
-  const body = payload.data.body || payload.notification.body || 'Nova novidade!';
-  const icon = 'https://i.imgur.com/BIXdM6M.png';
-
+  
+  // Só força a exibição se o navegador não tiver feito automático
+  // Usamos título e corpo padrão para garantir
+  const notificationTitle = payload.notification.title;
   const notificationOptions = {
-    body: body,
-    icon: icon,
-    badge: icon,
-    // A VIBRAÇÃO É O SEGREDO DO ANDROID ACORDAR
-    vibrate: [300, 100, 400, 100, 400], 
-    requireInteraction: true, // Obriga a ficar na tela
-    tag: 'push-fc-' + Date.now(),
-    data: {
-      url: 'https://fcperfumaria.netlify.app'
-    }
+    body: payload.notification.body,
+    icon: 'https://i.imgur.com/BIXdM6M.png',
+    data: { url: 'https://fcperfumaria.netlify.app' }
   };
 
-  return self.registration.showNotification(title, notificationOptions);
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Clique na notificação
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  event.waitUntil(
-    clients.matchAll({type: 'window', includeUncontrolled: true}).then(function(clientList) {
-      // Se já tem aba aberta, foca nela
-      for (var i = 0; i < clientList.length; i++) {
-        var client = clientList[i];
-        if (client.url.includes('fcperfumaria') && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // Se não, abre nova
-      if (clients.openWindow) {
-        return clients.openWindow('https://fcperfumaria.netlify.app');
-      }
-    })
-  );
+  event.waitUntil(clients.openWindow('https://fcperfumaria.netlify.app'));
 });
