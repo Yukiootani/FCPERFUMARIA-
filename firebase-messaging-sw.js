@@ -13,7 +13,5 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// Apenas loga o recebimento, deixa o sistema exibir sozinho
-messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Push:', payload);
-});
+// SEM CÓDIGO DE FUNDO.
+// Deixamos o Android desenhar a notificação sozinho baseado no payload 'notification'.
