@@ -21,30 +21,25 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Configuração Híbrida (iOS + Android Lock Screen)
+    // ESTRUTURA HÍBRIDA (A Chave do Sucesso)
     const message = {
-      // 1. Para iOS (Apple lê isso e exibe)
+      // 1. Para iOS (Display Automático)
       notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta disponível!"
+        body: data.body || "Nova oferta!"
       },
-      // 2. Para Android/Chrome (Configuração Completa de WebPush)
-      webpush: {
-        headers: {
-          "Urgency": "high", // Obriga o servidor a entregar rápido
-          "TTL": "4500"
-        },
-        notification: {
-          icon: 'https://i.imgur.com/BIXdM6M.png',
-          badge: 'https://i.imgur.com/BIXdM6M.png', // Ícone pequeno na barra
-          vibrate: [500, 200, 500], // VIBRAÇÃO FORTE (Meio segundo, pausa, meio segundo)
-          requireInteraction: true, // Fica na tela até o usuário tocar (Acorda a tela)
-          click_action: 'https://fcperfumaria.netlify.app',
-          tag: 'fc-notification-' + Date.now() // Evita agrupar e esconder
-        },
-        fcm_options: {
-          link: 'https://fcperfumaria.netlify.app'
-        }
+      // 2. Para Android (Dados para o Service Worker montar a notificação vibratória)
+      data: {
+        title: data.title || "FC Perfumaria",
+        body: data.body || "Nova oferta!",
+        icon: 'https://i.imgur.com/BIXdM6M.png',
+        url: 'https://fcperfumaria.netlify.app'
+      },
+      // 3. Configurações de Prioridade
+      android: { priority: 'high' },
+      webpush: { 
+        headers: { "Urgency": "high" },
+        fcm_options: { link: 'https://fcperfumaria.netlify.app' }
       },
       tokens: tokens
     };
