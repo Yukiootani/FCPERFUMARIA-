@@ -21,34 +21,29 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Ícone seguro
-    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
-    const linkLoja = 'https://fcperfumaria.netlify.app';
-
+    // ESTRUTURA OFICIAL (Simples e Direta)
     const message = {
-      // 1. IOS PRECISA DISSO (Display Automático)
       notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Oferta Especial!"
+        body: data.body || "Nova oferta!"
       },
-      // 2. ANDROID VAI LER ISSO (Dados para montagem manual)
-      data: {
-        custom_title: data.title || "FC Perfumaria",
-        custom_body: data.body || "Oferta Especial!",
-        custom_icon: iconUrl,
-        click_action: linkLoja
+      // Dados extras para garantir prioridade
+      android: {
+        priority: 'high',
+        notification: {
+          icon: 'stock_ticker_update', // Ícone nativo do Android (seguro)
+          color: '#1B263B',
+          clickAction: 'https://fcperfumaria.netlify.app'
+        }
       },
-      // 3. PRIORIDADES
-      android: { priority: 'high' },
-      webpush: { 
+      webpush: {
         headers: { "Urgency": "high" },
-        fcm_options: { link: linkLoja }
+        fcm_options: { link: 'https://fcperfumaria.netlify.app' }
       },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-
     return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
 
   } catch (error) {
