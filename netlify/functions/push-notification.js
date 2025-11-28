@@ -21,21 +21,41 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // ESTRUTURA "DATA-ONLY" (O Pulo do Gato)
-    // Não enviamos 'notification'. Enviamos apenas 'data'.
-    // Isso obriga o Android a acordar o Service Worker.
+    // Ícone seguro (Google) para garantir que o Android não bloqueie o download da imagem
+    const iconUrl = 'https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png';
+    const link = 'https://fcperfumaria.netlify.app';
+
     const message = {
-      data: {
+      // 1. Configuração Base (Para iOS)
+      notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Oferta Especial!",
-        icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
-        url: 'https://fcperfumaria.netlify.app',
-        timestamp: Date.now().toString() // Garante que cada mensagem é única
+        body: data.body || "Nova oferta!"
       },
-      // Configurações de prioridade para garantir a entrega
-      android: { priority: 'high' },
-      webpush: { 
-        headers: { "Urgency": "high" }
+      
+      // 2. Configuração Android Chrome (AQUI ESTÁ A MÁGICA)
+      // Mandamos as ordens de vibração direto no pacote
+      webpush: {
+        headers: {
+          "Urgency": "high",
+          "TTL": "4500"
+        },
+        notification: {
+          title: data.title || "FC Perfumaria",
+          body: data.body || "Nova oferta!",
+          icon: iconUrl,
+          badge: iconUrl,
+          
+          // OBRIGA A TELA A ACENDER/VIBRAR
+          vibrate: [200, 100, 200, 100, 200, 100, 200],
+          requireInteraction: true, // A notificação não some sozinha
+          renotify: true, // Toca o som mesmo se tiver outra
+          tag: 'fc-alert-' + Date.now(), // Tag única para forçar novo alerta
+          
+          click_action: link
+        },
+        fcm_options: {
+          link: link
+        }
       },
       tokens: tokens
     };
