@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL MANTIDO --- */
+        /* --- ESTILO VISUAL (IDÊNTICO AO 3 MARIAS) --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -20,7 +20,7 @@
         
         header { background-color: #fff; color: var(--primary-color); padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); padding-top: max(1.5rem, env(safe-area-inset-top)); }
         .header-logo-text { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0; letter-spacing: 1px; color: var(--primary-color); }
-        .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+        .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
         /* SINO */
         #notification-bell { position: fixed; top: max(15px, env(safe-area-inset-top)); right: 15px; width: 42px; height: 42px; background-color: #fff; border-radius: 50%; z-index: 9990; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
@@ -112,13 +112,16 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- NOVA FUNÇÃO: LIMPA O NÚMERO DO ÍCONE ---
+        // --- LIMPEZA DE BADGE AGRESSIVA ---
         function clearBadge() {
-            if ('setAppBadge' in navigator) navigator.setAppBadge(0);
-            if ('clearAppBadge' in navigator) navigator.clearAppBadge();
+            try {
+                if ('setAppBadge' in navigator) navigator.setAppBadge(0);
+                if ('clearAppBadge' in navigator) navigator.clearAppBadge();
+            } catch(e) { console.log("Badge error", e); }
         }
-        // Limpa ao abrir
+        // Limpa no Load e no Foco da tela
         clearBadge();
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') clearBadge(); });
 
         // PWA
         let deferredPrompt; const installBtn=document.getElementById('install-app-btn'); const iosBanner=document.getElementById('ios-install-banner');
@@ -127,12 +130,17 @@
         const isIos=()=>{return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())};
         if(isIos()&&!('standalone' in window.navigator && window.navigator.standalone)){iosBanner.style.display='block';document.getElementById('cart-icon').style.bottom='100px';}
         document.getElementById('close-ios-banner').addEventListener('click',()=>{iosBanner.style.display='none';document.getElementById('cart-icon').style.bottom='20px';});
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js'); }
+        
+        // SW Register
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try { navigator.serviceWorker.register('/sw.js'); } catch(e){}
+            });
+        }
 
-        // LOJA
+        // LOJA (Nuclear)
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message');
         let currentFilter='pronta-entrega', currentSecao='todos', allProducts=[];
-
         async function fetchSiteConfig(){try{const d=await db.collection("configuracoes").doc("siteInfo").get();if(d.exists&&d.data().logoUrl) document.querySelector('.header-logo-text').innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`;}catch(e){}}
 
         async function fetchAllProducts() {
@@ -164,16 +172,15 @@
                 grid.appendChild(card);
             });
         }
-
         document.querySelectorAll('.secao-button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.secao-button').forEach(btn=>btn.classList.remove('active'));b.classList.add('active');currentSecao=b.dataset.secao;renderProducts()}));
         document.querySelectorAll('.filter-button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-button').forEach(btn=>btn.classList.remove('active'));b.classList.add('active');currentFilter=b.dataset.filter;renderProducts()}));
         document.getElementById('search-input').addEventListener('input',(e)=>{const t=e.target.value.toLowerCase();const c=document.querySelectorAll('.product-card');c.forEach(card=>{if(card.querySelector('.product-name').textContent.toLowerCase().includes(t)){card.style.display='flex'}else{card.style.display='none'}})});
         function updateCartIcon(){const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}};let q=0;Object.values(c.items).forEach(i=>q+=i.quantity);const b=document.getElementById('cart-count');if(q>0){b.textContent=q;b.style.display='flex'}else{b.style.display='none'}}
         let tapCount=0; document.getElementById('main-header').addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
-        // --- NOTIFICAÇÃO E SINO (LÓGICA 3 MARIAS) ---
+        // --- SINO E NOTIFICAÇÕES ---
         async function handleBellClick() {
-            clearBadge(); // Limpa o número ao clicar
+            clearBadge(); // Força limpar número ao clicar
             if (Notification.permission === 'granted') { openInbox(); } else { requestPermission(); }
         }
         async function requestPermission() {
@@ -186,7 +193,7 @@
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
                         alert("Sucesso! Avisos ativados.");
                     }
-                }
+                } else { alert("Notificações bloqueadas."); }
             } catch(e) { console.log(e); }
         }
         async function openInbox() {
