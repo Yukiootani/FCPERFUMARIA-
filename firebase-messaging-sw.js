@@ -13,21 +13,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// --- CORREÇÃO AQUI: USANDO O COMANDO CERTO DA VERSÃO 8 ---
+// --- LÓGICA CLÁSSICA (V8) PARA ANDROID ---
 messaging.setBackgroundMessageHandler(function(payload) {
   console.log('[FC Perfumaria] Background:', payload);
 
-  // Tenta pegar o título/corpo do DATA ou do NOTIFICATION
+  // Garante que pegamos os dados, venham eles de onde vierem
   const title = payload.data.title || payload.notification.title || 'FC Perfumaria';
   const body = payload.data.body || payload.notification.body || 'Nova novidade!';
-  const icon = 'https://i.imgur.com/BIXdM6M.png'; 
+  const icon = 'https://i.imgur.com/BIXdM6M.png';
 
   const notificationOptions = {
     body: body,
     icon: icon,
-    badge: icon, // Ícone pequeno (Android)
-    vibrate: [200, 100, 200],
-    requireInteraction: true, // Fica na tela até clicar
+    badge: icon,
+    // A VIBRAÇÃO É O SEGREDO DO ANDROID ACORDAR
+    vibrate: [300, 100, 400, 100, 400], 
+    requireInteraction: true, // Obriga a ficar na tela
+    tag: 'push-fc-' + Date.now(),
     data: {
       url: 'https://fcperfumaria.netlify.app'
     }
@@ -41,14 +43,14 @@ self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({type: 'window', includeUncontrolled: true}).then(function(clientList) {
-      // Se tiver uma aba aberta, foca nela
+      // Se já tem aba aberta, foca nela
       for (var i = 0; i < clientList.length; i++) {
         var client = clientList[i];
         if (client.url.includes('fcperfumaria') && 'focus' in client) {
           return client.focus();
         }
       }
-      // Senão, abre nova
+      // Se não, abre nova
       if (clients.openWindow) {
         return clients.openWindow('https://fcperfumaria.netlify.app');
       }
