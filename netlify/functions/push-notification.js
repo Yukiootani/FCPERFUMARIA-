@@ -21,29 +21,27 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // ESTRUTURA OFICIAL (Simples e Direta)
+    // ESTRUTURA "DATA-ONLY" (O Pulo do Gato)
+    // Não enviamos 'notification'. Enviamos apenas 'data'.
+    // Isso obriga o Android a acordar o Service Worker.
     const message = {
-      notification: {
+      data: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+        body: data.body || "Oferta Especial!",
+        icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
+        url: 'https://fcperfumaria.netlify.app',
+        timestamp: Date.now().toString() // Garante que cada mensagem é única
       },
-      // Dados extras para garantir prioridade
-      android: {
-        priority: 'high',
-        notification: {
-          icon: 'stock_ticker_update', // Ícone nativo do Android (seguro)
-          color: '#1B263B',
-          clickAction: 'https://fcperfumaria.netlify.app'
-        }
-      },
-      webpush: {
-        headers: { "Urgency": "high" },
-        fcm_options: { link: 'https://fcperfumaria.netlify.app' }
+      // Configurações de prioridade para garantir a entrega
+      android: { priority: 'high' },
+      webpush: { 
+        headers: { "Urgency": "high" }
       },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
+
     return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
 
   } catch (error) {
