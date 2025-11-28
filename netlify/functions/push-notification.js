@@ -21,37 +21,28 @@ exports.handler = async function(event, context) {
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Ícone seguro e direto
-    const icon = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
-    const link = 'https://fcperfumaria.netlify.app';
+    // Ícone seguro
+    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
+    const linkLoja = 'https://fcperfumaria.netlify.app';
 
-    // ESTRUTURA NATIVA (WEB STANDARD)
     const message = {
-      // O iOS lê isso
+      // 1. IOS PRECISA DISSO (Display Automático)
       notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+        body: data.body || "Oferta Especial!"
       },
-      // O Android Chrome lê ISSO AQUI
-      webpush: {
-        headers: {
-          "Urgency": "high", // Prioridade Máxima de Rede
-          "TTL": "4500"
-        },
-        notification: {
-          title: data.title || "FC Perfumaria",
-          body: data.body || "Nova oferta!",
-          icon: icon,
-          badge: icon,
-          // OS 3 COMANDOS QUE FAZEM VIBRAR E ACENDER:
-          tag: 'fc-promo',       // Agrupa mensagens (substitui a anterior)
-          renotify: true,        // Obriga a vibrar de novo mesmo se tiver outra notificação
-          requireInteraction: true, // A tela fica acesa até o usuário tocar
-          click_action: link
-        },
-        fcm_options: {
-          link: link
-        }
+      // 2. ANDROID VAI LER ISSO (Dados para montagem manual)
+      data: {
+        custom_title: data.title || "FC Perfumaria",
+        custom_body: data.body || "Oferta Especial!",
+        custom_icon: iconUrl,
+        click_action: linkLoja
+      },
+      // 3. PRIORIDADES
+      android: { priority: 'high' },
+      webpush: { 
+        headers: { "Urgency": "high" },
+        fcm_options: { link: linkLoja }
       },
       tokens: tokens
     };
