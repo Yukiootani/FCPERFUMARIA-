@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 
-// Conexão Segura
+// Função para limpar a chave (Essencial no Netlify)
 function getServiceAccount() {
   try {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT) return null;
@@ -24,34 +24,51 @@ exports.handler = async function(event, context) {
     const data = JSON.parse(event.body);
     const db = admin.firestore();
     
-    // Pega tokens
+    // Busca tokens
     const snapshot = await db.collection('push_tokens').get();
     if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
+    
+    // Link e Ícone
+    const linkLoja = 'https://fcperfumaria.netlify.app';
+    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
 
-    // ESTRUTURA UNIVERSAL PURA
-    // Sem 'android: {}', sem 'data: {}', sem ícones externos.
-    // Apenas o básico que funciona em qualquer sistema.
+    // MENSAGEM HÍBRIDA (Cobre todas as bases)
     const message = {
       notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Nova oferta!"
+        body: data.body || "Oferta Especial"
       },
+      // Configuração específica para Android Nativo/Chrome
+      android: {
+        priority: 'high',
+        notification: {
+          icon: 'stock_ticker_update', // Ícone de sistema
+          color: '#1B263B',
+          default_sound: true,
+          click_action: linkLoja
+        }
+      },
+      // Configuração Web (PWA)
       webpush: {
         headers: {
           "Urgency": "high"
         },
+        notification: {
+          icon: iconUrl,
+          requireInteraction: true,
+          click_action: linkLoja
+        },
         fcm_options: {
-          link: "https://fcperfumaria.netlify.app"
+          link: linkLoja
         }
       },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-
-    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount, falhas: response.failureCount }) };
+    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
 
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
