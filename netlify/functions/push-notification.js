@@ -5,7 +5,7 @@ if (admin.apps.length === 0) {
     try {
       var serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
       admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-    } catch (e) { console.error("Erro Credencial:", e); }
+    } catch (e) { console.error(e); }
   }
 }
 
@@ -15,47 +15,42 @@ exports.handler = async function(event, context) {
   try {
     const data = JSON.parse(event.body);
     const db = admin.firestore();
-    
-    // 1. Busca tokens
     const snapshot = await db.collection('push_tokens').get();
+    
     if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
 
-    // Link da FC Perfumaria
-    const linkLoja = 'https://fcperfumaria.netlify.app';
-
-    // 🚨 ESTRUTURA HÍBRIDA (IGUAL AO 3 MARIAS) 🚨
+    // ESTRUTURA UNIVERSAL (WEB PUSH STANDARD)
     const message = {
-      notification: { 
-        title: data.title, 
-        body: data.body 
+      // Dados visuais para iOS e Chrome Desktop
+      notification: {
+        title: data.title || "FC Perfumaria",
+        body: data.body || "Oferta Especial"
       },
-      // Configuração específica para acordar o Android
-      android: {
-        priority: 'high',
-        notification: {
-          sound: 'default',
-          click_action: data.link || linkLoja
-        }
+      // Dados extras para o nosso Service Worker do Android montar
+      data: {
+        title: data.title,
+        body: data.body,
+        url: data.link || 'https://fcperfumaria.netlify.app'
       },
-      // Configuração para Web (PC/iPhone/PWA)
-      webpush: { 
+      // Configuração de prioridade Web
+      webpush: {
         headers: {
-          Urgency: "high"
+          "Urgency": "high"
         },
-        fcm_options: { 
-          link: data.link || linkLoja 
-        } 
+        fcm_options: {
+          link: 'https://fcperfumaria.netlify.app'
+        }
       },
       tokens: tokens
     };
 
     const response = await admin.messaging().sendEachForMulticast(message);
-    return { statusCode: 200, body: JSON.stringify({ success: true, count: response.successCount }) };
+
+    return { statusCode: 200, body: JSON.stringify({ success: true, enviados: response.successCount }) };
 
   } catch (error) {
-    console.error(error);
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
