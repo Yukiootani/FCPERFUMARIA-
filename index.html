@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO BLINDADO (Responsivo) --- */
+        /* --- CSS BLINDADO (Visual Travado e Responsivo) --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -116,6 +116,7 @@
         </div>
 
         <h2 id="collection-title" class="section-title">Loja Oficial</h2>
+        
         <div id="loading-message" style="text-align:center; padding:20px; color:var(--accent-color);">Carregando catálogo...</div>
         <div id="products-grid"></div>
         <p id="search-no-results" style="display:none; text-align:center; color:#999;">Nenhum produto encontrado.</p>
@@ -148,21 +149,22 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        // --- AMARRAÇÃO DO ANDROID (AQUI ESTÁ A CORREÇÃO) ---
+        // --- CORREÇÃO PWA: Registro Explícito para Android ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    // Registra o SW de Mensagem explicitamente
+                    // 1. Registra o arquivo de background (ESSENCIAL PARA ANDROID)
                     const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                    if(messaging) messaging.useServiceWorker(reg);
-                    
-                    // Registra o SW do Site
+                    if (messaging) {
+                        messaging.useServiceWorker(reg); // Amarra o Firebase a este arquivo
+                    }
+                    // 2. Registra o SW do site
                     navigator.serviceWorker.register('/sw.js');
-                } catch(err) { console.log(err); }
+                } catch (err) { console.log('SW Error:', err); }
             });
         }
 
-        // --- PWA e Lógica Visual ---
+        // --- PWA UI ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-app-btn');
         const iosBanner = document.getElementById('ios-install-banner');
@@ -172,7 +174,7 @@
         if (isIos() && !('standalone' in window.navigator && window.navigator.standalone)) { iosBanner.style.display = 'block'; document.getElementById('cart-icon').style.bottom = '100px'; }
         document.getElementById('close-ios-banner').addEventListener('click', () => { iosBanner.style.display = 'none'; document.getElementById('cart-icon').style.bottom = '20px'; });
 
-        // --- LOJA (Nuclear) ---
+        // --- LOJA ---
         const grid = document.getElementById('products-grid');
         const loadingMsg = document.getElementById('loading-message');
         const headerEl = document.getElementById('main-header');
@@ -231,8 +233,6 @@
                         await db.collection('push_tokens').doc(token).set({token, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
                         alert("Sucesso! Clique no sino para ver as mensagens.");
                     }
-                } else {
-                    alert("Para receber avisos, ative nas configurações.");
                 }
             } catch(e) { console.log(e); }
         }
