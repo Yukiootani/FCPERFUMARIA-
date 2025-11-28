@@ -13,43 +13,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// RECEBE A MENSAGEM INVISÍVEL (DATA) E TORNA ELA VISÍVEL
-messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Data Push:', payload);
+// SEM 'onBackgroundMessage' 
+// Deixamos o navegador ler as instruções que vieram no pacote 'webpush' do servidor.
+// Isso é mais estável no Android.
 
-  // Pega os dados brutos
-  const title = payload.data.title;
-  const body = payload.data.body;
-  const icon = payload.data.icon;
-  const url = payload.data.url;
-
-  const notificationOptions = {
-    body: body,
-    icon: icon,
-    badge: icon, // Ícone monocromático pequeno
-    vibrate: [200, 100, 200, 100, 200, 100, 200], // Vibração longa para chamar atenção
-    tag: 'fc-notification-' + payload.data.timestamp, // Tag única
-    renotify: true, // Obriga a tocar som
-    requireInteraction: true, // Não some até clicar
-    data: {
-        url: url
-    }
-  };
-
-  return self.registration.showNotification(title, notificationOptions);
-});
-
-// CLIQUE NA NOTIFICAÇÃO
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
-    clients.matchAll({type: 'window', includeUncontrolled: true}).then(function(clientList) {
-      if (clientList.length > 0) {
-        let client = clientList[0];
-        if ('focus' in client) return client.focus();
+    clients.matchAll({type: 'window'}).then( windowClients => {
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url.includes('fcperfumaria') && 'focus' in client) {
+          return client.focus();
+        }
       }
       if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
+        return clients.openWindow('https://fcperfumaria.netlify.app');
       }
     })
   );
