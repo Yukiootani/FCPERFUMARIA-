@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO --- */
+        /* --- ESTILO BLINDADO (Visual Novo) --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -29,7 +29,7 @@
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .inbox-header { background: var(--primary-color); color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-family: 'Playfair Display', serif; letter-spacing: 1px; }
         .close-inbox { font-size: 24px; cursor: pointer; line-height: 1; }
-        #inbox-list { list-style: none; max-height: 60vh; overflow-y: auto; padding: 0; }
+        #inbox-list { list-style: none; max-height: 60vh; overflow-y: auto; padding: 0; margin: 0; }
         .inbox-item { padding: 15px; border-bottom: 1px solid #eee; transition: background 0.2s; }
         .inbox-item h4 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1em; font-weight: 700; }
         .inbox-item p { margin: 0; color: #666; font-size: 0.9em; line-height: 1.4; }
@@ -71,9 +71,8 @@
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
         #cart-count { position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         
-        /* MODAL PUSH */
         #push-permission-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
-        .push-modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px; border-radius: 8px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .push-modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px; border-radius: 8px; text-align: center; }
         .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
     </style>
 </head>
@@ -97,7 +96,6 @@
     <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
     
     <div id="ios-install-banner"><span id="close-ios-banner">&times;</span><p>Para instalar: Toque em <strong>Compartilhar</strong> <i class="fas fa-share-square" style="color:#007AFF;"></i> e <strong>Adicionar à Tela de Início</strong>.</p></div>
-    
     <div id="push-permission-modal"><div class="push-modal-content"><i class="fas fa-bell" style="font-size: 40px; color: var(--accent-color); margin-bottom:15px;"></i><h3 style="margin:0 0 10px 0; color:var(--primary-color);">Ativar Avisos?</h3><p style="color:#666; font-size:0.9em;">Receba ofertas e novidades direto no celular.</p><button class="push-btn-allow" id="allow-push-btn">SIM, ATIVAR</button><button style="background:none; border:none; color:#999; margin-top:10px; cursor:pointer;" id="deny-push-btn">Agora não</button></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -109,23 +107,34 @@
         const db = firebase.firestore();
         let messaging; try { if (firebase.messaging.isSupported()) { messaging = firebase.messaging(); } } catch (e) {}
 
-        function clearBadge() { try { if ('setAppBadge' in navigator) navigator.setAppBadge(0); if ('clearAppBadge' in navigator) navigator.clearAppBadge(); } catch(e) { } }
-        clearBadge(); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') clearBadge(); });
+        // 🚨 AQUI ESTÁ A LIGAÇÃO MÁGICA (REGISTRO SW) 🚨
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    // 1. Registra o Arquivo de Notificação (O Motor)
+                    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    
+                    // 2. Amarra o Firebase a esse Motor (Essencial para Android)
+                    if (messaging) {
+                        messaging.useServiceWorker(reg);
+                    }
+                    
+                    // 3. Registra o Arquivo do Site (Para instalar)
+                    navigator.serviceWorker.register('/sw.js');
+                    console.log("Service Workers OK");
+                } catch (err) { console.log("SW Error:", err); }
+            });
+        }
 
+        // PWA
         let deferredPrompt; const installBtn=document.getElementById('install-app-btn'); const iosBanner=document.getElementById('ios-install-banner');
-        window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='block'});
+        window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='block'; tryShowPopup();});
         installBtn.addEventListener('click',()=>{installBtn.style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}});
         const isIos=()=>{return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())};
         if(isIos()&&!('standalone' in window.navigator && window.navigator.standalone)){iosBanner.style.display='block';document.getElementById('cart-icon').style.bottom='100px';}
         document.getElementById('close-ios-banner').addEventListener('click',()=>{iosBanner.style.display='none';document.getElementById('cart-icon').style.bottom='20px';});
-        
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try { navigator.serviceWorker.register('/sw.js'); } catch(e){}
-            });
-        }
 
-        // LOJA
+        // LOJA (Nuclear)
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message');
         let currentFilter='pronta-entrega', currentSecao='todos', allProducts=[];
         async function fetchSiteConfig(){try{const d=await db.collection("configuracoes").doc("siteInfo").get();if(d.exists&&d.data().logoUrl) document.querySelector('.header-logo-text').innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`;}catch(e){}}
@@ -165,6 +174,7 @@
         function updateCartIcon(){const c=JSON.parse(localStorage.getItem('whatsappCart'))||{items:{}};let q=0;Object.values(c.items).forEach(i=>q+=i.quantity);const b=document.getElementById('cart-count');if(q>0){b.textContent=q;b.style.display='flex'}else{b.style.display='none'}}
         let tapCount=0; document.getElementById('main-header').addEventListener('click', ()=>{ tapCount++; if(tapCount===3) window.location.href='admin.html'; setTimeout(()=>tapCount=0,1000); });
 
+        // --- NOTIFICAÇÕES ---
         async function handleBellClick() {
             if (Notification.permission === 'granted') { openInbox(); } else { requestPermission(); }
         }
@@ -202,25 +212,15 @@
         document.getElementById('notification-bell').addEventListener('click', handleBellClick);
         document.getElementById('inbox-modal').addEventListener('click', (e) => { if(e.target.id === 'inbox-modal') e.target.style.display = 'none'; });
         
-        // --- AUTO POPUP (Agressivo e Repetitivo) ---
+        // POPUP AUTOMÁTICO IMEDIATO
         const pushModal = document.getElementById('push-permission-modal');
-        
-        // Mostra SEMPRE que carregar (se não tiver permissão)
-        function showPopup() {
-            if('Notification' in window && Notification.permission === 'default') {
-                pushModal.style.display = 'flex';
-            }
+        function tryShowPopup() {
+            if('Notification' in window && Notification.permission === 'default') { pushModal.style.display = 'flex'; }
         }
-        
-        // Tenta ao carregar
-        showPopup();
-        // Tenta também ao rolar (para garantir)
-        window.addEventListener('scroll', showPopup, {once:true});
+        // Executa agora!
+        tryShowPopup();
 
-        document.getElementById('allow-push-btn').addEventListener('click', () => { 
-            pushModal.style.display = 'none'; 
-            requestPermission(); 
-        });
+        document.getElementById('allow-push-btn').addEventListener('click', () => { pushModal.style.display = 'none'; requestPermission(); });
         document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none');
 
         document.addEventListener('DOMContentLoaded', ()=>{ fetchSiteConfig(); updateCartIcon(); fetchAllProducts(); });
