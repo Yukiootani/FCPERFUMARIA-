@@ -1,110 +1,77 @@
 var admin = require("firebase-admin");
 
-// Função para limpar a chave privada (O erro comum do Netlify)
+// Limpeza da chave (caso tenha erros de formatação)
 function getServiceAccount() {
   try {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT) return null;
-    
     let rawKey = process.env.FIREBASE_SERVICE_ACCOUNT;
-    
-    // Se for string, tenta parsear. Se já for objeto, usa direto.
-    if (typeof rawKey === 'string') {
-        return JSON.parse(rawKey);
-    }
+    if (typeof rawKey === 'string') { return JSON.parse(rawKey); }
     return rawKey;
-  } catch (e) {
-    console.error("Erro ao ler chave:", e);
-    return null;
-  }
+  } catch (e) { console.error("Erro chave:", e); return null; }
 }
 
-// INICIALIZAÇÃO SEGURA
 if (admin.apps.length === 0) {
   const serviceAccount = getServiceAccount();
-  
   if (serviceAccount) {
-    try {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
-    } catch (e) {
-      console.error("Erro no init:", e);
-    }
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
   }
 }
 
 exports.handler = async function(event, context) {
-  // Permite requisições de qualquer lugar (CORS) para evitar bloqueio
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTION'
-  };
-
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "OK" };
-  }
-
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, headers, body: "Method Not Allowed" };
-  }
-
-  // Verifica se o Firebase conectou
-  if (admin.apps.length === 0) {
-    return { 
-      statusCode: 500, 
-      headers,
-      body: JSON.stringify({ error: "O servidor não conseguiu ler a Chave Secreta do Firebase no Netlify." }) 
-    };
-  }
+  if (event.httpMethod !== "POST") return { statusCode: 405, body: "Method Not Allowed" };
 
   try {
     const data = JSON.parse(event.body);
     const db = admin.firestore();
     
-    // Busca Tokens
+    // 1. Pegar Tokens
     const snapshot = await db.collection('push_tokens').get();
-    if (snapshot.empty) {
-      return { statusCode: 200, headers, body: JSON.stringify({ message: "Nenhum celular cadastrado." }) };
-    }
+    if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
+
+    // 2. Configuração WEB PURE (Sem conflito Android Nativo)
+    const iconUrl = 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png';
     const link = 'https://fcperfumaria.netlify.app';
 
     const message = {
+      // O iOS e o Android lêem isso
       notification: {
         title: data.title || "FC Perfumaria",
-        body: data.body || "Oferta!"
+        body: data.body || "Oferta Especial!"
       },
+      // Configurações adicionais de comportamento
       webpush: {
-        headers: { "Urgency": "high" },
-        notification: {
-          icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
-          click_action: link,
-          requireInteraction: true
+        headers: {
+          "Urgency": "high"
         },
-        fcm_options: { link: link }
-      },
-      android: {
-        priority: 'high',
         notification: {
-          icon: 'stock_ticker_update',
-          color: '#1B263B',
-          clickAction: link
+          icon: iconUrl,
+          badge: iconUrl,
+          requireInteraction: true, // Obriga a ficar na tela
+          click_action: link
+        },
+        fcm_options: {
+          link: link
         }
       },
       tokens: tokens
     };
 
+    // 3. Enviar
     const response = await admin.messaging().sendEachForMulticast(message);
 
+    // Resposta detalhada para o Admin saber o que houve
     return { 
       statusCode: 200, 
-      headers,
-      body: JSON.stringify({ success: true, enviados: response.successCount, falhas: response.failureCount }) 
+      body: JSON.stringify({ 
+        success: true, 
+        enviados: response.successCount, 
+        falhas: response.failureCount 
+      }) 
     };
 
   } catch (error) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
