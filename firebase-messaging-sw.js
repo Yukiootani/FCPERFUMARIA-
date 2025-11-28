@@ -13,29 +13,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Background:', payload);
-  
-  const notificationTitle = payload.notification.title || 'FC Perfumaria';
-  const notificationOptions = {
-    body: payload.notification.body,
-    
-    // ✅ ÍCONE NOVO DE PERFUME
-    icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
-    badge: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
-    
-    tag: 'push-alert-' + Date.now(),
-    renotify: true,
-    requireInteraction: true,
-    data: {
-        url: 'https://fcperfumaria.netlify.app'
-    }
-  };
-
-  return self.registration.showNotification(notificationTitle, notificationOptions);
-});
+// LÓGICA DE GRANDES SITES:
+// Não escrevemos "setBackgroundMessageHandler".
+// Deixamos o Sistema Operacional assumir o controle total.
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  event.waitUntil(clients.openWindow('https://fcperfumaria.netlify.app'));
+  // Garante que o clique abra a loja
+  event.waitUntil(
+    clients.matchAll({type: 'window'}).then( windowClients => {
+      for (var i = 0; i < windowClients.length; i++) {
+        var client = windowClients[i];
+        if (client.url.includes('fcperfumaria') && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow('https://fcperfumaria.netlify.app');
+      }
+    })
+  );
 });
