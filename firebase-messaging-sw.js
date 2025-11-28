@@ -13,16 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// O Android precisa deste evento para saber o que fazer em background
+// Apenas loga o recebimento, deixa o sistema exibir sozinho
 messaging.onBackgroundMessage((payload) => {
-  console.log('[FC Perfumaria] Background:', payload);
-  
-  // Se o navegador não mostrar sozinho, forçamos aqui
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png'
-  };
-
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+  console.log('[FC Perfumaria] Push:', payload);
 });
