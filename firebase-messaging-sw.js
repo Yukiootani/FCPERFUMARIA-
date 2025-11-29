@@ -13,23 +13,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// --- CORREÇÃO: USANDO COMANDO DA VERSÃO 8 ---
 messaging.setBackgroundMessageHandler(function(payload) {
   console.log('[FC Perfumaria] Background:', payload);
   
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'https://cdn-icons-png.flaticon.com/512/2771/2771401.png',
+    // ✅ SEU LOGO NOVO AQUI
+    icon: 'https://fcperfumaria.netlify.app/IMG_6254.jpg',
     
-    // Truques do 3 Marias
     tag: 'push-alert-' + Date.now(),
     renotify: true,
     requireInteraction: true,
-    vibrate: [300, 100, 300],
+    vibrate: [300, 100, 400],
     
     data: {
-        url: payload.notification.click_action || 'https://fcperfumaria.netlify.app'
+        url: 'https://fcperfumaria.netlify.app'
     }
   };
 
@@ -38,7 +37,5 @@ messaging.setBackgroundMessageHandler(function(payload) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url || '/')
-  );
+  event.waitUntil(clients.openWindow('https://fcperfumaria.netlify.app'));
 });
