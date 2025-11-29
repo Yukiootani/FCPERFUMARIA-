@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 
-// Função de Limpeza de Chave
+// Função para limpar a chave (Segurança do Netlify)
 function getServiceAccount() {
   try {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT) return null;
@@ -28,17 +28,20 @@ exports.handler = async function(event, context) {
     if (snapshot.empty) return { statusCode: 200, body: JSON.stringify({ message: "Sem tokens." }) };
 
     const tokens = snapshot.docs.map(doc => doc.data().token);
+    
     const link = 'https://fcperfumaria.netlify.app';
     
     // ✅ SEU LOGO NOVO AQUI
     const iconUrl = 'https://fcperfumaria.netlify.app/IMG_6254.jpg';
 
-    // ESTRUTURA 3 MARIAS
+    // ESTRUTURA COMPLETA (iOS + Android + Web)
     const message = {
+      // 1. iOS lê aqui
       notification: {
         title: data.title,
         body: data.body
       },
+      // 2. Android Nativo lê aqui
       android: {
         priority: 'high',
         notification: {
@@ -48,10 +51,11 @@ exports.handler = async function(event, context) {
           click_action: link
         }
       },
+      // 3. Chrome/Web lê aqui
       webpush: {
         headers: { "Urgency": "high" },
         notification: {
-          icon: iconUrl,
+          icon: iconUrl, // Aqui vai aparecer sua foto
           requireInteraction: true,
           click_action: link
         },
