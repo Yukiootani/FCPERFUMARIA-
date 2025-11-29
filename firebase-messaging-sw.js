@@ -17,8 +17,10 @@ messaging.setBackgroundMessageHandler(function(payload) {
   console.log('[FC Perfumaria] Background:', payload);
   
   const notificationTitle = payload.notification.title;
+  
   const notificationOptions = {
     body: payload.notification.body,
+    
     // ✅ SEU LOGO NOVO AQUI
     icon: 'https://fcperfumaria.netlify.app/IMG_6254.jpg',
     
