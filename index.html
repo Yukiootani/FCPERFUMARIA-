@@ -7,28 +7,31 @@
     <link rel="manifest" href="manifest.json">
     <title>FC Perfumaria</title>
     
+    <link rel="apple-touch-icon" href="IMG_6254.jpg">
+    <link rel="icon" type="image/jpeg" href="IMG_6254.jpg">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL --- */
+        /* --- ESTILO BLINDADO --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         
-        /* HEADER COM LOGO */
         header { background-color: #fff; color: var(--primary-color); padding: 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); padding-top: max(1.5rem, env(safe-area-inset-top)); }
         
-        /* CLASSE NOVA PARA O LOGO */
-        .site-logo { 
-            max-height: 80px; /* Tamanho bom para celular */
+        /* LOGO NOVO */
+        .header-img { 
+            max-height: 85px; /* Tamanho ideal */
             width: auto; 
             display: block; 
-            margin: 0 auto; 
+            margin: 0 auto 5px auto; 
+            border-radius: 4px;
         }
-
-        .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
         /* SINO */
         #notification-bell { position: fixed; top: max(15px, env(safe-area-inset-top)); right: 15px; width: 42px; height: 42px; background-color: #fff; border-radius: 50%; z-index: 9990; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--primary-color); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
@@ -40,7 +43,7 @@
         @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .inbox-header { background: var(--primary-color); color: #fff; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-family: 'Playfair Display', serif; letter-spacing: 1px; }
         .close-inbox { font-size: 24px; cursor: pointer; line-height: 1; }
-        #inbox-list { list-style: none; max-height: 60vh; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+        #inbox-list { list-style: none; max-height: 60vh; overflow-y: auto; padding: 0; margin: 0; }
         .inbox-item { padding: 15px; border-bottom: 1px solid #eee; transition: background 0.2s; }
         .inbox-item h4 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 1em; font-weight: 700; }
         .inbox-item p { margin: 0; color: #666; font-size: 0.9em; line-height: 1.4; }
@@ -83,6 +86,7 @@
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
         #cart-count { position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         
+        /* Modal Push */
         #push-permission-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
         .push-modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px; border-radius: 8px; text-align: center; }
         .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
@@ -92,7 +96,7 @@
     <button id="install-app-btn">📲 INSTALAR APLICATIVO</button>
     
     <header id="main-header">
-        <img src="IMG_6254.jpg" alt="FC Perfumaria" class="site-logo">
+        <img src="IMG_6254.jpg" alt="FC Perfumaria" class="header-img">
         <div class="header-sub">Essência Brasileira no Japão</div>
     </header>
 
@@ -142,7 +146,12 @@
 
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message');
         let currentFilter='pronta-entrega', currentSecao='todos', allProducts=[];
-        async function fetchSiteConfig(){try{const d=await db.collection("configuracoes").doc("siteInfo").get();if(d.exists&&d.data().logoUrl) document.querySelector('.header-logo-text').innerHTML=`<img src="${d.data().logoUrl}" class="header-img"><div class="header-sub">Essência Brasileira no Japão</div>`;}catch(e){}}
+        
+        // 🚨 REMOVI A FUNÇÃO QUE TENTAVA PUXAR O LOGO DO BANCO 🚨
+        // Assim ele respeita o logo fixo no HTML (IMG_6254.jpg)
+        async function fetchSiteConfig(){ 
+            // Código removido para garantir o logo fixo
+        }
 
         async function fetchAllProducts() {
             loadingMsg.style.display='block'; grid.innerHTML='';
@@ -154,7 +163,6 @@
                 renderProducts();
             } catch(e) { loadingMsg.style.color='red'; loadingMsg.innerHTML="Erro de conexão."; }
         }
-
         function renderProducts() {
             loadingMsg.style.display='none'; grid.innerHTML='';
             let filtered = allProducts.filter(p => {
@@ -221,7 +229,6 @@
             if('Notification' in window && Notification.permission === 'default') { pushModal.style.display = 'flex'; }
         }
         tryShowPopup();
-
         document.getElementById('allow-push-btn').addEventListener('click', () => { pushModal.style.display = 'none'; requestPermission(); });
         document.getElementById('deny-push-btn').addEventListener('click', () => pushModal.style.display = 'none');
 
