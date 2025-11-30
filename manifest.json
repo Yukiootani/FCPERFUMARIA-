@@ -1,19 +1,19 @@
 {
   "name": "FC Perfumaria",
   "short_name": "FC Perfumes",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#FDFBF7",
   "theme_color": "#1B263B",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/IMG_6254.jpg",
+      "src": "IMG_6254.jpg",
       "sizes": "192x192",
       "type": "image/jpeg"
     },
     {
-      "src": "/IMG_6254.jpg",
+      "src": "IMG_6254.jpg",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
