@@ -90,34 +90,19 @@
 
             <div id="reviews-panel">
                 <h3>⭐ Cadastrar Avaliação (Prova Social)</h3>
-                
                 <label>Escolha o Produto:</label>
-                <select id="review-product-select">
-                    <option value="">Carregando produtos...</option>
-                </select>
-                
-                <label>Nome do Cliente:</label>
-                <input type="text" id="review-name" placeholder="Ex: Ana K.">
-                
+                <select id="review-product-select"><option value="">Carregando produtos...</option></select>
+                <label>Nome do Cliente:</label><input type="text" id="review-name" placeholder="Ex: Ana K.">
                 <label>Nota:</label>
                 <select id="review-rating">
                     <option value="5">⭐⭐⭐⭐⭐ (5)</option>
                     <option value="4">⭐⭐⭐⭐ (4)</option>
                     <option value="3">⭐⭐⭐ (3)</option>
                 </select>
-                
-                <label>Comentário:</label>
-                <textarea id="review-text" rows="3" placeholder="Ex: Amei a fixação!"></textarea>
-                
+                <label>Comentário:</label><textarea id="review-text" rows="3" placeholder="Ex: Amei a fixação!"></textarea>
                 <button id="btn-save-review" style="background-color: #0d47a1; margin-top:10px">Salvar Avaliação</button>
-
                 <h4 style="margin-top:20px">Últimas Avaliações</h4>
-                <div class="table-container">
-                    <table id="reviews-table">
-                        <thead><tr><th>Produto</th><th>Cliente</th><th>Nota</th><th>Ação</th></tr></thead>
-                        <tbody id="reviews-list"></tbody>
-                    </table>
-                </div>
+                <div class="table-container"><table id="reviews-table"><thead><tr><th>Produto</th><th>Cliente</th><th>Nota</th><th>Ação</th></tr></thead><tbody id="reviews-list"></tbody></table></div>
             </div>
 
             <hr>
@@ -126,11 +111,8 @@
                 <h3 id="form-title">Novo Produto</h3>
                 <input type="hidden" id="productId"> 
                 
-                <label>Nome do Produto:</label>
-                <input type="text" id="name" required>
-                
-                <label>Preço (¥):</label>
-                <input type="number" id="price" required>
+                <label>Nome do Produto:</label><input type="text" id="name" required>
+                <label>Preço (¥):</label><input type="number" id="price" required>
                 
                 <label>Categoria:</label>
                 <select id="secao" required>
@@ -142,8 +124,7 @@
                     <option value="kits">Kits</option>
                 </select>
                 
-                <label>Descrição:</label>
-                <textarea id="description" rows="4"></textarea>
+                <label>Descrição:</label><textarea id="description" rows="4"></textarea>
                 
                 <label>Variantes (Marca e Volume):</label>
                 <div id="variants-container"></div>
@@ -162,8 +143,14 @@
                     <option value="destaque">Destaque</option>
                 </select>
                 
-                <label>Foto:</label>
+                <label>Capa (Principal):</label>
                 <input type="file" id="imageUrl">
+
+                <label>Vídeo (Opcional):</label>
+                <input type="file" id="videoUrl" accept="video/*">
+
+                <label>Galeria (Várias Fotos):</label>
+                <input type="file" id="galeria" multiple accept="image/*">
                 
                 <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar</button>
@@ -224,39 +211,25 @@
             });
 
             const productsList = document.getElementById('products-list');
-            // REVIEW SELECTOR (Para preencher a lista de perfumes na hora de avaliar)
             const reviewProductSelect = document.getElementById('review-product-select');
 
             async function fetchProducts() {
                 try {
                     productsList.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
-                    reviewProductSelect.innerHTML = '<option value="">Escolha...</option>'; // Limpa o select
+                    reviewProductSelect.innerHTML = '<option value="">Escolha...</option>';
                     
                     const snap = await db.collection("products").orderBy("createdAt", "desc").get();
                     let h = '';
                     snap.forEach(doc => {
                         let p = doc.data();
-                        // Tabela
-                        h += `<tr>
-                            <td><img src="${p.imageUrl||''}" class="thumb"></td>
-                            <td>${p.name}</td>
-                            <td>${p.secao||'-'}</td>
-                            <td>¥${p.price}</td>
-                            <td>${p.estoqueTotal||0}</td>
-                            <td><button class="edit-btn" data-id="${doc.id}">Editar</button> <button class="delete-btn" data-id="${doc.id}">X</button></td>
-                        </tr>`;
-                        
-                        // Preenche o Select de Avaliação
-                        let opt = document.createElement('option');
-                        opt.value = doc.id;
-                        opt.text = p.name;
-                        reviewProductSelect.appendChild(opt);
+                        h += `<tr><td><img src="${p.imageUrl||''}" class="thumb"></td><td>${p.name}</td><td>${p.secao||'-'}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td><td><button class="edit-btn" data-id="${doc.id}">Editar</button> <button class="delete-btn" data-id="${doc.id}">X</button></td></tr>`;
+                        let opt = document.createElement('option'); opt.value = doc.id; opt.text = p.name; reviewProductSelect.appendChild(opt);
                     });
                     productsList.innerHTML = h || '<tr><td colspan="6">Vazio</td></tr>';
                 } catch(e) { showStatus(statusDiv, e.message, 'error'); }
             }
 
-            // --- PUSH NOTIFICATION ---
+            // PUSH
             const btnSendPush = document.getElementById('btn-send-push');
             const messagesList = document.getElementById('messages-list');
             async function fetchMessages() {
@@ -282,77 +255,73 @@
                 });
             }
 
-            // --- AVALIAÇÕES (REVIEWS) ---
+            // REVIEWS
             const reviewsList = document.getElementById('reviews-list');
             const btnSaveReview = document.getElementById('btn-save-review');
-
             async function fetchReviews() {
                 try {
                     reviewsList.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
                     const snap = await db.collection('reviews').orderBy('createdAt', 'desc').limit(20).get();
-                    
-                    if (snap.empty) {
-                        reviewsList.innerHTML = '<tr><td colspan="4">Nenhuma avaliação.</td></tr>';
-                        return;
-                    }
-
+                    if (snap.empty) { reviewsList.innerHTML = '<tr><td colspan="4">Nenhuma avaliação.</td></tr>'; return; }
                     let html = '';
-                    snap.forEach(doc => {
-                        const r = doc.data();
-                        html += `<tr><td>${r.productName}</td><td>${r.customerName}</td><td>${r.rating}⭐</td><td><button class="delete-btn del-rev" data-id="${doc.id}">X</button></td></tr>`;
-                    });
+                    snap.forEach(doc => { const r = doc.data(); html += `<tr><td>${r.productName}</td><td>${r.customerName}</td><td>${r.rating}⭐</td><td><button class="delete-btn del-rev" data-id="${doc.id}">X</button></td></tr>`; });
                     reviewsList.innerHTML = html;
-                    
-                    document.querySelectorAll('.del-rev').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            if(confirm("Apagar avaliação?")) {
-                                await db.collection('reviews').doc(e.target.dataset.id).delete();
-                                fetchReviews();
-                            }
-                        });
-                    });
+                    document.querySelectorAll('.del-rev').forEach(btn => { btn.addEventListener('click', async (e) => { if(confirm("Apagar avaliação?")) { await db.collection('reviews').doc(e.target.dataset.id).delete(); fetchReviews(); } }); });
                 } catch(e){}
             }
-
             if(btnSaveReview) {
                 btnSaveReview.addEventListener('click', async () => {
                     const pid = reviewProductSelect.value;
                     const name = document.getElementById('review-name').value;
                     const text = document.getElementById('review-text').value;
                     const rating = parseInt(document.getElementById('review-rating').value);
-                    
                     if(!pid || !name || !text) return alert("Preencha todos os campos!");
-                    
                     const productName = reviewProductSelect.options[reviewProductSelect.selectedIndex].text;
-
-                    showStatus(statusDiv, "Salvando Avaliação...", "loading");
+                    showStatus(statusDiv, "Salvando...", "loading");
                     try {
-                        await db.collection('reviews').add({
-                            productId: pid,
-                            productName: productName,
-                            customerName: name,
-                            text: text,
-                            rating: rating,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        showStatus(statusDiv, "Avaliação Salva!", "success");
-                        document.getElementById('review-name').value = "";
-                        document.getElementById('review-text').value = "";
-                        fetchReviews();
+                        await db.collection('reviews').add({ productId: pid, productName: productName, customerName: name, text: text, rating: rating, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                        showStatus(statusDiv, "Salvo!", "success");
+                        document.getElementById('review-name').value = ""; document.getElementById('review-text').value = ""; fetchReviews();
                     } catch(e) { showStatus(statusDiv, e.message, "error"); }
                 });
             }
 
-            // --- PRODUTOS ---
+            // PRODUTOS - LÓGICA RESTAURADA (VÍDEO E GALERIA)
             document.getElementById('product-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const saveBtn = document.getElementById('save-btn'); saveBtn.disabled = true;
                 const id = document.getElementById('productId').value || `pid_${Date.now()}`;
                 try {
-                    let img=oldImageUrl; const fImg = document.getElementById('imageUrl').files[0];
+                    let img=oldImageUrl, vid=oldVideoUrl, gal=oldGaleria;
+                    const fImg = document.getElementById('imageUrl').files[0];
+                    const fVid = document.getElementById('videoUrl').files[0];
+                    const fGal = document.getElementById('galeria').files;
+
                     if(fImg) img = await uploadFile(fImg, `products/${id}/capa`);
+                    if(fVid) vid = await uploadFile(fVid, `products/${id}/video`);
+                    
+                    if(fGal.length > 0) {
+                        gal = [];
+                        for(let f of fGal) {
+                            const url = await uploadFile(f, `products/${id}/gal_${f.name}`);
+                            gal.push(url);
+                        }
+                    }
+
                     let v = getVariants();
-                    let data = { name: document.getElementById('name').value, price: parseFloat(document.getElementById('price').value), secao: document.getElementById('secao').value, description: document.getElementById('description').value, variantes: v, estoqueTotal: calcTotal(v), source: document.getElementById('source').value, isFeatured: document.getElementById('isFeatured').value, imageUrl: img };
+                    let data = { 
+                        name: document.getElementById('name').value, 
+                        price: parseFloat(document.getElementById('price').value), 
+                        secao: document.getElementById('secao').value, 
+                        description: document.getElementById('description').value, 
+                        variantes: v, 
+                        estoqueTotal: calcTotal(v), 
+                        source: document.getElementById('source').value, 
+                        isFeatured: document.getElementById('isFeatured').value, 
+                        imageUrl: img, 
+                        videoUrl: vid, // Adicionado
+                        galeria: gal   // Adicionado
+                    };
                     if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
                     else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
                     cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
@@ -373,12 +342,18 @@
                 if(e.target.classList.contains('delete-btn') && confirm("Apagar?")) { await db.collection("products").doc(e.target.dataset.id).delete(); fetchProducts(); }
                 if(e.target.classList.contains('edit-btn')) {
                     let d = await db.collection("products").doc(e.target.dataset.id).get(); let p = d.data();
-                    document.getElementById('productId').value = d.id; document.getElementById('name').value = p.name; document.getElementById('price').value = p.price; document.getElementById('secao').value = p.secao; document.getElementById('description').value = p.description; setVariants(p.variantes); document.getElementById('source').value = p.source; document.getElementById('isFeatured').value = p.isFeatured; oldImageUrl = p.imageUrl;
+                    document.getElementById('productId').value = d.id; document.getElementById('name').value = p.name; document.getElementById('price').value = p.price; document.getElementById('secao').value = p.secao; document.getElementById('description').value = p.description; setVariants(p.variantes); document.getElementById('source').value = p.source; document.getElementById('isFeatured').value = p.isFeatured; 
+                    
+                    // Recupera dados extras
+                    oldImageUrl = p.imageUrl; 
+                    oldVideoUrl = p.videoUrl; 
+                    oldGaleria = p.galeria || [];
+                    
                     document.getElementById('save-btn').textContent = "Atualizar"; document.getElementById('cancel-edit-btn').style.display="block"; window.scrollTo(0,0);
                 }
             });
             document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
-            function cancelEditMode() { document.getElementById('productId').value = ''; document.getElementById('product-form').reset(); document.getElementById('variants-container').innerHTML = ''; oldImageUrl = ''; document.getElementById('save-btn').textContent = "Salvar Produto"; document.getElementById('cancel-edit-btn').style.display = "none"; }
+            function cancelEditMode() { document.getElementById('productId').value = ''; document.getElementById('product-form').reset(); document.getElementById('variants-container').innerHTML = ''; oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = []; document.getElementById('save-btn').textContent = "Salvar Produto"; document.getElementById('cancel-edit-btn').style.display = "none"; }
             
             const logoForm = document.getElementById('logo-form'); const logoUpload = document.getElementById('logo-upload'); const logoPrev = document.getElementById('logo-preview');
             async function loadSiteConfig() { try{ const d=await db.collection("configuracoes").doc("siteInfo").get(); if(d.exists) logoPrev.src=d.data().logoUrl; }catch(e){} }
