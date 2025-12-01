@@ -13,22 +13,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
+// Lógica de Background (Acordar o Android)
 messaging.setBackgroundMessageHandler(function(payload) {
   console.log('[FC Perfumaria] Background:', payload);
   
   const notificationTitle = payload.notification.title;
-  
   const notificationOptions = {
     body: payload.notification.body,
-    
-    // ✅ SEU LOGO NOVO AQUI
-    icon: 'https://fcperfumaria.netlify.app/IMG_6254.jpg',
-    
+    icon: 'https://fcperfumaria.netlify.app/663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png', // Seu Logo PNG
     tag: 'push-alert-' + Date.now(),
     renotify: true,
     requireInteraction: true,
     vibrate: [300, 100, 400],
-    
     data: {
         url: 'https://fcperfumaria.netlify.app'
     }
