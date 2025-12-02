@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO --- */
+        /* --- ESTILO BLINDADO --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; padding-bottom: 100px; width: 100%; overflow-x: hidden; }
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
@@ -23,39 +23,53 @@
         header a { color: var(--primary-color); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
         
         main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        
         #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; }
         .media-area { flex: 1 1 100%; } 
         .info-area { flex: 1 1 100%; }
         @media (min-width: 768px) { .media-area { flex: 1 1 45%; } .info-area { flex: 1 1 50%; } }
         
-        /* ÁREA DE MÍDIA (FOTO/VÍDEO) */
+        /* ÁREA DE MÍDIA */
         #main-media-display { 
-            position: relative; width: 100%; padding-top: 100%; /* Quadrado */
+            position: relative; width: 100%; padding-top: 100%; 
             margin-bottom: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; 
             display: flex; align-items: center; justify-content: center;
         }
-        /* A foto ou o vídeo ocupam o mesmo espaço */
         #main-media-display img, #main-media-display video { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 5px; 
         }
         
-        /* CARROSSEL DE MINIATURAS */
-        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        /* FOTOS PEQUENAS (THUMBNAILS) */
+        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
         .thumb-container { 
             width: 60px; height: 60px; flex-shrink: 0; border-radius: 4px; 
-            cursor: pointer; border: 1px solid #ddd; background: #fff; transition: 0.3s; position: relative; overflow: hidden;
+            cursor: pointer; border: 1px solid #ddd; background: #fff; transition: 0.3s; 
         }
         .thumb-container.active { border: 2px solid var(--accent-color); }
         .thumb-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
         
-        /* ÍCONE DE PLAY NA MINIATURA */
-        .video-thumb-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+        /* BARRA DE VÍDEO SEPARADA */
+        .video-trigger-bar {
+            width: 100%;
+            background-color: #fff;
+            border: 1px dashed var(--accent-color);
+            color: var(--primary-color);
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+            margin-bottom: 20px; /* Espaço para separar da info */
         }
-        .video-thumb-overlay i { color: #fff; font-size: 20px; }
+        .video-trigger-bar:active { background-color: #f9f9f9; transform: scale(0.98); }
+        .video-trigger-bar i { color: var(--accent-color); font-size: 1.2em; }
 
-        /* INFO */
+        /* INFO DO PRODUTO */
         .status-badge { font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; font-weight: 600; display: inline-block; margin-bottom: 10px; }
         .status-pronta-entrega { background-color: #e6f9e6; color: #1e7e34; border: 1px solid #c3e6cb; }
         .status-sob-encomenda { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
@@ -63,7 +77,7 @@
         h1 { font-family: 'Playfair Display', serif; color: var(--primary-color); margin: 0 0 10px 0; font-size: 1.8em; line-height: 1.2; }
         .price { font-size: 1.6em; font-weight: 700; color: var(--accent-color); margin: 10px 0; }
         
-        .variant-group { margin-top: 20px; }
+        .variant-group { margin-top: 10px; }
         .variant-group label { font-size: 0.85em; font-weight: 600; color: #666; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 1px; }
         .selector-container { display: flex; flex-wrap: wrap; gap: 8px; }
         .variant-btn { padding: 10px 15px; border: 1px solid #ccc; background: #fff; color: #333; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-weight: 500; min-width: 60px; text-align: center; transition: 0.3s; }
@@ -87,14 +101,10 @@
     </style>
 </head>
 <body>
-
-    <header>
-        <a href="index.html"><i class="fas fa-arrow-left"></i> Voltar para a Loja</a>
-    </header>
+    <header><a href="index.html"><i class="fas fa-arrow-left"></i> Voltar para a Loja</a></header>
 
     <main>
-        <div id="loading" style="text-align:center; padding:50px; color:var(--accent-color);">Carregando detalhes...</div>
-        
+        <div id="loading" style="text-align:center; padding:50px; color:var(--accent-color);">Carregando...</div>
         <div id="product-details" style="display: none;"></div>
     </main>
     
@@ -112,23 +122,18 @@
         const loadingDiv = document.getElementById('loading');
         let currentProductId = new URLSearchParams(window.location.search).get('id');
         let productData = {};
-        let selectedLine = null; 
-        let selectedVol = null;  
+        let selectedLine = null, selectedVol = null;  
 
         document.addEventListener('DOMContentLoaded', () => {
             if(!currentProductId) return window.location.href = 'index.html';
-            fetchProductDetails();
-            updateCartIcon();
+            fetchProductDetails(); updateCartIcon();
         });
 
         async function fetchProductDetails() {
             try {
                 const doc = await db.collection("products").doc(currentProductId).get();
                 if (!doc.exists) { loadingDiv.innerHTML = "Produto não encontrado."; return; }
-                
-                productData = doc.data();
-                renderProduct();
-                fetchReviews();
+                productData = doc.data(); renderProduct(); fetchReviews();
             } catch (e) { loadingDiv.innerHTML = "Erro ao carregar."; }
         }
 
@@ -141,32 +146,33 @@
                 ? '<span class="status-badge status-pronta-entrega">Pronta Entrega</span>' 
                 : '<span class="status-badge status-sob-encomenda">Sob Encomenda</span>';
 
-            // --- LÓGICA DE GALERIA COM VÍDEO INTEGRADO ---
-            let mainMedia = `<img id="main-display-content" src="${p.imageUrl}">`; // Padrão: Imagem
+            // 1. Mídia Principal
+            let mediaHtml = `<div id="main-media-display"><img id="main-display-content" src="${p.imageUrl}"></div>`;
             
+            // 2. Galeria de Fotos (Só fotos)
             let thumbsHtml = '';
-            
-            // 1. Thumb da Imagem Principal
+            // Foto Principal
             thumbsHtml += `<div class="thumb-container active" onclick="showImage('${p.imageUrl}', this)"><img src="${p.imageUrl}"></div>`;
-
-            // 2. Thumbs da Galeria
+            // Fotos Extras
             if(p.galeria && p.galeria.length > 0) {
                 p.galeria.forEach(url => {
                     thumbsHtml += `<div class="thumb-container" onclick="showImage('${url}', this)"><img src="${url}"></div>`;
                 });
             }
+            // Container das Thumbs
+            mediaHtml += `<div id="thumbnails">${thumbsHtml}</div>`;
 
-            // 3. Thumb do VÍDEO (Se existir)
+            // 3. VÍDEO (SEPARADO NA PRÓXIMA LINHA)
+            // Se tiver vídeo, cria uma barra clicável embaixo das fotos
             if (p.videoUrl && p.videoUrl.trim() !== '') {
-                // Usa a imagem principal como capa do vídeo, com ícone de Play em cima
-                thumbsHtml += `
-                    <div class="thumb-container" onclick="showVideo('${p.videoUrl}', this)">
-                        <img src="${p.imageUrl}">
-                        <div class="video-thumb-overlay"><i class="fas fa-play"></i></div>
+                mediaHtml += `
+                    <div class="video-trigger-bar" onclick="showVideo('${p.videoUrl}')">
+                        <i class="fas fa-play-circle"></i> ASSISTIR VÍDEO DO PRODUTO
                     </div>
                 `;
             }
 
+            // Variantes
             let variantsHtml = '';
             if(hasVariants) {
                 const lines = Object.keys(p.variantes);
@@ -175,10 +181,7 @@
             }
 
             detailsContainer.innerHTML = `
-                <div class="media-area">
-                    <div id="main-media-display">${mainMedia}</div>
-                    <div id="thumbnails">${thumbsHtml}</div>
-                </div>
+                <div class="media-area">${mediaHtml}</div>
                 <div class="info-area">
                     ${statusHtml}
                     <h1>${p.name}</h1>
@@ -206,20 +209,20 @@
             if(hasVariants) setupVariantLogic(); else setupSimpleCartLogic();
         }
 
-        // --- FUNÇÕES DE TROCA DE MÍDIA ---
+        // FUNÇÕES DE MÍDIA
         window.showImage = function(src, el) {
             document.getElementById('main-media-display').innerHTML = `<img id="main-display-content" src="${src}">`;
-            updateActiveThumb(el);
+            if(el) updateActiveThumb(el);
         }
 
-        window.showVideo = function(videoUrl, el) {
+        window.showVideo = function(videoUrl) {
             document.getElementById('main-media-display').innerHTML = `
-                <video id="main-display-content" controls autoplay playsinline style="width:100%; height:100%; object-fit:contain;">
+                <video id="main-display-content" controls autoplay playsinline style="width:100%; height:100%; object-fit:contain; background:#000;">
                     <source src="${videoUrl}" type="video/mp4">
-                    <source src="${videoUrl}" type="video/webm">
                 </video>
             `;
-            updateActiveThumb(el);
+            // Remove seleção das fotos para indicar que é vídeo
+            document.querySelectorAll('.thumb-container').forEach(t => t.classList.remove('active'));
         }
 
         function updateActiveThumb(el) {
@@ -227,105 +230,56 @@
             el.classList.add('active');
         }
 
-        // (Resto das funções JS mantidas iguais...)
+        // (Resto das funções lógicas mantidas...)
         function setupVariantLogic() {
             const lineBtns = document.querySelectorAll('.line-selector');
             const volContainer = document.getElementById('vol-container');
             const volGroup = document.getElementById('vol-group');
             const buyBtn = document.getElementById('add-to-cart-btn');
             const labelLine = document.getElementById('selected-line-label');
-
             lineBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    lineBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    selectedLine = btn.dataset.line;
-                    selectedVol = null;
-                    labelLine.textContent = selectedLine;
-                    renderVolumes(selectedLine);
-                    volGroup.style.opacity = '1';
-                    volGroup.style.pointerEvents = 'auto';
-                    buyBtn.disabled = true;
-                    buyBtn.textContent = "Selecione o Tamanho";
+                    lineBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active');
+                    selectedLine = btn.dataset.line; selectedVol = null; labelLine.textContent = selectedLine;
+                    renderVolumes(selectedLine); volGroup.style.opacity = '1'; volGroup.style.pointerEvents = 'auto';
+                    buyBtn.disabled = true; buyBtn.textContent = "Selecione o Tamanho";
                 });
             });
-
             function renderVolumes(line) {
-                const stockData = productData.variantes[line];
-                volContainer.innerHTML = '';
+                const stockData = productData.variantes[line]; volContainer.innerHTML = '';
                 Object.keys(stockData).forEach(volKey => {
-                    const qty = stockData[volKey];
-                    const isSoldOut = qty <= 0;
-                    const btn = document.createElement('button');
-                    btn.className = `variant-btn vol-selector ${isSoldOut ? 'disabled' : ''}`;
-                    btn.textContent = volKey + (isSoldOut ? ' (Esgotado)' : '');
+                    const qty = stockData[volKey]; const isSoldOut = qty <= 0;
+                    const btn = document.createElement('button'); btn.className = `variant-btn vol-selector ${isSoldOut ? 'disabled' : ''}`; btn.textContent = volKey + (isSoldOut ? ' (Esgotado)' : '');
                     if(!isSoldOut) { btn.onclick = () => selectVolume(btn, volKey, qty); }
                     volContainer.appendChild(btn);
                 });
             }
-
             function selectVolume(btn, vol, qty) {
-                document.querySelectorAll('.vol-selector').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                selectedVol = vol;
-                buyBtn.disabled = false;
-                buyBtn.innerHTML = `ADICIONAR AO CARRINHO <i class="fas fa-shopping-bag"></i>`;
-                const newBtn = buyBtn.cloneNode(true);
-                buyBtn.parentNode.replaceChild(newBtn, buyBtn);
-                newBtn.addEventListener('click', () => addToCart(qty));
+                document.querySelectorAll('.vol-selector').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+                selectedVol = vol; buyBtn.disabled = false; buyBtn.innerHTML = `ADICIONAR AO CARRINHO <i class="fas fa-shopping-bag"></i>`;
+                const newBtn = buyBtn.cloneNode(true); buyBtn.parentNode.replaceChild(newBtn, buyBtn); newBtn.addEventListener('click', () => addToCart(qty));
             }
         }
-
         function setupSimpleCartLogic() {
-            const btn = document.getElementById('add-to-cart-btn');
-            const maxStock = productData.estoqueTotal || 999;
+            const btn = document.getElementById('add-to-cart-btn'); const maxStock = productData.estoqueTotal || 999;
             btn.addEventListener('click', () => addToCart(maxStock));
         }
-
         function addToCart(maxStock) {
             const cart = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}};
             const variantId = selectedLine ? `${currentProductId}_${selectedLine}_${selectedVol}` : `${currentProductId}_padrao`;
             const currentQty = cart.items[variantId] ? cart.items[variantId].quantity : 0;
             if(currentQty >= maxStock) { alert("Estoque máximo atingido."); return; }
-            if(!cart.items[variantId]) {
-                cart.items[variantId] = {
-                    id: currentProductId,
-                    name: productData.name,
-                    price: productData.price,
-                    image: productData.imageUrl,
-                    color: selectedLine || '',
-                    size: selectedVol || '',
-                    quantity: 0
-                };
-            }
-            cart.items[variantId].quantity++;
-            localStorage.setItem('whatsappCart', JSON.stringify(cart));
-            updateCartIcon();
-            const btn = document.querySelector('.buy-button');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "ADICIONADO! ✓";
-            btn.style.backgroundColor = "#25D366";
+            if(!cart.items[variantId]) { cart.items[variantId] = { id: currentProductId, name: productData.name, price: productData.price, image: productData.imageUrl, color: selectedLine || '', size: selectedVol || '', quantity: 0 }; }
+            cart.items[variantId].quantity++; localStorage.setItem('whatsappCart', JSON.stringify(cart)); updateCartIcon();
+            const btn = document.querySelector('.buy-button'); const originalText = btn.innerHTML; btn.innerHTML = "ADICIONADO! ✓"; btn.style.backgroundColor = "#25D366";
             setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ""; }, 2000);
         }
-
-        function updateCartIcon(){
-            const c = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}};
-            let q = 0; Object.values(c.items).forEach(i => q += i.quantity);
-            const badge = document.getElementById('cart-count');
-            if(q > 0) { badge.textContent = q; badge.style.display = 'flex'; }
-            else badge.style.display = 'none';
-        }
-
+        function updateCartIcon(){ const c = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}}; let q = 0; Object.values(c.items).forEach(i => q += i.quantity); const badge = document.getElementById('cart-count'); if(q > 0) { badge.textContent = q; badge.style.display = 'flex'; } else badge.style.display = 'none'; }
+        
         async function fetchReviews() {
-            const div = document.getElementById('reviews-container');
-            const snap = await db.collection('reviews').where('productId', '==', currentProductId).get();
+            const div = document.getElementById('reviews-container'); const snap = await db.collection('reviews').where('productId', '==', currentProductId).get();
             if(snap.empty) { div.innerHTML = '<p style="color:#999; font-style:italic;">Seja o primeiro a avaliar.</p>'; return; }
-            let h = '';
-            snap.forEach(d => {
-                const r = d.data();
-                const stars = '★'.repeat(r.rating) + '☆'.repeat(5-r.rating);
-                h += `<div class="review-item"><div class="review-header"><span>${r.customerName}</span><span class="stars">${stars}</span></div><p class="review-text">"${r.text}"</p></div>`;
-            });
+            let h = ''; snap.forEach(d => { const r = d.data(); const stars = '★'.repeat(r.rating) + '☆'.repeat(5-r.rating); h += `<div class="review-item"><div class="review-header"><span>${r.customerName}</span><span class="stars">${stars}</span></div><p class="review-text">"${r.text}"</p></div>`; });
             div.innerHTML = h;
         }
     </script>
