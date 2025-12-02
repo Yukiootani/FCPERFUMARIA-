@@ -14,36 +14,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO BLINDADO --- */
+        /* --- ESTILO BLINDADO (TRAVAMENTO DE TELA) --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; padding-bottom: 100px; width: 100%; overflow-x: hidden; }
+        
+        html, body { 
+            width: 100%; 
+            max-width: 100vw; /* Garante que não passa da tela */
+            overflow-x: hidden; /* Bloqueia rolagem lateral da página inteira */
+            font-family: 'Montserrat', sans-serif; 
+            background-color: #FDFBF7; 
+            color: #333; 
+            padding-bottom: 100px; 
+        }
+        
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         
+        /* HEADER */
         header { background-color: #fff; padding: 1rem; border-bottom: 1px solid #e0e0e0; padding-top: max(1rem, env(safe-area-inset-top)); }
         header a { color: var(--primary-color); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
         
-        main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        main { 
+            width: 100%; 
+            max-width: 1000px; 
+            margin: 20px auto; 
+            padding: 0 15px; 
+            overflow: hidden; /* Garante que nada dentro do main vaze */
+        }
         
-        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; }
-        .media-area { flex: 1 1 100%; } 
-        .info-area { flex: 1 1 100%; }
-        @media (min-width: 768px) { .media-area { flex: 1 1 45%; } .info-area { flex: 1 1 50%; } }
+        /* LAYOUT DE COLUNAS */
+        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; width: 100%; }
+        .media-area { flex: 1 1 100%; width: 100%; } 
+        .info-area { flex: 1 1 100%; width: 100%; }
         
-        /* ÁREA DE MÍDIA */
+        @media (min-width: 768px) {
+            .media-area { flex: 1 1 45%; }
+            .info-area { flex: 1 1 50%; }
+        }
+        
+        /* GALERIA DE FOTOS */
         #main-media-display { 
-            position: relative; width: 100%; padding-top: 100%; 
-            margin-bottom: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; 
+            position: relative; width: 100%; padding-top: 100%; /* Quadrado */
+            margin-bottom: 15px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; 
             display: flex; align-items: center; justify-content: center;
         }
         #main-media-display img, #main-media-display video { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 5px; 
         }
         
-        /* FOTOS PEQUENAS (THUMBNAILS) */
-        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
+        /* --- MINIATURAS (CORREÇÃO DE SCROLL) --- */
+        #thumbnails { 
+            display: flex; 
+            gap: 10px; 
+            overflow-x: auto; /* Permite rolar só aqui dentro */
+            padding-bottom: 10px; /* Espaço para scrollbar invisível */
+            margin-bottom: 10px; 
+            width: 100%;
+            max-width: 100vw; /* Trava na largura da tela */
+            
+            /* Truques para iOS ficar liso */
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE 10+ */
+        }
+        /* Esconde a barra de rolagem no Chrome/Safari */
+        #thumbnails::-webkit-scrollbar { 
+            display: none; 
+            width: 0;
+            height: 0;
+        }
+
         .thumb-container { 
-            width: 60px; height: 60px; flex-shrink: 0; border-radius: 4px; 
-            cursor: pointer; border: 1px solid #ddd; background: #fff; transition: 0.3s; 
+            width: 60px; 
+            height: 60px; 
+            flex-shrink: 0; /* IMPEDE QUE ELES SE ESMAGUEM */
+            border-radius: 4px; 
+            cursor: pointer; 
+            border: 1px solid #ddd; 
+            background: #fff; 
+            transition: 0.3s; 
+            position: relative; 
+            overflow: hidden;
         }
         .thumb-container.active { border: 2px solid var(--accent-color); }
         .thumb-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
@@ -64,12 +114,12 @@
             justify-content: center;
             gap: 10px;
             transition: 0.3s;
-            margin-bottom: 20px; /* Espaço para separar da info */
+            margin-bottom: 20px;
         }
         .video-trigger-bar:active { background-color: #f9f9f9; transform: scale(0.98); }
         .video-trigger-bar i { color: var(--accent-color); font-size: 1.2em; }
 
-        /* INFO DO PRODUTO */
+        /* INFO */
         .status-badge { font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 4px; font-weight: 600; display: inline-block; margin-bottom: 10px; }
         .status-pronta-entrega { background-color: #e6f9e6; color: #1e7e34; border: 1px solid #c3e6cb; }
         .status-sob-encomenda { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
@@ -77,7 +127,7 @@
         h1 { font-family: 'Playfair Display', serif; color: var(--primary-color); margin: 0 0 10px 0; font-size: 1.8em; line-height: 1.2; }
         .price { font-size: 1.6em; font-weight: 700; color: var(--accent-color); margin: 10px 0; }
         
-        .variant-group { margin-top: 10px; }
+        .variant-group { margin-top: 20px; }
         .variant-group label { font-size: 0.85em; font-weight: 600; color: #666; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 1px; }
         .selector-container { display: flex; flex-wrap: wrap; gap: 8px; }
         .variant-btn { padding: 10px 15px; border: 1px solid #ccc; background: #fff; color: #333; cursor: pointer; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-weight: 500; min-width: 60px; text-align: center; transition: 0.3s; }
@@ -90,6 +140,7 @@
         .description-box { margin-top: 30px; line-height: 1.6; color: #555; font-size: 0.95em; border-top: 1px solid #eee; padding-top: 20px; }
         .description-box h3 { font-family: 'Playfair Display'; color: var(--primary-color); margin-bottom: 10px; }
 
+        /* REVIEWS */
         #reviews-section { margin-top: 40px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
         .review-item { border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 15px; }
         .review-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; font-size: 0.9em; }
@@ -101,10 +152,14 @@
     </style>
 </head>
 <body>
-    <header><a href="index.html"><i class="fas fa-arrow-left"></i> Voltar para a Loja</a></header>
+
+    <header>
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Voltar para a Loja</a>
+    </header>
 
     <main>
-        <div id="loading" style="text-align:center; padding:50px; color:var(--accent-color);">Carregando...</div>
+        <div id="loading" style="text-align:center; padding:50px; color:var(--accent-color);">Carregando detalhes...</div>
+        
         <div id="product-details" style="display: none;"></div>
     </main>
     
@@ -122,18 +177,23 @@
         const loadingDiv = document.getElementById('loading');
         let currentProductId = new URLSearchParams(window.location.search).get('id');
         let productData = {};
-        let selectedLine = null, selectedVol = null;  
+        let selectedLine = null; 
+        let selectedVol = null;  
 
         document.addEventListener('DOMContentLoaded', () => {
             if(!currentProductId) return window.location.href = 'index.html';
-            fetchProductDetails(); updateCartIcon();
+            fetchProductDetails();
+            updateCartIcon();
         });
 
         async function fetchProductDetails() {
             try {
                 const doc = await db.collection("products").doc(currentProductId).get();
                 if (!doc.exists) { loadingDiv.innerHTML = "Produto não encontrado."; return; }
-                productData = doc.data(); renderProduct(); fetchReviews();
+                
+                productData = doc.data();
+                renderProduct();
+                fetchReviews();
             } catch (e) { loadingDiv.innerHTML = "Erro ao carregar."; }
         }
 
@@ -143,27 +203,23 @@
             const hasVariants = p.variantes && Object.keys(p.variantes).length > 0;
             
             let statusHtml = p.source === 'pronta-entrega' 
-                ? '<span class="status-badge status-pronta-entrega">Pronta Entrega</span>' 
-                : '<span class="status-badge status-sob-encomenda">Sob Encomenda</span>';
+                ? '<span class="status-badge status-pronta-entrega"><i class="fas fa-check"></i> Pronta Entrega</span>' 
+                : '<span class="status-badge status-sob-encomenda"><i class="fas fa-clock"></i> Sob Encomenda (15-20 dias)</span>';
 
-            // 1. Mídia Principal
+            // MÍDIA
             let mediaHtml = `<div id="main-media-display"><img id="main-display-content" src="${p.imageUrl}"></div>`;
             
-            // 2. Galeria de Fotos (Só fotos)
+            // THUMBS (FOTOS)
             let thumbsHtml = '';
-            // Foto Principal
             thumbsHtml += `<div class="thumb-container active" onclick="showImage('${p.imageUrl}', this)"><img src="${p.imageUrl}"></div>`;
-            // Fotos Extras
             if(p.galeria && p.galeria.length > 0) {
                 p.galeria.forEach(url => {
                     thumbsHtml += `<div class="thumb-container" onclick="showImage('${url}', this)"><img src="${url}"></div>`;
                 });
             }
-            // Container das Thumbs
             mediaHtml += `<div id="thumbnails">${thumbsHtml}</div>`;
 
-            // 3. VÍDEO (SEPARADO NA PRÓXIMA LINHA)
-            // Se tiver vídeo, cria uma barra clicável embaixo das fotos
+            // VÍDEO (BOTÃO SEPARADO)
             if (p.videoUrl && p.videoUrl.trim() !== '') {
                 mediaHtml += `
                     <div class="video-trigger-bar" onclick="showVideo('${p.videoUrl}')">
@@ -172,7 +228,7 @@
                 `;
             }
 
-            // Variantes
+            // VARIANTES
             let variantsHtml = '';
             if(hasVariants) {
                 const lines = Object.keys(p.variantes);
@@ -212,7 +268,7 @@
         // FUNÇÕES DE MÍDIA
         window.showImage = function(src, el) {
             document.getElementById('main-media-display').innerHTML = `<img id="main-display-content" src="${src}">`;
-            if(el) updateActiveThumb(el);
+            updateActiveThumb(el);
         }
 
         window.showVideo = function(videoUrl) {
@@ -221,7 +277,7 @@
                     <source src="${videoUrl}" type="video/mp4">
                 </video>
             `;
-            // Remove seleção das fotos para indicar que é vídeo
+            // Remove seleção das thumbs
             document.querySelectorAll('.thumb-container').forEach(t => t.classList.remove('active'));
         }
 
@@ -230,7 +286,7 @@
             el.classList.add('active');
         }
 
-        // (Resto das funções lógicas mantidas...)
+        // (Funções de Carrinho e Reviews mantidas iguais)
         function setupVariantLogic() {
             const lineBtns = document.querySelectorAll('.line-selector');
             const volContainer = document.getElementById('vol-container');
@@ -275,7 +331,6 @@
             setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ""; }, 2000);
         }
         function updateCartIcon(){ const c = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}}; let q = 0; Object.values(c.items).forEach(i => q += i.quantity); const badge = document.getElementById('cart-count'); if(q > 0) { badge.textContent = q; badge.style.display = 'flex'; } else badge.style.display = 'none'; }
-        
         async function fetchReviews() {
             const div = document.getElementById('reviews-container'); const snap = await db.collection('reviews').where('productId', '==', currentProductId).get();
             if(snap.empty) { div.innerHTML = '<p style="color:#999; font-style:italic;">Seja o primeiro a avaliar.</p>'; return; }
