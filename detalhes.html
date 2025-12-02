@@ -58,7 +58,7 @@
         h1 { font-family: 'Playfair Display', serif; color: var(--primary-color); margin: 0 0 10px 0; font-size: 1.8em; line-height: 1.2; }
         .price { font-size: 1.6em; font-weight: 700; color: var(--accent-color); margin: 10px 0; }
         
-        /* BOTÕES DE VARIANTE */
+        /* VARIANTE */
         .variant-group { margin-top: 20px; }
         .variant-group label { font-size: 0.85em; font-weight: 600; color: #666; text-transform: uppercase; margin-bottom: 8px; display: block; letter-spacing: 1px; }
         
@@ -84,24 +84,26 @@
         .description-box { margin-top: 30px; line-height: 1.6; color: #555; font-size: 0.95em; border-top: 1px solid #eee; padding-top: 20px; }
         .description-box h3 { font-family: 'Playfair Display'; color: var(--primary-color); margin-bottom: 10px; }
 
-        /* --- ÁREA DE VÍDEO (NOVO) --- */
-        #video-container { 
+        /* --- ÁREA DE VÍDEO (SEPARADA E DESTACADA) --- */
+        #video-section-container { 
             display: none; /* Escondido por padrão */
             margin-top: 30px; 
             background: #fff; 
-            padding: 15px; 
-            border-radius: 8px; 
             border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        #video-container h3 {
+        .video-header {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 10px 15px;
+            font-weight: bold;
             font-family: 'Playfair Display', serif;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.2em;
+            letter-spacing: 1px;
             display: flex; align-items: center; gap: 10px;
         }
-        video { width: 100%; border-radius: 4px; background: #000; max-height: 400px; }
+        video { width: 100%; display: block; max-height: 400px; object-fit: contain; background: #000; }
 
         /* AVALIAÇÕES */
         #reviews-section { margin-top: 40px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
@@ -124,8 +126,7 @@
     <main>
         <div id="loading" style="text-align:center; padding:50px; color:var(--accent-color);">Carregando detalhes...</div>
         
-        <div id="product-details" style="display: none;">
-            </div>
+        <div id="product-details" style="display: none;"></div>
     </main>
     
     <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
@@ -172,7 +173,7 @@
                 ? '<span class="status-badge status-pronta-entrega"><i class="fas fa-check"></i> Pronta Entrega</span>' 
                 : '<span class="status-badge status-sob-encomenda"><i class="fas fa-clock"></i> Sob Encomenda (15-20 dias)</span>';
 
-            // Galeria
+            // Galeria de Fotos
             let mediaHtml = `<div id="main-media-display"><img id="main-img" src="${p.imageUrl}"></div>`;
             if(p.galeria && p.galeria.length > 0) {
                 let thumbs = `<div class="thumb-container active" onclick="changeImage('${p.imageUrl}', this)"><img src="${p.imageUrl}"></div>`;
@@ -190,22 +191,23 @@
                 variantsHtml += `<div class="variant-group"><label>1. Versão: <span id="selected-line-label" style="color:#333;"></span></label><div class="selector-container" id="line-container">${linesBtns}</div></div><div class="variant-group" id="vol-group" style="opacity:0.5; pointer-events:none;"><label>2. Tamanho:</label><div class="selector-container" id="vol-container"></div></div>`;
             }
 
-            // --- VÍDEO (LÓGICA NOVA) ---
-            // Só cria o HTML do vídeo se existir um link de vídeo no banco
-            let videoHtml = '';
+            // --- VÍDEO (CÓDIGO NOVO) ---
+            // Verifica se existe e não está vazio
+            let videoSection = '';
             if (p.videoUrl && p.videoUrl.trim() !== '') {
-                videoHtml = `
-                    <div id="video-container">
-                        <h3><i class="fas fa-play-circle"></i> Vídeo de Demonstração</h3>
-                        <video controls>
+                videoSection = `
+                    <div id="video-section-container">
+                        <div class="video-header"><i class="fas fa-play-circle"></i> Vídeo de Demonstração</div>
+                        <video controls playsinline>
                             <source src="${p.videoUrl}" type="video/mp4">
-                            Seu navegador não suporta vídeo.
+                            <source src="${p.videoUrl}" type="video/webm">
+                            Seu navegador não suporta o vídeo.
                         </video>
                     </div>
                 `;
             }
 
-            // Montagem Final
+            // Montagem
             detailsContainer.innerHTML = `
                 <div class="media-area">${mediaHtml}</div>
                 <div class="info-area">
@@ -222,7 +224,7 @@
                         <p>${(p.description || '').replace(/\n/g, '<br>')}</p>
                     </div>
 
-                    ${videoHtml}
+                    ${videoSection}
 
                     <div id="reviews-section">
                         <h3 style="font-family:'Playfair Display'; color:var(--primary-color);">Avaliações de Clientes</h3>
@@ -238,7 +240,7 @@
             else setupSimpleCartLogic();
         }
 
-        // Lógica Variantes
+        // ... (Resto das funções: setupVariantLogic, addToCart, etc - Mantidas iguais)
         function setupVariantLogic() {
             const lineBtns = document.querySelectorAll('.line-selector');
             const volContainer = document.getElementById('vol-container');
@@ -297,9 +299,7 @@
             const cart = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}};
             const variantId = selectedLine ? `${currentProductId}_${selectedLine}_${selectedVol}` : `${currentProductId}_padrao`;
             const currentQty = cart.items[variantId] ? cart.items[variantId].quantity : 0;
-
             if(currentQty >= maxStock) { alert("Estoque máximo atingido."); return; }
-
             if(!cart.items[variantId]) {
                 cart.items[variantId] = {
                     id: currentProductId,
@@ -314,15 +314,11 @@
             cart.items[variantId].quantity++;
             localStorage.setItem('whatsappCart', JSON.stringify(cart));
             updateCartIcon();
-            
             const btn = document.querySelector('.buy-button');
             const originalText = btn.innerHTML;
             btn.innerHTML = "ADICIONADO! ✓";
             btn.style.backgroundColor = "#25D366";
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.backgroundColor = ""; 
-            }, 2000);
+            setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ""; }, 2000);
         }
 
         function updateCartIcon(){
