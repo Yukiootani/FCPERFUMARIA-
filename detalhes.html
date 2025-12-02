@@ -14,109 +14,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO BLINDADO (TRAVAMENTO DE TELA) --- */
+        /* --- ESTILO GERAL --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        html, body { 
-            width: 100%; 
-            max-width: 100vw; /* Garante que não passa da tela */
-            overflow-x: hidden; /* Bloqueia rolagem lateral da página inteira */
-            font-family: 'Montserrat', sans-serif; 
-            background-color: #FDFBF7; 
-            color: #333; 
-            padding-bottom: 100px; 
-        }
-        
+        body { font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; padding-bottom: 100px; width: 100%; overflow-x: hidden; }
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         
-        /* HEADER */
         header { background-color: #fff; padding: 1rem; border-bottom: 1px solid #e0e0e0; padding-top: max(1rem, env(safe-area-inset-top)); }
         header a { color: var(--primary-color); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
         
-        main { 
-            width: 100%; 
-            max-width: 1000px; 
-            margin: 20px auto; 
-            padding: 0 15px; 
-            overflow: hidden; /* Garante que nada dentro do main vaze */
-        }
+        main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         
-        /* LAYOUT DE COLUNAS */
-        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; width: 100%; }
-        .media-area { flex: 1 1 100%; width: 100%; } 
-        .info-area { flex: 1 1 100%; width: 100%; }
+        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; }
+        .media-area { flex: 1 1 100%; } 
+        .info-area { flex: 1 1 100%; }
+        @media (min-width: 768px) { .media-area { flex: 1 1 45%; } .info-area { flex: 1 1 50%; } }
         
-        @media (min-width: 768px) {
-            .media-area { flex: 1 1 45%; }
-            .info-area { flex: 1 1 50%; }
-        }
+        /* MÍDIA */
+        #main-media-display { position: relative; width: 100%; padding-top: 100%; margin-bottom: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        #main-media-display img, #main-media-display video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 5px; }
         
-        /* GALERIA DE FOTOS */
-        #main-media-display { 
-            position: relative; width: 100%; padding-top: 100%; /* Quadrado */
-            margin-bottom: 15px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        #main-media-display img, #main-media-display video { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 5px; 
-        }
-        
-        /* --- MINIATURAS (CORREÇÃO DE SCROLL) --- */
-        #thumbnails { 
-            display: flex; 
-            gap: 10px; 
-            overflow-x: auto; /* Permite rolar só aqui dentro */
-            padding-bottom: 10px; /* Espaço para scrollbar invisível */
-            margin-bottom: 10px; 
-            width: 100%;
-            max-width: 100vw; /* Trava na largura da tela */
-            
-            /* Truques para iOS ficar liso */
-            -webkit-overflow-scrolling: touch; 
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE 10+ */
-        }
-        /* Esconde a barra de rolagem no Chrome/Safari */
-        #thumbnails::-webkit-scrollbar { 
-            display: none; 
-            width: 0;
-            height: 0;
-        }
-
-        .thumb-container { 
-            width: 60px; 
-            height: 60px; 
-            flex-shrink: 0; /* IMPEDE QUE ELES SE ESMAGUEM */
-            border-radius: 4px; 
-            cursor: pointer; 
-            border: 1px solid #ddd; 
-            background: #fff; 
-            transition: 0.3s; 
-            position: relative; 
-            overflow: hidden;
-        }
+        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
+        .thumb-container { width: 60px; height: 60px; flex-shrink: 0; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; background: #fff; transition: 0.3s; position: relative; overflow: hidden; }
         .thumb-container.active { border: 2px solid var(--accent-color); }
         .thumb-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
-        
-        /* BARRA DE VÍDEO SEPARADA */
-        .video-trigger-bar {
-            width: 100%;
-            background-color: #fff;
-            border: 1px dashed var(--accent-color);
-            color: var(--primary-color);
-            padding: 12px;
-            text-align: center;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: 0.3s;
-            margin-bottom: 20px;
-        }
-        .video-trigger-bar:active { background-color: #f9f9f9; transform: scale(0.98); }
+        .video-trigger-bar { width: 100%; background-color: #fff; border: 1px dashed var(--accent-color); color: var(--primary-color); padding: 12px; text-align: center; font-weight: bold; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; margin-bottom: 20px; }
         .video-trigger-bar i { color: var(--accent-color); font-size: 1.2em; }
 
         /* INFO */
@@ -146,6 +67,19 @@
         .review-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; font-size: 0.9em; }
         .stars { color: var(--accent-color); letter-spacing: 2px; }
         .review-text { font-style: italic; color: #666; }
+
+        /* --- RELACIONADOS (NOVO) --- */
+        #related-section { margin-top: 50px; border-top: 1px solid #ddd; padding-top: 30px; display: none; }
+        .related-title { font-family: 'Playfair Display'; font-size: 1.4em; color: var(--primary-color); text-align: center; margin-bottom: 20px; }
+        
+        #related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* Reuso estilo do card da home para consistência */
+        .rel-card { background: #fff; border: 1px solid #eee; border-radius: 6px; overflow: hidden; text-decoration: none; color: #333; display: flex; flex-direction: column; }
+        .rel-img-box { width: 100%; padding-top: 120%; position: relative; background: #f9f9f9; }
+        .rel-img-box img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .rel-info { padding: 10px; text-align: center; }
+        .rel-name { font-family: 'Playfair Display'; font-size: 0.9em; color: var(--primary-color); margin-bottom: 5px; }
+        .rel-price { font-weight: bold; font-size: 0.9em; }
 
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); cursor: pointer; z-index: 1000; text-decoration: none; transition: transform 0.2s; }
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; display: none; }
@@ -177,8 +111,7 @@
         const loadingDiv = document.getElementById('loading');
         let currentProductId = new URLSearchParams(window.location.search).get('id');
         let productData = {};
-        let selectedLine = null; 
-        let selectedVol = null;  
+        let selectedLine = null, selectedVol = null;  
 
         document.addEventListener('DOMContentLoaded', () => {
             if(!currentProductId) return window.location.href = 'index.html';
@@ -190,10 +123,10 @@
             try {
                 const doc = await db.collection("products").doc(currentProductId).get();
                 if (!doc.exists) { loadingDiv.innerHTML = "Produto não encontrado."; return; }
-                
                 productData = doc.data();
                 renderProduct();
                 fetchReviews();
+                fetchRelated(); // Chama os relacionados
             } catch (e) { loadingDiv.innerHTML = "Erro ao carregar."; }
         }
 
@@ -203,32 +136,22 @@
             const hasVariants = p.variantes && Object.keys(p.variantes).length > 0;
             
             let statusHtml = p.source === 'pronta-entrega' 
-                ? '<span class="status-badge status-pronta-entrega"><i class="fas fa-check"></i> Pronta Entrega</span>' 
-                : '<span class="status-badge status-sob-encomenda"><i class="fas fa-clock"></i> Sob Encomenda (15-20 dias)</span>';
+                ? '<span class="status-badge status-pronta-entrega">Pronta Entrega</span>' 
+                : '<span class="status-badge status-sob-encomenda">Sob Encomenda</span>';
 
-            // MÍDIA
             let mediaHtml = `<div id="main-media-display"><img id="main-display-content" src="${p.imageUrl}"></div>`;
             
-            // THUMBS (FOTOS)
             let thumbsHtml = '';
             thumbsHtml += `<div class="thumb-container active" onclick="showImage('${p.imageUrl}', this)"><img src="${p.imageUrl}"></div>`;
             if(p.galeria && p.galeria.length > 0) {
-                p.galeria.forEach(url => {
-                    thumbsHtml += `<div class="thumb-container" onclick="showImage('${url}', this)"><img src="${url}"></div>`;
-                });
+                p.galeria.forEach(url => { thumbsHtml += `<div class="thumb-container" onclick="showImage('${url}', this)"><img src="${url}"></div>`; });
             }
             mediaHtml += `<div id="thumbnails">${thumbsHtml}</div>`;
 
-            // VÍDEO (BOTÃO SEPARADO)
             if (p.videoUrl && p.videoUrl.trim() !== '') {
-                mediaHtml += `
-                    <div class="video-trigger-bar" onclick="showVideo('${p.videoUrl}')">
-                        <i class="fas fa-play-circle"></i> ASSISTIR VÍDEO DO PRODUTO
-                    </div>
-                `;
+                mediaHtml += `<div class="video-trigger-bar" onclick="showVideo('${p.videoUrl}')"><i class="fas fa-play-circle"></i> ASSISTIR VÍDEO DO PRODUTO</div>`;
             }
 
-            // VARIANTES
             let variantsHtml = '';
             if(hasVariants) {
                 const lines = Object.keys(p.variantes);
@@ -256,6 +179,11 @@
                         <h3 style="font-family:'Playfair Display'; color:var(--primary-color);">Avaliações</h3>
                         <div id="reviews-container">Carregando...</div>
                     </div>
+
+                    <div id="related-section">
+                        <div class="related-title">Você também pode gostar</div>
+                        <div id="related-grid">Carregando...</div>
+                    </div>
                 </div>
             `;
 
@@ -265,10 +193,49 @@
             if(hasVariants) setupVariantLogic(); else setupSimpleCartLogic();
         }
 
-        // FUNÇÕES DE MÍDIA
+        // --- LÓGICA DE RELACIONADOS ---
+        async function fetchRelated() {
+            try {
+                // Busca 4 produtos da mesma categoria
+                const snap = await db.collection("products")
+                    .where("secao", "==", productData.secao)
+                    .limit(5) // Pega 5 para garantir que sobra 4 se excluir o atual
+                    .get();
+
+                if(snap.empty) return;
+
+                let html = '';
+                let count = 0;
+
+                snap.forEach(d => {
+                    if(d.id === currentProductId) return; // Pula o produto atual
+                    if(count >= 4) return; // Limita a 4
+
+                    const p = d.data();
+                    const pf = (p.price||0).toLocaleString('ja-JP');
+                    
+                    html += `
+                        <a href="detalhes.html?id=${d.id}" class="rel-card">
+                            <div class="rel-img-box"><img src="${p.imageUrl}"></div>
+                            <div class="rel-info">
+                                <div class="rel-name">${p.name}</div>
+                                <div class="rel-price">¥${pf}</div>
+                            </div>
+                        </a>
+                    `;
+                    count++;
+                });
+
+                if (count > 0) {
+                    document.getElementById('related-grid').innerHTML = html;
+                    document.getElementById('related-section').style.display = 'block';
+                }
+            } catch(e) { console.log("Erro Relacionados:", e); }
+        }
+
         window.showImage = function(src, el) {
             document.getElementById('main-media-display').innerHTML = `<img id="main-display-content" src="${src}">`;
-            updateActiveThumb(el);
+            if(el) updateActiveThumb(el);
         }
 
         window.showVideo = function(videoUrl) {
@@ -277,7 +244,6 @@
                     <source src="${videoUrl}" type="video/mp4">
                 </video>
             `;
-            // Remove seleção das thumbs
             document.querySelectorAll('.thumb-container').forEach(t => t.classList.remove('active'));
         }
 
@@ -286,7 +252,6 @@
             el.classList.add('active');
         }
 
-        // (Funções de Carrinho e Reviews mantidas iguais)
         function setupVariantLogic() {
             const lineBtns = document.querySelectorAll('.line-selector');
             const volContainer = document.getElementById('vol-container');
@@ -331,6 +296,7 @@
             setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ""; }, 2000);
         }
         function updateCartIcon(){ const c = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}}; let q = 0; Object.values(c.items).forEach(i => q += i.quantity); const badge = document.getElementById('cart-count'); if(q > 0) { badge.textContent = q; badge.style.display = 'flex'; } else badge.style.display = 'none'; }
+        
         async function fetchReviews() {
             const div = document.getElementById('reviews-container'); const snap = await db.collection('reviews').where('productId', '==', currentProductId).get();
             if(snap.empty) { div.innerHTML = '<p style="color:#999; font-style:italic;">Seja o primeiro a avaliar.</p>'; return; }
@@ -339,4 +305,4 @@
         }
     </script>
 </body>
-</html>
+</html>r
