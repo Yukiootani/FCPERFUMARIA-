@@ -14,21 +14,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL --- */
+        /* --- ESTILO BLINDADO --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         
-        header { background-color: #fff; color: var(--primary-color); padding: 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); padding-top: max(1.5rem, env(safe-area-inset-top)); }
-        
-        /* LOGO */
-        .header-img { 
-            max-height: 130px; 
-            width: auto; 
-            display: block; 
-            margin: 0 auto 5px auto; 
+        /* --- ANIMAÇÕES DE ATENÇÃO (NOVO) --- */
+        @keyframes pulse-android {
+            0% { box-shadow: 0 0 0 0 rgba(204, 164, 59, 0.7); transform: scale(1); }
+            50% { box-shadow: 0 0 15px 5px rgba(204, 164, 59, 0.3); transform: scale(1.02); background-color: #263752; }
+            100% { box-shadow: 0 0 0 0 rgba(204, 164, 59, 0); transform: scale(1); }
         }
+        @keyframes pulse-ios {
+            0% { box-shadow: 0 -2px 5px rgba(0,0,0,0.1); border-top-color: #ccc; }
+            50% { box-shadow: 0 -5px 20px rgba(204, 164, 59, 0.4); border-top-color: var(--accent-color); }
+            100% { box-shadow: 0 -2px 5px rgba(0,0,0,0.1); border-top-color: #ccc; }
+        }
+
+        /* HEADER */
+        header { background-color: #fff; color: var(--primary-color); padding: 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); padding-top: max(1.5rem, env(safe-area-inset-top)); }
+        .header-img { max-height: 130px; width: auto; display: block; margin: 0 auto 5px auto; }
         .header-sub { font-size: 0.8em; color: var(--accent-color); margin-top: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
 
         /* SINO */
@@ -48,11 +54,45 @@
         .inbox-date { font-size: 0.75em; color: #999; margin-top: 8px; text-align: right; display: block; }
         .inbox-empty { padding: 30px; text-align: center; color: #999; font-style: italic; }
 
-        /* BOTÃO INSTALAR (Android) */
-        #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; padding-top: max(15px, env(safe-area-inset-top)); }
+        /* BOTÃO INSTALAR (ANDROID - COM PISCA PISCA) */
+        #install-app-btn { 
+            display: none; 
+            width: 100%; 
+            background-color: var(--primary-color); 
+            color: #fff; 
+            font-weight: bold; 
+            text-align: center; 
+            padding: 15px; 
+            border: none; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            padding-top: max(15px, env(safe-area-inset-top));
+            
+            /* Animação */
+            animation: pulse-android 2s infinite;
+        }
         
-        /* BANNER IOS (iPhone) */
-        #ios-install-banner { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background-color: #f0f0f0; border-top: 1px solid #ccc; padding: 20px 15px; padding-bottom: max(20px, env(safe-area-inset-bottom)); text-align: center; z-index: 3000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); font-size: 0.95em; color: #333; }
+        /* BANNER IOS (IPHONE - COM PISCA PISCA NA BORDA) */
+        #ios-install-banner { 
+            display: none; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            background-color: #f9f9f9; 
+            border-top: 2px solid #ccc; 
+            padding: 20px 15px; 
+            padding-bottom: max(20px, env(safe-area-inset-bottom)); 
+            text-align: center; 
+            z-index: 3000; 
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); 
+            font-size: 0.95em; 
+            color: #333; 
+            
+            /* Animação */
+            animation: pulse-ios 2.5s infinite;
+        }
         #close-ios-banner { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #888; padding: 5px; }
         .ios-share-icon { color: #007AFF; font-size: 1.2em; margin: 0 5px; vertical-align: middle; }
 
@@ -84,9 +124,10 @@
         .badge-esgotado { background-color: #666; right: 5px; left: auto; }
 
         footer { text-align: center; padding: 30px; margin-top: 20px; color: #666; border-top: 1px solid #eee; font-size: 0.8em; }
-        #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
+        #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
         #cart-count { position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         
+        /* MODAL PUSH */
         #push-permission-modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(27, 38, 59, 0.8); align-items: center; justify-content: center; }
         .push-modal-content { background: #fff; width: 85%; max-width: 320px; padding: 25px; border-radius: 8px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .push-btn-allow { background: var(--accent-color); color: #fff; border: none; padding: 12px; width: 100%; border-radius: 4px; font-weight: bold; margin-top: 15px; cursor: pointer; }
@@ -137,39 +178,23 @@
         function clearBadge() { try { if ('setAppBadge' in navigator) navigator.setAppBadge(0); if ('clearAppBadge' in navigator) navigator.clearAppBadge(); } catch(e) { } }
         clearBadge(); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') clearBadge(); });
 
-        // --- PWA e Instalação ---
-        let deferredPrompt; 
-        const installBtn = document.getElementById('install-app-btn'); 
-        const iosBanner = document.getElementById('ios-install-banner');
+        let deferredPrompt; const installBtn=document.getElementById('install-app-btn'); const iosBanner=document.getElementById('ios-install-banner');
+        window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;installBtn.style.display='block'; tryShowPopup();});
+        installBtn.addEventListener('click',()=>{installBtn.style.display='none';if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}});
         
-        window.addEventListener('beforeinstallprompt',(e)=>{
-            e.preventDefault(); 
-            deferredPrompt=e; 
-            installBtn.style.display='block'; 
-            tryShowPopup();
-        });
-        installBtn.addEventListener('click',()=>{
-            installBtn.style.display='none'; 
-            if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null}
-        });
-
         const isIos=()=>{return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())};
         const isStandalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-
-        // Verifica se já fechou o banner antes
+        
+        // Lógica de Memória do iOS (Se fechou, não mostra mais)
         const bannerDismissed = localStorage.getItem('iosBannerDismissed') === 'true';
-
-        // Só mostra se for iOS, NÃO for app e NÃO tiver fechado antes
         if(isIos() && !isStandalone && !bannerDismissed){
             iosBanner.style.display='block';
             document.getElementById('cart-icon').style.bottom='150px';
         }
-
-        // Botão Fechar com Memória
-        document.getElementById('close-ios-banner').addEventListener('click', ()=>{
+        document.getElementById('close-ios-banner').addEventListener('click',()=>{
             iosBanner.style.display='none';
             document.getElementById('cart-icon').style.bottom='20px';
-            localStorage.setItem('iosBannerDismissed', 'true'); // Salva na memória
+            localStorage.setItem('iosBannerDismissed', 'true');
         });
         
         if ('serviceWorker' in navigator) {
@@ -178,11 +203,10 @@
             });
         }
 
-        // --- LOJA (Nuclear) ---
         const grid=document.getElementById('products-grid'), loadingMsg=document.getElementById('loading-message');
         let currentFilter='pronta-entrega', currentSecao='todos', allProducts=[];
         
-        async function fetchSiteConfig(){ } // Mantido vazio
+        async function fetchSiteConfig(){ }
 
         async function fetchAllProducts() {
             loadingMsg.style.display='block'; grid.innerHTML='';
