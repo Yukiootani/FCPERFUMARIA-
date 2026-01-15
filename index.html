@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO VISUAL --- */
+        /* --- ESTILO VISUAL (MANTIDO DO CÓDIGO OURO) --- */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
         body { padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
@@ -23,7 +23,7 @@
         header { background-color: #fff; color: var(--primary-color); padding: 1rem; text-align: center; border-bottom: 3px solid var(--accent-color); padding-top: max(1.5rem, env(safe-area-inset-top)); }
         
         .header-img { 
-            max-height: 130px; /* LOGO GRANDE */
+            max-height: 130px; 
             width: auto; 
             display: block; 
             margin: 0 auto 5px auto; 
@@ -48,7 +48,7 @@
 
         #install-app-btn { display: none; width: 100%; background-color: var(--primary-color); color: #fff; font-weight: bold; text-align: center; padding: 15px; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; padding-top: max(15px, env(safe-area-inset-top)); }
         
-        /* BANNER IOS - COM ÍCONE DE MAIS (+) */
+        /* BANNER IOS */
         #ios-install-banner { 
             display: none; 
             position: fixed; 
@@ -96,7 +96,29 @@
         .badge-novo { background-color: var(--accent-color); }
         .badge-esgotado { background-color: #666; right: 5px; left: auto; }
 
-        footer { text-align: center; padding: 30px; margin-top: 20px; color: #666; border-top: 1px solid #eee; font-size: 0.8em; }
+        /* RODAPÉ NOVO COM CONTATO */
+        footer { 
+            text-align: center; 
+            padding: 30px; 
+            margin-top: 20px; 
+            color: #666; 
+            border-top: 1px solid #eee; 
+            font-size: 0.9em; 
+        }
+        .footer-contact {
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .footer-contact a {
+            color: inherit;
+            text-decoration: none;
+        }
+
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-decoration: none; z-index: 9990; }
         #cart-count { position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
         
@@ -126,7 +148,14 @@
         <p id="search-no-results" style="display:none; text-align:center; color:#999; padding:20px;">Nenhum produto encontrado.</p>
     </main>
 
-    <footer><p>© 2025 FC Perfumaria</p></footer>
+    <footer>
+        <p>© 2025 FC Perfumaria</p>
+        <div class="footer-contact">
+            <i class="fab fa-whatsapp"></i> 
+            <a href="tel:09076966075">090-7696-6075</a>
+        </div>
+    </footer>
+
     <a id="cart-icon" href="carrinho.html"><i class="fas fa-shopping-bag"></i><span id="cart-count">0</span></a>
     
     <div id="ios-install-banner">
