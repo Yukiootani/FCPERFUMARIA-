@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin FC Perfumaria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #1B263B; border-bottom: 2px solid #Cca43b; padding-bottom: 10px; margin-top: 0; }
+        
+        /* BOTÃO DE ESTOQUE NOVO */
+        .stock-shortcut-btn {
+            display: block;
+            background-color: #Cca43b; /* Dourado */
+            color: #1B263B; /* Azul Escuro */
+            text-align: center;
+            text-decoration: none;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+        .stock-shortcut-btn:hover { background-color: #dcb34a; transform: translateY(-2px); }
+        
+        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        
+        button { margin-top: 20px; padding: 15px; width: 100%; background: #1B263B; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #2c3e50; }
+        
+        .status { padding: 10px; margin-top: 10px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .loading { background: #cce5ff; color: #004085; }
+
+        /* Área de Notificação */
+        .push-box { background: #fff3cd; padding: 20px; border: 1px solid #ffeeba; border-radius: 8px; margin-bottom: 30px; }
+        
+        /* Tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
+        th { background: #eee; }
+        .del-btn { background: #dc3545; color: white; padding: 5px 10px; font-size: 0.8em; width: auto; margin: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Painel Admin</h1>
+
+    <div id="login-area">
+        <label>Email:</label><input type="email" id="email">
+        <label>Senha:</label><input type="password" id="senha">
+        <button onclick="fazerLogin()">ENTRAR</button>
+    </div>
+
+    <div id="admin-area" style="display: none;">
+        
+        <a href="estoque.html" class="stock-shortcut-btn">📦 IR PARA ESTOQUE RÁPIDO</a>
+
+        <div id="status-msg" class="status"></div>
+
+        <div class="push-box">
+            <h3 style="margin-top:0; color:#856404;">📢 Enviar Notificação Push</h3>
+            <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Promoção!">
+            <label>Mensagem:</label><textarea id="push-body" rows="2" placeholder="Ex: Tudo com 10% OFF"></textarea>
+            <button onclick="enviarPush()">ENVIAR AGORA</button>
+
+            <h4>Histórico de Mensagens</h4>
+            <div style="overflow-x:auto;">
+                <table id="msg-table">
+                    <thead><tr><th>Data</th><th>Título</th><th>Msg</th><th>Apagar</th></tr></thead>
+                    <tbody id="msg-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <h3>📦 Cadastrar Produto</h3>
+        <label>Nome:</label><input type="text" id="prod-name">
+        <label>Preço (¥):</label><input type="number" id="prod-price">
+        <label>Categoria:</label>
+        <select id="prod-secao">
+            <option value="feminino">Feminino</option>
+            <option value="masculino">Masculino</option>
+            <option value="unissex">Unissex</option>
+            <option value="kits">Kits</option>
+        </select>
+        <label>Foto:</label><input type="file" id="prod-img">
+        <button onclick="salvarProduto()">SALVAR PRODUTO</button>
+        
+        <h3>Lista de Produtos</h3>
+        <div style="overflow-x:auto;">
+            <table id="prod-table">
+                <thead><tr><th>Nome</th><th>Preço</th><th>Ação</th></tr></thead>
+                <tbody id="prod-list"></tbody>
+            </table>
+        </div>
+        
+        <button onclick="logout()" style="background:#555; margin-top:40px;">SAIR</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // LOGIN
+    function fazerLogin() {
+        const e = document.getElementById('email').value;
+        const p = document.getElementById('senha').value;
+        auth.signInWithEmailAndPassword(e, p).catch(err => alert("Erro: " + err.message));
+    }
+    function logout() { auth.signOut(); window.location.reload(); }
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('login-area').style.display = 'none';
+            document.getElementById('admin-area').style.display = 'block';
+            carregarTudo();
+        }
+    });
+
+    function showStatus(msg, type) {
+        const el = document.getElementById('status-msg');
+        el.textContent = msg;
+        el.className = 'status ' + type;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 4000);
+    }
+
+    function carregarTudo() {
+        carregarMensagens();
+        carregarProdutos();
+    }
+
+    // --- NOTIFICAÇÕES ---
+    async function carregarMensagens() {
+        const list = document.getElementById('msg-list');
+        list.innerHTML = '';
+        const snap = await db.collection('site_messages').orderBy('createdAt', 'desc').limit(5).get();
+        snap.forEach(doc => {
+            const m = doc.data();
+            const dt = m.createdAt ? m.createdAt.toDate().toLocaleDateString() : '-';
+            list.innerHTML += `<tr><td>${dt}</td><td>${m.title}</td><td>${m.body}</td><td><button class="del-btn" onclick="apagarMsg('${doc.id}')">X</button></td></tr>`;
+        });
+    }
+
+    async function apagarMsg(id) {
+        if(confirm("Apagar?")) { await db.collection('site_messages').doc(id).delete(); carregarMensagens(); }
+    }
+
+    async function enviarPush() {
+        const title = document.getElementById('push-title').value;
+        const body = document.getElementById('push-body').value;
+        if(!title || !body) return alert("Preencha tudo");
+
+        showStatus("Enviando...", "loading");
+
+        try {
+            // 1. CHAMA O SERVIDOR (NETLIFY)
+            const response = await fetch('/.netlify/functions/push-notification', {
+                method: 'POST',
+                body: JSON.stringify({ title, body })
+            });
+            
+            const res = await response.json();
+
+            // 2. SALVA NO HISTÓRICO (Isso faz aparecer na tabela)
+            await db.collection('site_messages').add({
+                title, body, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            if(response.ok) {
+                showStatus(`Sucesso! Enviado para ${res.enviados} celulares.`, "success");
+            } else {
+                showStatus(`Erro no envio: ${res.error}`, "error");
+            }
+            carregarMensagens();
+
+        } catch (err) {
+            showStatus("Erro técnico: " + err.message, "error");
+        }
+    }
+
+    // --- PRODUTOS ---
+    async function carregarProdutos() {
+        const list = document.getElementById('prod-list');
+        list.innerHTML = '';
+        const snap = await db.collection('products').orderBy('createdAt', 'desc').limit(10).get();
+        snap.forEach(doc => {
+            const p = doc.data();
+            list.innerHTML += `<tr><td>${p.name}</td><td>¥${p.price}</td><td><button class="del-btn" onclick="apagarProd('${doc.id}')">X</button></td></tr>`;
+        });
+    }
+    
+    async function salvarProduto() {
+        const name = document.getElementById('prod-name').value;
+        const price = parseFloat(document.getElementById('prod-price').value);
+        const secao = document.getElementById('prod-secao').value;
+        const file = document.getElementById('prod-img').files[0];
+        
+        if(!name || !price || !file) return alert("Preencha tudo e escolha foto.");
+        
+        showStatus("Salvando foto...", "loading");
+        const ref = storage.ref(`products/${Date.now()}`);
+        await ref.put(file);
+        const url = await ref.getDownloadURL();
+        
+        await db.collection('products').add({
+            name, price, secao, imageUrl: url,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            source: 'pronta-entrega', isFeatured: 'novo', estoqueTotal: 10,
+            variantes: {} // Simplificado para teste
+        });
+        
+        showStatus("Produto Salvo!", "success");
+        carregarProdutos();
+    }
+    
+    async function apagarProd(id) {
+        if(confirm("Apagar?")) { await db.collection('products').doc(id).delete(); carregarProdutos(); }
+    }
+</script>
+
+</body>
+</html>
