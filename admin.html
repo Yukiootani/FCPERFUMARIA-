@@ -3,215 +3,448 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin FC Perfumaria</title>
+    <title>Admin FC Perfumaria (Completo)</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #f4f4f4; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #1B263B; border-bottom: 2px solid #Cca43b; padding-bottom: 10px; margin-top: 0; }
+        /* --- CSS GERAL --- */
+        :root {
+            --primary-color: #1B263B; /* Azul Marinho */
+            --accent-color: #Cca43b;  /* Dourado */
+            --text-color: #333;
+            --bg-color: #f4f4f4;
+            --border-color: #ddd;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+        }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-top: 0; }
         
-        /* BOTÃO DE ESTOQUE (Dourado e Grande) */
+        /* BOTÃO DE ESTOQUE NO TOPO */
         .stock-shortcut-btn {
-            display: block;
-            background-color: #Cca43b;
-            color: #1B263B;
-            text-align: center;
-            text-decoration: none;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 1.1em;
-            border-radius: 5px;
-            margin-bottom: 25px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            transition: 0.2s;
-            border: 1px solid #bfa05f;
+            display: block; background-color: var(--accent-color); color: #fff; text-align: center; text-decoration: none; padding: 15px;
+            font-weight: bold; font-size: 1.1em; border-radius: 5px; margin-bottom: 25px; box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: 0.2s; border: 1px solid #bfa05f; text-transform: uppercase; letter-spacing: 1px;
         }
         .stock-shortcut-btn:hover { background-color: #dcb34a; transform: translateY(-2px); }
-        
-        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        
-        button { margin-top: 20px; padding: 15px; width: 100%; background: #1B263B; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        button:hover { background: #2c3e50; }
-        
-        .status { padding: 10px; margin-top: 10px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .loading { background: #cce5ff; color: #004085; }
 
-        .push-box { background: #fff3cd; padding: 20px; border: 1px solid #ffeeba; border-radius: 8px; margin-bottom: 30px; }
+        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fafafa; border-radius: 5px; border: 1px solid #eee; }
+        label { font-weight: bold; margin-bottom: -10px; color: var(--primary-color); }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        textarea { min-height: 80px; }
+        button { background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { opacity: 0.9; }
         
-        /* Tabela Melhorada */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.9em; }
-        th { background: #1B263B; color: #fff; }
-        .del-btn { background: #dc3545; color: white; padding: 5px 10px; font-size: 0.8em; width: auto; margin: 0; cursor: pointer; }
+        /* Status */
+        #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .success { background-color: #d4edda; color: var(--success-color); }
+        .error { background-color: #f8d7da; color: var(--error-color); }
+        .loading { background-color: #cce5ff; color: #004085; }
         
-        /* Destaque para Estoque Baixo */
-        .low-stock { color: #d63384; font-weight: bold; }
+        /* Tabelas */
+        .table-container { overflow-x: auto; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; vertical-align: middle; }
+        th { background-color: var(--primary-color); color: #fff; font-size: 0.9em; }
+        td { font-size: 0.9em; }
+        img.thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+        .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 10px; width: auto; }
+        .edit-btn { background-color: var(--accent-color); color: #fff; font-size: 0.8em; padding: 5px 10px; width: auto; margin-right: 5px; }
+        
+        /* Painel Push */
+        #push-panel { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        #push-panel h3 { color: #856404; border-bottom-color: #856404; }
+        
+        /* Variantes (Adaptado para Perfumes) */
+        #variants-container { border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; background: #fff; }
+        .variant-entry { border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
+        .variant-entry:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        .variant-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+        .variant-header select { flex: 1; font-weight: bold; }
+        .variant-custom-input { display: none; flex: 1; }
+        
+        .variant-stock-grid { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .stock-input-group { display: flex; flex-direction: column; align-items: center; width: 60px; }
+        .stock-input-group label { font-size: 0.8em; margin-bottom: 2px; color: #666; }
+        .stock-input-group input { text-align: center; padding: 5px; }
+
+        /* Login */
+        #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
+        #admin-panel { display: none; } 
+        #btnLogout { background-color: #555; margin-top: 20px; width: auto; float: right; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Painel Admin</h1>
-
-    <div id="login-area">
-        <label>Email:</label><input type="email" id="email">
-        <label>Senha:</label><input type="password" id="senha">
-        <button onclick="fazerLogin()">ENTRAR</button>
-    </div>
-
-    <div id="admin-area" style="display: none;">
+    <div class="container">
+        <h1>Painel Admin (Completo)</h1>
         
-        <a href="estoque.html" target="_blank" class="stock-shortcut-btn">
-            📦 CLIQUE AQUI PARA GERENCIAR ESTOQUE
-        </a>
+        <section id="login-section">
+            <h3>Login Restrito</h3>
+            <form id="loginForm">
+                <label>Email:</label><input type="email" id="login-email" required>
+                <label>Senha:</label><input type="password" id="login-password" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <div id="loginStatus"></div>
+        </section>
 
-        <div id="status-msg" class="status"></div>
-
-        <div class="push-box">
-            <h3 style="margin-top:0; color:#856404;">📢 Enviar Notificação Push</h3>
-            <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Promoção!">
-            <label>Mensagem:</label><textarea id="push-body" rows="2" placeholder="Ex: Tudo com 10% OFF"></textarea>
-            <button onclick="enviarPush()">ENVIAR AGORA</button>
-        </div>
-
-        <hr>
-
-        <h3>📦 Cadastrar Novo Produto</h3>
-        <label>Nome:</label><input type="text" id="prod-name">
-        <label>Preço (¥):</label><input type="number" id="prod-price">
-        <label>Categoria:</label>
-        <select id="prod-secao">
-            <option value="feminino">Feminino</option>
-            <option value="masculino">Masculino</option>
-            <option value="unissex">Unissex</option>
-            <option value="kits">Kits</option>
-            <option value="infantil">Infantil</option>
-        </select>
-        <label>Foto:</label><input type="file" id="prod-img">
-        <button onclick="salvarProduto()">SALVAR PRODUTO</button>
-        
-        <h3 style="margin-top: 40px;">Lista de Produtos Cadastrados</h3>
-        <div style="overflow-x:auto;">
-            <table id="prod-table">
-                <thead><tr><th>Nome</th><th>Preço</th><th>Estoque Total</th><th>Ação</th></tr></thead>
-                <tbody id="prod-list"></tbody>
-            </table>
-        </div>
-        
-        <button onclick="logout()" style="background:#555; margin-top:40px;">SAIR</button>
-    </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
-<script>
-    const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    function fazerLogin() {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('senha').value;
-        auth.signInWithEmailAndPassword(e, p).catch(err => alert("Erro: " + err.message));
-    }
-    function logout() { auth.signOut(); window.location.reload(); }
-
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('login-area').style.display = 'none';
-            document.getElementById('admin-area').style.display = 'block';
-            carregarProdutos();
-        }
-    });
-
-    function showStatus(msg, type) {
-        const el = document.getElementById('status-msg');
-        el.textContent = msg;
-        el.className = 'status ' + type;
-        el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 4000);
-    }
-
-    // --- PUSH (Mantido Simplificado) ---
-    async function enviarPush() {
-        const title = document.getElementById('push-title').value;
-        const body = document.getElementById('push-body').value;
-        if(!title || !body) return alert("Preencha tudo");
-        showStatus("Enviando...", "loading");
-        try {
-            const response = await fetch('/.netlify/functions/push-notification', { method: 'POST', body: JSON.stringify({ title, body }) });
-            if(response.ok) showStatus("Enviado com sucesso!", "success");
-            else showStatus("Erro ao enviar.", "error");
-        } catch (err) { showStatus("Erro técnico.", "error"); }
-    }
-
-    // --- PRODUTOS ---
-    async function carregarProdutos() {
-        const list = document.getElementById('prod-list');
-        list.innerHTML = '';
-        const snap = await db.collection('products').orderBy('createdAt', 'desc').get();
-        
-        snap.forEach(doc => {
-            const p = doc.data();
-            const estoque = p.estoqueTotal || 0;
-            const estoqueStyle = estoque < 5 ? 'class="low-stock"' : '';
+        <section id="admin-panel">
             
-            // LINHA DA TABELA ATUALIZADA
-            list.innerHTML += `
-                <tr>
-                    <td>${p.name}</td>
-                    <td>¥${p.price}</td>
-                    <td ${estoqueStyle}>${estoque} un</td>
-                    <td><button class="del-btn" onclick="apagarProd('${doc.id}')">Excluir</button></td>
-                </tr>
-            `;
-        });
-    }
-    
-    async function salvarProduto() {
-        const name = document.getElementById('prod-name').value;
-        const price = parseFloat(document.getElementById('prod-price').value);
-        const secao = document.getElementById('prod-secao').value;
-        const file = document.getElementById('prod-img').files[0];
-        
-        if(!name || !price || !file) return alert("Preencha tudo e escolha foto.");
-        
-        showStatus("Enviando foto...", "loading");
-        const ref = storage.ref(`products/${Date.now()}`);
-        await ref.put(file);
-        const url = await ref.getDownloadURL();
-        
-        // CRIA COM ESTOQUE PADRÃO 10
-        await db.collection('products').add({
-            name, price, secao, imageUrl: url,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            source: 'pronta-entrega', isFeatured: 'novo', 
-            estoqueTotal: 10,
-            variantes: {} 
-        });
-        
-        showStatus("Produto Salvo!", "success");
-        document.getElementById('prod-name').value = '';
-        document.getElementById('prod-price').value = '';
-        document.getElementById('prod-img').value = '';
-        carregarProdutos();
-    }
-    
-    async function apagarProd(id) {
-        if(confirm("Tem certeza? Isso apaga o produto do site.")) { 
-            await db.collection('products').doc(id).delete(); 
-            carregarProdutos(); 
-        }
-    }
-</script>
+            <a href="estoque.html" target="_blank" class="stock-shortcut-btn">📦 Gerenciar Estoque Rápido</a>
 
+            <div id="status"></div>
+
+            <div id="push-panel">
+                <h3>📢 Notificações Push</h3>
+                <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Chegou Malbec!">
+                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;" placeholder="Texto da mensagem..."></textarea>
+                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">Enviar Notificação</button>
+                
+                <h4 style="margin-top: 20px;">Histórico</h4>
+                <div class="table-container">
+                    <table id="messages-table">
+                        <thead><tr><th>Data</th><th>Título</th><th>Mensagem</th><th>Ação</th></tr></thead>
+                        <tbody id="messages-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr>
+
+            <form id="product-form">
+                <h3 id="form-title">Adicionar / Editar Produto</h3>
+                <input type="hidden" id="productId"> 
+                
+                <label>Nome do Perfume/Kit:</label>
+                <input type="text" id="name" required placeholder="Ex: Malbec Gold">
+
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Preço (¥):</label>
+                        <input type="number" id="price" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Categoria:</label>
+                        <select id="secao" required>
+                            <option value="">Escolha...</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="unissex">Unissex</option>
+                            <option value="infantil">Infantil</option>
+                            <option value="kits">Kits</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label>Descrição:</label>
+                <textarea id="description" rows="3"></textarea>
+                
+                <label>Estoque e Versões:</label>
+                <div id="variants-container"></div>
+                <button type="button" id="add-variant-btn" style="background:#666; font-size:0.9em;">+ Adicionar Versão (Ex: Tradicional, Gold...)</button>
+
+                <label>Disponibilidade:</label>
+                <select id="source" required>
+                    <option value="pronta-entrega">Pronta Entrega (Estoque Local)</option>
+                    <option value="sob-encomenda">Sob Encomenda (Do Brasil)</option>
+                </select>
+                
+                <label>Destaque:</label>
+                <select id="isFeatured">
+                    <option value="nenhum">Nenhum</option>
+                    <option value="novo">Lançamento</option>
+                    <option value="destaque">Mais Vendido</option>
+                </select>
+                
+                <label>Foto Principal:</label>
+                <input type="file" id="imageUrl" accept="image/*">
+                
+                <label>Vídeo (Opcional):</label>
+                <input type="file" id="videoUrl" accept="video/*">
+                
+                <label>Galeria (Outras Fotos):</label>
+                <input type="file" id="galeria" multiple accept="image/*">
+                
+                <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
+                <button type="button" id="cancel-edit-btn" style="display:none; background:#999; margin-top:10px;">Cancelar</button>
+            </form>
+
+            <hr>
+
+            <h3>Lista de Produtos</h3>
+            <div class="table-container">
+                <table id="products-table">
+                    <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Estoque Total</th><th>Tipo</th><th>Ações</th></tr></thead>
+                    <tbody id="products-list"></tbody>
+                </table>
+            </div>
+            
+            <button id="btnLogout">Sair</button>
+        </section>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
+
+    <script>
+        // CONFIGURAÇÃO FC PERFUMARIA
+        const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
+
+        async function uploadFile(file, path) {
+            const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm=document.getElementById('loginForm');
+            const adminPanel=document.getElementById('admin-panel');
+            const loginSection=document.getElementById('login-section');
+            const statusDiv=document.getElementById('status');
+            const variantsContainer = document.getElementById('variants-container');
+            
+            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
+
+            // Opções de "Versões" para Perfumes
+            const perfumeLines = ["Tradicional", "Gold", "Black", "Club", "Play", "Sport", "Absoluto", "Noir", "Rose", "Lily", "Kit Completo", "Refil", "Creme", "Body Splash"];
+            
+            // Opções de Volumes (Tamanhos)
+            const volumeOptions = ["100ml", "75ml", "50ml", "30ml", "10ml", "200ml", "250g", "Unico"];
+
+            // 1. GESTÃO DE VARIANTES (ADAPTADA)
+            document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
+
+            function createVariantEntry(lineName='', stocks={}) {
+                const div = document.createElement('div'); div.className='variant-entry';
+                
+                // Select de Linha
+                let opts = perfumeLines.map(v => `<option value="${v}">${v}</option>`).join('');
+                let isCustom = lineName && !perfumeLines.includes(lineName);
+                
+                // Inputs de Volume
+                let stockInputs = volumeOptions.map(vol => `
+                    <div class="stock-input-group">
+                        <label>${vol}</label>
+                        <input type="number" data-vol="${vol}" value="${stocks[vol]||0}" min="0">
+                    </div>
+                `).join('');
+
+                div.innerHTML = `
+                    <div class="variant-header">
+                        <label>Versão:</label>
+                        <select class="line-select">
+                            <option value="">Selecione...</option>
+                            ${opts}
+                            <option value="custom">Outra (Digitar)</option>
+                        </select>
+                        <input type="text" class="variant-custom-input" placeholder="Digite o nome da versão" value="${isCustom ? lineName : ''}">
+                        <button type="button" class="delete-btn" onclick="this.parentElement.parentElement.remove()" style="margin-left:auto;">Remover</button>
+                    </div>
+                    <div class="variant-stock-grid">
+                        ${stockInputs}
+                    </div>
+                `;
+                
+                variantsContainer.appendChild(div);
+                
+                const sel = div.querySelector('.line-select');
+                const customInp = div.querySelector('.variant-custom-input');
+                sel.value = isCustom ? 'custom' : lineName;
+                if(isCustom) customInp.style.display = 'block';
+
+                sel.addEventListener('change', () => {
+                    customInp.style.display = sel.value === 'custom' ? 'block' : 'none';
+                });
+            }
+
+            function getVariantsData() {
+                let v = {};
+                variantsContainer.querySelectorAll('.variant-entry').forEach(div => {
+                    const sel = div.querySelector('.line-select').value;
+                    const custom = div.querySelector('.variant-custom-input').value;
+                    const lineName = sel === 'custom' ? custom : sel;
+                    
+                    if(lineName) {
+                        let stocks = {};
+                        div.querySelectorAll('input[type="number"]').forEach(inp => {
+                            const val = parseInt(inp.value);
+                            if(val > 0) stocks[inp.dataset.vol] = val; // Só salva se tiver estoque > 0 ou se quiser salvar 0
+                            if(inp.value === "0") stocks[inp.dataset.vol] = 0;
+                        });
+                        v[lineName] = stocks;
+                    }
+                });
+                return v;
+            }
+
+            function calcTotalStock(v) {
+                let t = 0;
+                for(let line in v) for(let vol in v[line]) t += v[line][vol];
+                return t;
+            }
+
+            // 2. SALVAR PRODUTO
+            document.getElementById('product-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = "Salvando...";
+                
+                try {
+                    const id = document.getElementById('productId').value || `prod_${Date.now()}`;
+                    const imgFile = document.getElementById('imageUrl').files[0];
+                    const vidFile = document.getElementById('videoUrl').files[0];
+                    
+                    let img = oldImageUrl;
+                    if(imgFile) img = await uploadFile(imgFile, `products/${id}/capa`);
+                    
+                    let vid = oldVideoUrl;
+                    if(vidFile) vid = await uploadFile(vidFile, `products/${id}/video`);
+                    
+                    const variants = getVariantsData();
+                    const total = calcTotalStock(variants);
+                    
+                    const data = {
+                        name: document.getElementById('name').value,
+                        price: parseFloat(document.getElementById('price').value),
+                        secao: document.getElementById('secao').value,
+                        description: document.getElementById('description').value,
+                        source: document.getElementById('source').value,
+                        isFeatured: document.getElementById('isFeatured').value,
+                        variantes: variants,
+                        estoqueTotal: total,
+                        imageUrl: img,
+                        videoUrl: vid
+                    };
+
+                    if(document.getElementById('productId').value) {
+                        await db.collection("products").doc(id).update(data);
+                    } else {
+                        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                        await db.collection("products").doc(id).set(data);
+                    }
+                    
+                    alert("Produto Salvo!");
+                    cancelEdit();
+                    fetchProducts();
+                    
+                } catch(err) { alert("Erro: " + err.message); } 
+                finally { btn.disabled = false; btn.textContent = "Salvar Produto"; }
+            });
+
+            // 3. LISTAR PRODUTOS
+            async function fetchProducts() {
+                const list = document.getElementById('products-list'); list.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
+                const snap = await db.collection("products").orderBy("createdAt", "desc").get();
+                let html = '';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    html += `
+                        <tr>
+                            <td><img src="${p.imageUrl}" class="thumb"></td>
+                            <td>${p.name}</td>
+                            <td>¥${p.price}</td>
+                            <td>${p.estoqueTotal || 0}</td>
+                            <td>${p.source}</td>
+                            <td>
+                                <button class="edit-btn" onclick="editProduct('${doc.id}')">Editar</button>
+                                <button class="delete-btn" onclick="deleteProduct('${doc.id}')">X</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                list.innerHTML = html;
+            }
+
+            // 4. EDITAR / EXCLUIR
+            window.editProduct = async (id) => {
+                const doc = await db.collection("products").doc(id).get();
+                const p = doc.data();
+                
+                document.getElementById('productId').value = id;
+                document.getElementById('name').value = p.name;
+                document.getElementById('price').value = p.price;
+                document.getElementById('secao').value = p.secao;
+                document.getElementById('description').value = p.description;
+                document.getElementById('source').value = p.source;
+                document.getElementById('isFeatured').value = p.isFeatured;
+                
+                oldImageUrl = p.imageUrl;
+                oldVideoUrl = p.videoUrl;
+                
+                variantsContainer.innerHTML = '';
+                if(p.variantes) {
+                    for(let line in p.variantes) createVariantEntry(line, p.variantes[line]);
+                }
+                
+                document.getElementById('form-title').textContent = "Editando Produto";
+                document.getElementById('save-btn').textContent = "Atualizar";
+                document.getElementById('cancel-edit-btn').style.display = 'block';
+                window.scrollTo(0, 500);
+            }
+            
+            window.deleteProduct = async (id) => {
+                if(confirm("Tem certeza que deseja apagar?")) {
+                    await db.collection("products").doc(id).delete();
+                    fetchProducts();
+                }
+            }
+
+            function cancelEdit() {
+                document.getElementById('product-form').reset();
+                document.getElementById('productId').value = '';
+                variantsContainer.innerHTML = '';
+                oldImageUrl = ''; oldVideoUrl = '';
+                document.getElementById('form-title').textContent = "Adicionar Produto";
+                document.getElementById('save-btn').textContent = "Salvar Produto";
+                document.getElementById('cancel-edit-btn').style.display = 'none';
+            }
+            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
+
+            // 5. LOGIN E GERAL
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const em = document.getElementById('login-email').value;
+                const pw = document.getElementById('login-password').value;
+                try { await auth.signInWithEmailAndPassword(em, pw); } 
+                catch(e) { alert("Erro: " + e.message); }
+            });
+            
+            document.getElementById('btnLogout').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
+
+            auth.onAuthStateChanged(user => {
+                if(user) {
+                    loginSection.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    fetchProducts();
+                    fetchMessages();
+                }
+            });
+            
+            // 6. PUSH (Simplificado)
+            async function fetchMessages() {
+                const l = document.getElementById('messages-list'); l.innerHTML = '';
+                const s = await db.collection('site_messages').orderBy('createdAt','desc').limit(5).get();
+                s.forEach(d => {
+                    const m = d.data();
+                    l.innerHTML += `<tr><td>${m.createdAt?m.createdAt.toDate().toLocaleDateString():'-'}</td><td>${m.title}</td><td>${m.body}</td><td><button class="delete-btn" onclick="delMsg('${d.id}')">X</button></td></tr>`;
+                });
+            }
+            window.delMsg = async(id)=>{ await db.collection('site_messages').doc(id).delete(); fetchMessages(); };
+            
+            document.getElementById('btn-send-push').addEventListener('click', async()=>{
+                const t=document.getElementById('push-title').value; const b=document.getElementById('push-body').value;
+                if(!t||!b) return alert("Preencha tudo");
+                if(!confirm("Enviar Push?")) return;
+                try {
+                    await db.collection('site_messages').add({title:t, body:b, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+                    fetch('/.netlify/functions/push-notification', {method:'POST', body:JSON.stringify({title:t, body:b})});
+                    alert("Enviado e Salvo!"); fetchMessages();
+                } catch(e){alert(e.message)}
+            });
+        });
+    </script>
 </body>
 </html>
