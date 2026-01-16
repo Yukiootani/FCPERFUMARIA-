@@ -4,46 +4,256 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Estoque | ClickVenda Pro</title>
+    
+    <link rel="apple-touch-icon" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
+    <link rel="icon" type="image/png" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* CSS DO ESTOQUE (Igual ao anterior) */
+        :root {
+            --primary: #1B263B;
+            --gold: #Cca43b;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+        }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding-bottom: 20px; }
+        
+        /* BARRA DE NAVEGAÇÃO */
+        .app-bar {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .app-bar a { color: var(--white); font-size: 1.4em; text-decoration: none; display: flex; align-items: center; }
+        .app-bar h1 { margin: 0; font-size: 1.1em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+
+        /* STATUS FLUTUANTE */
+        #status-float { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; padding: 10px 20px; border-radius: 30px; color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; }
+        .st-success { background: #10b981; }
+        .st-load { background: #3b82f6; }
+
+        /* FILTROS */
+        .filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 15px; }
+        .filter-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.8em; white-space: nowrap; }
+        .filter-btn.active { background: var(--primary); color: white; }
+
+        /* CARD DE PRODUTO */
+        .stock-card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-header { display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .card-header img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; }
+        .prod-info h3 { margin: 0; font-size: 1em; color: var(--primary); }
+        .prod-info span { font-size: 0.8em; color: #666; background: #eee; padding: 2px 6px; border-radius: 4px; }
+        .prod-total { margin-left: auto; text-align: right; }
+        .prod-total div { font-size: 1.2em; font-weight: 700; color: var(--primary); }
+        .prod-total label { font-size: 0.6em; text-transform: uppercase; color: #999; }
+
+        /* LINHA DE VARIANTE */
+        .variant-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #eee; }
+        .variant-row:last-child { border: none; margin: 0; padding: 0; }
+        
+        .variant-title { font-weight: 700; font-size: 0.9em; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .update-btn { background: var(--gold); color: white; border: none; padding: 6px 15px; border-radius: 4px; font-size: 0.8em; font-weight: bold; cursor: pointer; }
+        
+        .volumes-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .vol-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 5px 10px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+        .vol-item label { font-size: 0.7em; color: #666; margin-bottom: 3px; }
+        .qty-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ccc; background: white; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 1.1em; cursor: pointer; }
+        .qty-val { font-weight: 700; font-size: 1.1em; color: var(--primary); min-width: 20px; text-align: center; }
+
+        #loading-screen { text-align: center; margin-top: 50px; color: #666; }
     </style>
 </head>
 <body>
 
     <div class="app-bar">
         <a href="manager.html"><i class="fas fa-arrow-left"></i></a>
-        <h1 style="margin:0; font-size:1.1em;">Estoque Rápido</h1>
+        <h1>Estoque Rápido</h1>
     </div>
 
+    <div id="status-float"></div>
+
     <div class="container">
+        
+        <div id="loading-screen">Verificando acesso...</div>
+
         <section id="stock-panel" style="display:none;">
             <div class="filters">
+                <button class="filter-btn active" data-f="todos">Todos</button>
+                <button class="filter-btn" data-f="pronta-entrega">Pronta Entrega</button>
+                <button class="filter-btn" data-f="sob-encomenda">Sob Encomenda</button>
+            </div>
+
+            <div id="stock-list">
                 </div>
-            <div id="stock-list">Carregando...</div>
         </section>
+
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const stockList = document.getElementById('stock-list');
+        const statusDiv = document.getElementById('status-float');
+        let currentFilter = 'todos';
+
+        function showStatus(msg, type) {
+            statusDiv.textContent = msg; statusDiv.className = type==='success'?'st-success':'st-load';
+            statusDiv.style.display = 'block'; setTimeout(()=>statusDiv.style.display='none', 2500);
+        }
 
         // SEGURANÇA
         auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('stock-panel').style.display = 'block';
-                // loadStock(); // Chame a função de carregar estoque aqui
-            } else {
-                window.location.href = 'manager.html';
+            if(user) { 
+                document.getElementById('loading-screen').style.display='none'; 
+                document.getElementById('stock-panel').style.display='block'; 
+                loadStock(); 
+            } else { 
+                window.location.href = 'manager.html'; 
             }
         });
 
-        // (Cole o resto do JS do Estoque aqui: loadStock, saveLine, etc.)
+        // CARREGAR ESTOQUE
+        async function loadStock() {
+            stockList.innerHTML = '<p style="text-align:center; padding:20px;">Carregando produtos...</p>';
+            let q = db.collection('products').orderBy('name');
+            
+            try {
+                const snap = await q.get();
+                if(snap.empty) { stockList.innerHTML = '<p style="text-align:center">Nenhum produto cadastrado.</p>'; return; }
+                
+                let html = '';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    
+                    // Filtro Manual (porque o Firebase limita filtros complexos)
+                    if(currentFilter !== 'todos' && p.source !== currentFilter) return;
+
+                    const variants = p.variantes || {};
+                    let varsHtml = '';
+
+                    if(Object.keys(variants).length === 0) {
+                        varsHtml = '<small style="color:#999; display:block; padding:10px;">Sem variações cadastradas. Use o Admin.</small>';
+                    } else {
+                        for(let line in variants) {
+                            let volsHtml = '';
+                            for(let vol in variants[line]) {
+                                volsHtml += `
+                                    <div class="vol-item" data-vol="${vol}">
+                                        <label>${vol}</label>
+                                        <div class="qty-controls">
+                                            <div class="qty-btn" onclick="adj(this,-1)">-</div>
+                                            <span class="qty-val">${variants[line][vol]}</span>
+                                            <div class="qty-btn" onclick="adj(this,1)">+</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            varsHtml += `
+                                <div class="variant-row" data-line="${line}">
+                                    <div class="variant-title">
+                                        <span>${line}</span>
+                                        <button class="update-btn" onclick="saveLine('${doc.id}', '${line}', this)">Salvar</button>
+                                    </div>
+                                    <div class="volumes-grid">${volsHtml}</div>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    html += `
+                        <div class="stock-card">
+                            <div class="card-header">
+                                <img src="${p.imageUrl || 'https://via.placeholder.com/50'}">
+                                <div class="prod-info">
+                                    <h3>${p.name}</h3>
+                                    <span>${p.source==='pronta-entrega'?'Pronta Entrega':'Encomenda'}</span>
+                                </div>
+                                <div class="prod-total">
+                                    <div id="total-${doc.id}">${p.estoqueTotal||0}</div>
+                                    <label>Total</label>
+                                </div>
+                            </div>
+                            <div class="card-body">${varsHtml}</div>
+                        </div>
+                    `;
+                });
+                stockList.innerHTML = html || '<p style="text-align:center">Nenhum item nesta categoria.</p>';
+            } catch(e) {
+                console.log(e);
+                stockList.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar.</p>';
+            }
+        }
+
+        // LÓGICA DE BOTÕES (+/-)
+        window.adj = function(btn, delta) {
+            const span = btn.parentElement.querySelector('.qty-val');
+            let v = parseInt(span.textContent) + delta;
+            if(v < 0) v = 0;
+            span.textContent = v;
+        }
+
+        // SALVAR NO FIREBASE
+        window.saveLine = async function(id, line, btn) {
+            const row = btn.closest('.variant-row');
+            let data = {};
+            row.querySelectorAll('.vol-item').forEach(d => {
+                data[d.dataset.vol] = parseInt(d.querySelector('.qty-val').textContent);
+            });
+            
+            const originalText = btn.textContent;
+            btn.textContent = '...';
+            btn.disabled = true;
+            
+            try {
+                // 1. Atualiza a linha específica
+                await db.collection('products').doc(id).update({ [`variantes.${line}`]: data });
+                
+                // 2. Recalcula Total
+                const doc = await db.collection('products').doc(id).get();
+                let tot = 0; const vs = doc.data().variantes;
+                for(let l in vs) for(let v in vs[l]) tot += vs[l][v];
+                
+                await db.collection('products').doc(id).update({ estoqueTotal: tot });
+                document.getElementById(`total-${id}`).textContent = tot;
+
+                showStatus("Estoque Atualizado!", "success");
+            } catch(e) { 
+                showStatus("Erro ao salvar", "load"); 
+                console.error(e);
+            } finally { 
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // FILTROS
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.f;
+                loadStock();
+            });
+        });
     </script>
 </body>
 </html>
