@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin | ClickVenda Pro</title>
+    <title>Admin Completo | ClickVenda Pro</title>
     
     <link rel="apple-touch-icon" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
     <link rel="icon" type="image/png" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
@@ -40,9 +40,10 @@
 
         /* FORMULÁRIOS */
         form { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: 700; color: var(--primary); font-size: 0.9em; margin-bottom: -5px; }
+        label { font-weight: 700; color: var(--primary); font-size: 0.9em; margin-bottom: -5px; margin-top: 5px; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 1em; }
-        button { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 6px; font-weight: bold; font-size: 1em; cursor: pointer; }
+        button { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 6px; font-weight: bold; font-size: 1em; cursor: pointer; transition: 0.3s; }
+        button:hover { opacity: 0.9; }
         
         /* VARIANTES */
         #variants-container { background: #fafafa; border: 1px dashed #ccc; padding: 15px; border-radius: 6px; }
@@ -80,7 +81,7 @@
 
     <div class="app-bar">
         <a href="manager.html"><i class="fas fa-arrow-left"></i></a>
-        <h1>Administração</h1>
+        <h1>Painel Admin</h1>
     </div>
 
     <div class="container">
@@ -130,7 +131,7 @@
                 
                 <label>Versões e Estoque:</label>
                 <div id="variants-container"></div>
-                <button type="button" id="add-variant-btn" style="background:#9ca3af; font-size:0.9em;">+ Adicionar Versão</button>
+                <button type="button" id="add-variant-btn" style="background:#9ca3af; font-size:0.9em; width: auto; align-self: flex-start;">+ Adicionar Versão</button>
 
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1">
@@ -150,8 +151,16 @@
                     </div>
                 </div>
 
-                <label>Foto:</label>
-                <input type="file" id="imageUrl" accept="image/*">
+                <div style="border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px;">
+                    <label>📸 Foto Principal (Capa):</label>
+                    <input type="file" id="imageUrl" accept="image/*">
+                    
+                    <label>🎥 Vídeo de Demonstração (Opcional):</label>
+                    <input type="file" id="videoUrl" accept="video/*">
+                    
+                    <label>🖼️ Galeria de Fotos (Múltiplas):</label>
+                    <input type="file" id="galeria" multiple accept="image/*">
+                </div>
                 
                 <button type="submit" id="save-btn">Salvar Produto</button>
                 <button type="button" id="cancel-edit-btn" style="display:none; background:#9ca3af;">Cancelar Edição</button>
@@ -178,6 +187,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
 
+        // Função de Upload Genérica
         async function uploadFile(file, path) { const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL(); }
         function showStatus(msg, type) { const s=document.getElementById('status'); s.innerHTML=msg; s.className='status '+type; s.style.display='block'; setTimeout(()=>s.style.display='none',4000); }
 
@@ -188,9 +198,11 @@
             const variantsContainer=document.getElementById('variants-container');
             const productForm=document.getElementById('product-form');
             const productsList=document.getElementById('products-list');
+            
+            // Variáveis para manter mídia antiga na edição
             let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
 
-            // VARIANTES
+            // VARIANTES DE PERFUME
             const perfumeVersions = ["Tradicional", "Gold", "Black", "Club", "Sport", "Rose", "Lily", "Kit"];
             const vols = ["100ml", "75ml", "50ml", "10ml"];
 
@@ -238,15 +250,34 @@
                 return v;
             }
 
-            // SALVAR
+            // SALVAR PRODUTO (COM VÍDEO E GALERIA)
             productForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const btn=document.getElementById('save-btn'); btn.disabled=true; btn.textContent="Salvando...";
+                const btn=document.getElementById('save-btn'); btn.disabled=true; btn.textContent="Enviando Mídia e Salvando...";
                 try {
                     const id = document.getElementById('productId').value || `prod_${Date.now()}`;
+                    
+                    // Arquivos
                     const fImg = document.getElementById('imageUrl').files[0];
+                    const fVid = document.getElementById('videoUrl').files[0];
+                    const fGal = document.getElementById('galeria').files;
+
+                    // Upload Capa
                     let img = oldImageUrl;
                     if(fImg) img = await uploadFile(fImg, `products/${id}/capa`);
+                    
+                    // Upload Vídeo
+                    let vid = oldVideoUrl;
+                    if(fVid) vid = await uploadFile(fVid, `products/${id}/video`);
+
+                    // Upload Galeria
+                    let gal = oldGaleria;
+                    if(fGal.length > 0) {
+                        gal = []; // Se selecionou novos, limpa os antigos
+                        for(let f of fGal) {
+                            gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`));
+                        }
+                    }
                     
                     const vars = getVariantsData();
                     let total = 0;
@@ -259,13 +290,17 @@
                         description: document.getElementById('description').value,
                         source: document.getElementById('source').value,
                         isFeatured: document.getElementById('isFeatured').value,
-                        variantes: vars, estoqueTotal: total, imageUrl: img
+                        variantes: vars, 
+                        estoqueTotal: total, 
+                        imageUrl: img,
+                        videoUrl: vid,   // Salva o link do vídeo
+                        galeria: gal     // Salva o array da galeria
                     };
                     
                     if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
                     else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
                     
-                    cancelEdit(); fetchProducts(); showStatus("Produto Salvo!", "success");
+                    cancelEdit(); fetchProducts(); showStatus("Produto Salvo com Sucesso!", "success");
                 } catch(e) { showStatus("Erro: "+e.message, "error"); }
                 finally { btn.disabled=false; btn.textContent="Salvar Produto"; }
             });
@@ -286,7 +321,7 @@
                 productsList.innerHTML = html;
             }
 
-            // EDITAR/EXCLUIR
+            // EDITAR (CARREGA MÍDIAS ANTIGAS)
             window.editProd = async (id) => {
                 const doc = await db.collection("products").doc(id).get(); const p=doc.data();
                 document.getElementById('productId').value = id;
@@ -296,10 +331,15 @@
                 document.getElementById('description').value = p.description;
                 document.getElementById('source').value = p.source;
                 document.getElementById('isFeatured').value = p.isFeatured;
+                
+                // Carrega Mídias para as variáveis globais
                 oldImageUrl = p.imageUrl;
+                oldVideoUrl = p.videoUrl || '';
+                oldGaleria = p.galeria || [];
+
                 variantsContainer.innerHTML = '';
                 if(p.variantes) for(let n in p.variantes) createVariantEntry(n, p.variantes[n]);
-                document.getElementById('save-btn').textContent = "Atualizar";
+                document.getElementById('save-btn').textContent = "Atualizar Produto";
                 document.getElementById('cancel-edit-btn').style.display='block';
                 window.scrollTo(0,0);
             }
@@ -307,6 +347,7 @@
             
             function cancelEdit() {
                 productForm.reset(); document.getElementById('productId').value=''; variantsContainer.innerHTML='';
+                oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
                 document.getElementById('save-btn').textContent="Salvar Produto";
                 document.getElementById('cancel-edit-btn').style.display='none';
             }
