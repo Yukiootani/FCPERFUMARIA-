@@ -2,291 +2,169 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin FC Perfumaria (Gestão Completa)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin | ClickVenda Pro</title>
+    
+    <link rel="apple-touch-icon" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
+    <link rel="icon" type="image/png" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* --- CSS IDÊNTICO AO 3 MARIAS --- */
         :root {
-            --primary-color: #1B263B; /* Azul Marinho (Identidade FC) */
-            --accent-color: #Cca43b;  /* Dourado (Identidade FC) */
-            --text-color: #333;
-            --bg-color: #FDFBF7;
-            --border-color: #e0e0e0;
-            --error-color: #dc3545;
+            --primary: #1B263B;
+            --gold: #Cca43b;
+            --bg: #f4f7f6;
+            --white: #ffffff;
         }
-        body { 
-            font-family: Arial, sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 20px; 
-        }
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
-        }
-        h1, h2, h3 { 
-            color: var(--primary-color); 
-            text-align: center; 
-            border-bottom: 2px solid var(--accent-color); 
-            padding-bottom: 10px; 
-        }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding-bottom: 40px; }
         
-        /* BOTÃO DE ESTOQUE NO TOPO */
-        .stock-shortcut-btn {
-            display: block; background-color: var(--accent-color); color: #fff; text-align: center; text-decoration: none; padding: 15px;
-            font-weight: bold; font-size: 1.1em; border-radius: 5px; margin-bottom: 25px; box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            transition: 0.2s; border: 1px solid #bfa05f; text-transform: uppercase; letter-spacing: 1px;
-        }
-        .stock-shortcut-btn:hover { background-color: #dcb34a; transform: translateY(-2px); }
-
-        form { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            margin-bottom: 30px; 
-            padding: 20px; 
-            background: #fdf7f9; /* Mantendo levemente rosado ou mudar para #f4f4f4 */
-            background-color: #f8f8f8;
-            border-radius: 5px; 
-        }
-        label { 
-            font-weight: bold; 
-            margin-bottom: -10px; 
-            color: var(--primary-color);
-        }
-        input, textarea, select { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 4px; 
-            box-sizing: border-box; 
-        }
-        textarea { min-height: 100px; }
-        button {
-            background-color: var(--primary-color); 
-            color: white; 
-            padding: 12px; 
-            border: none; 
-            border-radius: 4px; 
-            font-size: 1em; 
-            font-weight: bold; 
-            cursor: pointer; 
-        }
-        
-        /* Status e Avisos */
-        #status, #loginStatus { 
-            text-align: center; 
-            font-weight: bold; 
-            padding: 10px; 
-            border-radius: 4px; 
-            margin-bottom: 15px; 
-            display: none; 
-        }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: var(--error-color); }
-        .loading { background-color: #cce5ff; color: #004085; }
-        
-        /* Tabelas */
-        #products-table-container, #messages-table-container, .table-container { 
-            overflow-x: auto; 
-            margin-bottom: 30px;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-        }
-        th, td { 
-            border: 1px solid var(--border-color); 
-            padding: 8px; 
-            text-align: left; 
-        }
-        th { background-color: var(--primary-color); color: #fff; }
-        img.thumb { 
-            width: 50px; 
-            height: 50px; 
-            object-fit: cover; 
-            border-radius: 4px; 
-        }
-        .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; width: auto; }
-        .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; width: auto; }
-        
-        /* Painel de Notificação (Amarelo) */
-        #push-panel { 
-            background-color: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            padding: 20px; 
-            border-radius: 8px; 
-            margin-bottom: 30px; 
-        }
-        #push-panel h3 { color: #856404; border-bottom-color: #856404; }
-
-        /* Variantes (Adaptado para Perfumes) */
-        #variants-container { 
-            border: 1px solid var(--border-color); 
-            padding: 10px; 
-            border-radius: 4px; 
-            background: #fff; 
-        }
-        .variant-entry { 
-            border-bottom: 1px dashed var(--border-color); 
-            padding-bottom: 10px; 
-            margin-bottom: 10px; 
-        }
-        .variant-entry:last-child { border-bottom: none; }
-        .variant-row { 
-            display: flex; 
-            gap: 10px; 
-            align-items: center; 
-            flex-wrap: wrap; 
-        }
-        .variant-size-stock-group { 
-            display: flex; 
-            gap: 10px; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            margin-top: 10px; 
-        }
-        .variant-size-stock-group div {
+        /* BARRA DE NAVEGAÇÃO TIPO APP */
+        .app-bar {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px 20px;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .variant-size-stock-group label { font-size: 0.8em; margin-bottom: 2px; color: #666; }
-        .variant-size-stock-group input { width: 60px; padding: 5px; text-align: center; }
+        .app-bar a { color: var(--white); font-size: 1.2em; text-decoration: none; display: flex; align-items: center; }
+        .app-bar h1 { margin: 0; font-size: 1.1em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+
+        /* FORMULÁRIOS */
+        form { background: var(--white); padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px; }
+        label { font-weight: 700; color: var(--primary); font-size: 0.9em; margin-bottom: -5px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 1em; }
+        button { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 6px; font-weight: bold; font-size: 1em; cursor: pointer; }
         
-        /* Login/Geral */
-        #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
-        #admin-panel { display: none; } 
-        #btnLogout { background-color: #777; margin-top: 20px; }
-        #logo-preview { max-width: 250px; display: block; margin: 0 auto; }
+        /* VARIANTES */
+        #variants-container { background: #fafafa; border: 1px dashed #ccc; padding: 15px; border-radius: 6px; }
+        .variant-entry { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
+        .variant-entry:last-child { border-bottom: none; margin-bottom: 0; }
+        .variant-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .variant-stock-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .stock-input-group { display: flex; flex-direction: column; align-items: center; width: 60px; }
+        .stock-input-group label { font-size: 0.7em; color: #666; margin-bottom: 2px; }
+        .stock-input-group input { text-align: center; padding: 5px; font-size: 0.9em; }
+
+        /* TABELA */
+        .table-container { overflow-x: auto; margin-top: 20px; background: white; border-radius: 10px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; font-size: 0.9em; }
+        th { color: var(--gold); font-weight: 700; text-transform: uppercase; font-size: 0.8em; }
+        img.thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; }
+
+        /* STATUS */
+        .status { padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .loading { background: #dbeafe; color: #1e40af; }
+        
+        /* BOTÕES PEQUENOS */
+        .btn-small { padding: 6px 12px; font-size: 0.8em; width: auto; margin-right: 5px; }
+        .btn-edit { background: var(--gold); color: #fff; }
+        .btn-del { background: #ef4444; color: #fff; }
+
+        #login-section { margin-top: 50px; }
+        #admin-panel { display: none; }
     </style>
 </head>
 <body>
 
+    <div class="app-bar">
+        <a href="manager.html"><i class="fas fa-arrow-left"></i></a>
+        <h1>Administração</h1>
+    </div>
+
     <div class="container">
-        <h1>Painel Admin FC Perfumaria</h1>
         
         <section id="login-section">
-            <h3>Login de Admin</h3>
             <form id="loginForm">
-                <label>Email:</label>
-                <input type="email" id="login-email" required>
-                
-                <label>Senha:</label>
-                <input type="password" id="login-password" required>
-                
-                <button type="submit" id="btnLogin">Entrar</button>
+                <h3 style="text-align:center; margin:0; color:var(--primary)">Login Admin</h3>
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Senha" required>
+                <button type="submit">ENTRAR</button>
             </form>
-            <div id="loginStatus" class="status"></div>
         </section>
 
         <section id="admin-panel">
-            
-            <a href="estoque.html" target="_blank" class="stock-shortcut-btn">📦 ABRIR CONTROLE DE ESTOQUE RÁPIDO</a>
-
             <div id="status"></div>
 
-            <div id="push-panel">
-                <h3>📢 Enviar Notificação</h3>
-                <label>Título:</label>
-                <input type="text" id="push-title" placeholder="Ex: Chegou Malbec!">
-                <label>Mensagem:</label>
-                <textarea id="push-body" style="min-height: 60px;" placeholder="Texto..."></textarea>
-                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar</button>
-                
-                <h4 style="margin-top: 20px;">Histórico de Mensagens</h4>
-                <div id="messages-table-container">
-                    <table id="messages-table">
-                        <thead><tr><th>Data</th><th>Título</th><th>Mensagem</th><th>Ação</th></tr></thead>
-                        <tbody id="messages-list"></tbody>
-                    </table>
-                </div>
+            <div style="background:#fffbeb; padding:15px; border-radius:10px; border:1px solid #fcd34d; margin-bottom:20px;">
+                <h3 style="margin:0 0 10px 0; color:#d97706; font-size:1em;"><i class="fas fa-bell"></i> Enviar Notificação</h3>
+                <input type="text" id="push-title" placeholder="Título (Ex: Chegou Reposição!)" style="margin-bottom:10px;">
+                <textarea id="push-body" rows="2" placeholder="Mensagem..."></textarea>
+                <button id="btn-send-push" style="margin-top:10px; background:#d97706;">Enviar Push</button>
             </div>
 
-            <hr>
-
             <form id="product-form">
-                <h3 id="form-title">Adicionar Novo Produto</h3>
+                <h3 style="margin:0; border-bottom:2px solid var(--gold); padding-bottom:10px;">Novo Produto</h3>
                 <input type="hidden" id="productId"> 
                 
-                <label>Nome do Produto:</label>
+                <label>Nome:</label>
                 <input type="text" id="name" required placeholder="Ex: Malbec Gold">
 
-                <label>Preço (¥):</label>
-                <input type="number" id="price" required>
-                
-                <label>Seção:</label>
-                <select id="secao" required>
-                    <option value="">Escolha...</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="feminino">Feminino</option>
-                    <option value="unissex">Unissex</option>
-                    <option value="infantil">Infantil</option>
-                    <option value="kits">Kits</option>
-                </select>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Preço (¥):</label><input type="number" id="price" required></div>
+                    <div style="flex:1">
+                        <label>Seção:</label>
+                        <select id="secao" required>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="unissex">Unissex</option>
+                            <option value="infantil">Infantil</option>
+                            <option value="kits">Kits</option>
+                        </select>
+                    </div>
+                </div>
 
                 <label>Descrição:</label>
-                <textarea id="description" rows="4"></textarea>
+                <textarea id="description" rows="3"></textarea>
                 
-                <label style="color: #b76e86; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;">
-                    ESTOQUE DETALHADO (Versões e Volumes)
-                </label>
-                <div id="variants-container">
+                <label>Versões e Estoque:</label>
+                <div id="variants-container"></div>
+                <button type="button" id="add-variant-btn" style="background:#9ca3af; font-size:0.9em;">+ Adicionar Versão</button>
+
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>Tipo:</label>
+                        <select id="source">
+                            <option value="pronta-entrega">Pronta Entrega</option>
+                            <option value="sob-encomenda">Sob Encomenda</option>
+                        </select>
                     </div>
-                <button type="button" id="add-variant-btn" style="margin-top:5px; background-color: #666;">+ Adicionar Versão (Ex: Gold, Tradicional)</button>
+                    <div style="flex:1">
+                        <label>Selo:</label>
+                        <select id="isFeatured">
+                            <option value="nenhum">Nenhum</option>
+                            <option value="novo">Novidade</option>
+                            <option value="destaque">Destaque</option>
+                        </select>
+                    </div>
+                </div>
 
-                <label>Disponibilidade:</label>
-                <select id="source" required>
-                    <option value="pronta-entrega">Pronta Entrega</option>
-                    <option value="sob-encomenda">Sob Encomenda</option>
-                </select>
+                <label>Foto:</label>
+                <input type="file" id="imageUrl" accept="image/*">
                 
-                <label>Selo:</label>
-                <select id="isFeatured">
-                    <option value="nenhum">Nenhum</option>
-                    <option value="novo">Novidade</option>
-                    <option value="destaque">Destaque</option>
-                </select>
-                
-                <label>Capa (Upload):</label>
-                <input type="file" id="imageUrl" accept="image/png, image/jpeg">
-                
-                <label>Vídeo (Upload):</label>
-                <input type="file" id="videoUrl" accept="video/mp4, video/webm">
-                
-                <label>Galeria (Múltipla):</label>
-                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
-                
-                <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
-                <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar Edição</button>
+                <button type="submit" id="save-btn">Salvar Produto</button>
+                <button type="button" id="cancel-edit-btn" style="display:none; background:#9ca3af;">Cancelar Edição</button>
             </form>
-            
-            <hr>
 
-            <h2>Produtos Cadastrados</h2>
-            <div id="products-table-container">
+            <div class="table-container">
                 <table id="products-table">
-                    <thead>
-                        <tr>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Seção</th>
-                            <th>Preço</th>
-                            <th>Total</th>
-                            <th>Disp.</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Total</th><th>Ações</th></tr></thead>
                     <tbody id="products-list"></tbody>
                 </table>
             </div>
             
-            <button id="btnLogout" style="margin-top:30px;">Sair (Logout)</button>
+            <button id="btnLogout" style="background:#333; margin-top:30px;">Sair</button>
         </section>
     </div>
 
@@ -296,242 +174,158 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
-        // 🚨 CONFIGURAÇÃO FC PERFUMARIA
         const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); 
-        const storage = firebase.storage(); 
-        const auth = firebase.auth(); 
+        const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
 
-        async function uploadFile(file, path) {
-            const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL();
-        }
+        async function uploadFile(file, path) { const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL(); }
+        function showStatus(msg, type) { const s=document.getElementById('status'); s.innerHTML=msg; s.className='status '+type; s.style.display='block'; setTimeout(()=>s.style.display='none',4000); }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('loginForm');
-            const loginSection = document.getElementById('login-section');
-            const adminPanel = document.getElementById('admin-panel');
-            const btnLogout = document.getElementById('btnLogout');
-            const loginStatusDiv = document.getElementById('loginStatus');
-            const statusDiv = document.getElementById('status');
-            const variantsContainer = document.getElementById('variants-container');
+            const loginForm=document.getElementById('loginForm');
+            const adminPanel=document.getElementById('admin-panel');
+            const loginSection=document.getElementById('login-section');
+            const variantsContainer=document.getElementById('variants-container');
+            const productForm=document.getElementById('product-form');
+            const productsList=document.getElementById('products-list');
+            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
 
-            // --- LÓGICA TIPO 3 MARIAS ---
-            
-            // Sugestões de Versões
+            // VARIANTES
             const perfumeVersions = ["Tradicional", "Gold", "Black", "Club", "Sport", "Rose", "Lily", "Kit"];
-            
+            const vols = ["100ml", "75ml", "50ml", "10ml"];
+
             document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
 
             function createVariantEntry(name='', stocks={}) {
-                const id = Date.now() + Math.random();
-                const div = document.createElement('div'); 
-                div.className = 'variant-entry'; 
-                
-                // Dropdown de versões (tipo "Cores" no 3 Marias)
-                let opts = perfumeVersions.map(x => `<option value="${x}">${x}</option>`).join('');
+                const div = document.createElement('div'); div.className='variant-entry';
+                let opts = perfumeVersions.map(x=>`<option value="${x}">${x}</option>`).join('');
                 let isCustom = name && !perfumeVersions.includes(name);
+                
+                let stockInputs = vols.map(v => `
+                    <div class="stock-input-group">
+                        <label>${v}</label><input type="number" data-vol="${v}" value="${stocks[v]||0}" min="0">
+                    </div>
+                `).join('');
 
                 div.innerHTML = `
                     <div class="variant-row">
-                        <select class="variant-name-select" style="flex:1; font-weight:bold;">
-                            <option value="">Selecione a Versão...</option>
-                            ${opts}
-                            <option value="custom">Outra (Digitar)</option>
-                        </select>
-                        <input class="variant-name-custom" style="display:${isCustom?'block':'none'}; flex:1;" value="${isCustom?name:''}" placeholder="Digite o nome da versão">
-                        <button type="button" class="delete-btn" onclick="this.parentElement.parentElement.remove()">X</button>
+                        <select class="line-select" style="flex:1"><option value="">Versão...</option>${opts}<option value="custom">Outra</option></select>
+                        <input class="custom-name" style="display:${isCustom?'block':'none'};flex:1" placeholder="Nome" value="${isCustom?name:''}">
+                        <button type="button" onclick="this.parentElement.parentElement.remove()" style="background:#ef4444;width:auto;padding:5px 10px;">X</button>
                     </div>
-                    <div class="variant-size-stock-group">
-                        <div><label>100ml</label><input type="number" data-s="100ml" value="${stocks['100ml']||0}"></div>
-                        <div><label>75ml</label><input type="number" data-s="75ml" value="${stocks['75ml']||0}"></div>
-                        <div><label>50ml</label><input type="number" data-s="50ml" value="${stocks['50ml']||0}"></div>
-                        <div><label>30ml</label><input type="number" data-s="30ml" value="${stocks['30ml']||0}"></div>
-                        <div><label>10ml</label><input type="number" data-s="10ml" value="${stocks['10ml']||0}"></div>
-                    </div>
+                    <div class="variant-stock-grid">${stockInputs}</div>
                 `;
-                
                 variantsContainer.appendChild(div);
-                
-                const sel = div.querySelector('select');
-                const cust = div.querySelector('.variant-name-custom');
+                const sel = div.querySelector('.line-select'); const cust = div.querySelector('.custom-name');
                 sel.value = isCustom ? 'custom' : (name||'');
-                sel.addEventListener('change', function(){ cust.style.display = this.value==='custom'?'block':'none'; });
+                sel.addEventListener('change', ()=> cust.style.display = sel.value==='custom'?'block':'none');
             }
 
-            function getVariants() {
+            function getVariantsData() {
                 let v = {};
-                variantsContainer.querySelectorAll('.variant-entry').forEach(e => {
-                    let sel = e.querySelector('select').value;
-                    let cust = e.querySelector('.variant-name-custom').value;
-                    let finalName = sel === 'custom' ? cust : sel;
-                    
-                    if(finalName) {
-                        let st = {};
-                        e.querySelectorAll('input[type=number]').forEach(i => {
-                            let val = parseInt(i.value) || 0;
-                            if(val > 0 || i.value === "0") st[i.dataset.s] = val; // Salva se tiver valor
+                variantsContainer.querySelectorAll('.variant-entry').forEach(div => {
+                    const sel = div.querySelector('.line-select').value;
+                    const cust = div.querySelector('.custom-name').value;
+                    const name = sel==='custom'?cust:sel;
+                    if(name) {
+                        let st={};
+                        div.querySelectorAll('input[type="number"]').forEach(inp => {
+                            if(parseInt(inp.value)>0 || inp.value==="0") st[inp.dataset.vol]=parseInt(inp.value);
                         });
-                        v[finalName] = st;
+                        v[name] = st;
                     }
                 });
                 return v;
             }
 
-            function calcTotal(v) {
-                let t = 0;
-                for(let name in v) for(let vol in v[name]) t += v[name][vol];
-                return t;
-            }
-
-            function setVariants(v) {
-                variantsContainer.innerHTML = '';
-                if(v) for(let name in v) createVariantEntry(name, v[name]);
-            }
-
-            // --- CARREGAR PRODUTOS ---
-            const productsList = document.getElementById('products-list');
-            const productForm = document.getElementById('product-form');
-
-            async function fetchProducts() {
-                try {
-                    productsList.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
-                    const snap = await db.collection("products").orderBy("createdAt", "desc").get();
-                    let html = '';
-                    snap.forEach(doc => {
-                        let p = doc.data();
-                        html += `
-                            <tr>
-                                <td><img src="${p.imageUrl||''}" class="thumb"></td>
-                                <td>${p.name}</td>
-                                <td>${p.secao||'-'}</td>
-                                <td>¥${p.price}</td>
-                                <td>${p.estoqueTotal||0}</td>
-                                <td>${p.source}</td>
-                                <td>
-                                    <button class="edit-btn" data-id="${doc.id}">Editar</button> 
-                                    <button class="delete-btn" data-id="${doc.id}">X</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    productsList.innerHTML = html || '<tr><td colspan="7">Vazio</td></tr>';
-                } catch(e) { showStatus(statusDiv, e.message, 'error'); }
-            }
-
-            // --- SALVAR PRODUTO ---
+            // SALVAR
             productForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const saveBtn = document.getElementById('save-btn'); saveBtn.disabled = true;
-                
-                showStatus(statusDiv, "Salvando...", "loading");
-                const id = document.getElementById('productId').value || `prod_${Date.now()}`;
-                
+                const btn=document.getElementById('save-btn'); btn.disabled=true; btn.textContent="Salvando...";
                 try {
-                    let img = oldImageUrl;
-                    let vid = oldVideoUrl;
-                    let gal = oldGaleria;
-
+                    const id = document.getElementById('productId').value || `prod_${Date.now()}`;
                     const fImg = document.getElementById('imageUrl').files[0];
-                    const fVid = document.getElementById('videoUrl').files[0];
-                    const fGal = document.getElementById('galeria').files;
-
+                    let img = oldImageUrl;
                     if(fImg) img = await uploadFile(fImg, `products/${id}/capa`);
-                    if(fVid) vid = await uploadFile(fVid, `products/${id}/video`);
-                    if(fGal.length > 0) { gal = []; for(let f of fGal) gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`)); }
+                    
+                    const vars = getVariantsData();
+                    let total = 0;
+                    for(let n in vars) for(let vol in vars[n]) total += vars[n][vol];
 
-                    let v = getVariants();
-                    let data = {
+                    const data = {
                         name: document.getElementById('name').value,
                         price: parseFloat(document.getElementById('price').value),
                         secao: document.getElementById('secao').value,
                         description: document.getElementById('description').value,
-                        variantes: v,
-                        estoqueTotal: calcTotal(v),
                         source: document.getElementById('source').value,
                         isFeatured: document.getElementById('isFeatured').value,
-                        imageUrl: img, videoUrl: vid, galeria: gal
+                        variantes: vars, estoqueTotal: total, imageUrl: img
                     };
-
+                    
                     if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
                     else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
-
-                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
-                } catch(err) { showStatus(statusDiv, err.message, 'error'); } 
-                finally { saveBtn.disabled = false; }
-            });
-
-            // EDITAR / EXCLUIR
-            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
-            productsList.addEventListener('click', async (e) => {
-                if(e.target.classList.contains('delete-btn') && confirm("Excluir?")) {
-                    await db.collection("products").doc(e.target.dataset.id).delete(); fetchProducts();
-                }
-                if(e.target.classList.contains('edit-btn')) {
-                    let d = await db.collection("products").doc(e.target.dataset.id).get(); let p = d.data();
-                    document.getElementById('productId').value = d.id;
-                    document.getElementById('name').value = p.name;
-                    document.getElementById('price').value = p.price;
-                    document.getElementById('secao').value = p.secao;
-                    document.getElementById('description').value = p.description;
-                    setVariants(p.variantes);
-                    document.getElementById('source').value = p.source;
-                    document.getElementById('isFeatured').value = p.isFeatured;
-                    oldImageUrl = p.imageUrl; oldVideoUrl = p.videoUrl; oldGaleria = p.galeria||[];
                     
-                    document.getElementById('form-title').textContent = "Editando"; 
-                    document.getElementById('save-btn').textContent = "Atualizar"; 
-                    document.getElementById('cancel-edit-btn').style.display="block"; 
-                    window.scrollTo(0,0);
-                }
+                    cancelEdit(); fetchProducts(); showStatus("Produto Salvo!", "success");
+                } catch(e) { showStatus("Erro: "+e.message, "error"); }
+                finally { btn.disabled=false; btn.textContent="Salvar Produto"; }
             });
 
-            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
-            function cancelEditMode() {
-                document.getElementById('productId').value = ''; productForm.reset();
-                variantsContainer.innerHTML = ''; oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
-                document.getElementById('form-title').textContent = "Adicionar Novo"; 
-                document.getElementById('save-btn').textContent = "Salvar Produto"; 
-                document.getElementById('cancel-edit-btn').style.display = "none";
+            // LISTAR
+            async function fetchProducts() {
+                productsList.innerHTML = '<tr><td colspan="5">Carregando...</td></tr>';
+                const snap = await db.collection("products").orderBy("createdAt", "desc").get();
+                let html='';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    html += `<tr>
+                        <td><img src="${p.imageUrl}" class="thumb"></td>
+                        <td>${p.name}</td><td>¥${p.price}</td><td>${p.estoqueTotal||0}</td>
+                        <td><button class="btn-small btn-edit" onclick="editProd('${doc.id}')"><i class="fas fa-pen"></i></button><button class="btn-small btn-del" onclick="delProd('${doc.id}')"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
+                });
+                productsList.innerHTML = html;
             }
 
-            // PUSH / LOGIN / STATUS
-            function showStatus(div, msg, type) {
-                div.textContent = msg; div.className = 'status ' + type; div.style.display = 'block';
-                setTimeout(() => div.style.display = 'none', 4000);
+            // EDITAR/EXCLUIR
+            window.editProd = async (id) => {
+                const doc = await db.collection("products").doc(id).get(); const p=doc.data();
+                document.getElementById('productId').value = id;
+                document.getElementById('name').value = p.name;
+                document.getElementById('price').value = p.price;
+                document.getElementById('secao').value = p.secao;
+                document.getElementById('description').value = p.description;
+                document.getElementById('source').value = p.source;
+                document.getElementById('isFeatured').value = p.isFeatured;
+                oldImageUrl = p.imageUrl;
+                variantsContainer.innerHTML = '';
+                if(p.variantes) for(let n in p.variantes) createVariantEntry(n, p.variantes[n]);
+                document.getElementById('save-btn').textContent = "Atualizar";
+                document.getElementById('cancel-edit-btn').style.display='block';
+                window.scrollTo(0,0);
             }
+            window.delProd = async (id) => { if(confirm("Apagar?")) { await db.collection("products").doc(id).delete(); fetchProducts(); } }
             
-            // Push
-            const msgList = document.getElementById('messages-list');
-            async function fetchMessages() {
-                msgList.innerHTML = '';
-                const s = await db.collection('site_messages').orderBy('createdAt','desc').limit(5).get();
-                s.forEach(d => {
-                   const m=d.data(); 
-                   msgList.innerHTML += `<tr><td>${m.createdAt?m.createdAt.toDate().toLocaleDateString():'-'}</td><td>${m.title}</td><td>${m.body}</td><td><button class="delete-btn" onclick="delMsg('${d.id}')">X</button></td></tr>`;
-                });
+            function cancelEdit() {
+                productForm.reset(); document.getElementById('productId').value=''; variantsContainer.innerHTML='';
+                document.getElementById('save-btn').textContent="Salvar Produto";
+                document.getElementById('cancel-edit-btn').style.display='none';
             }
-            window.delMsg = async(id)=>{ await db.collection('site_messages').doc(id).delete(); fetchMessages(); };
-            
+            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
+
+            // AUTH & PUSH
+            loginForm.addEventListener('submit', async(e)=>{ e.preventDefault(); try{await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value);}catch(e){alert("Erro login");} });
+            document.getElementById('btnLogout').addEventListener('click', ()=> auth.signOut());
+            auth.onAuthStateChanged(u => { if(u){ loginSection.style.display='none'; adminPanel.style.display='block'; fetchProducts(); } else { loginSection.style.display='block'; adminPanel.style.display='none'; } });
+
             document.getElementById('btn-send-push').addEventListener('click', async()=>{
                 const t=document.getElementById('push-title').value; const b=document.getElementById('push-body').value;
-                if(!t||!b) return alert("Preencha");
-                if(!confirm("Enviar?")) return;
-                await db.collection('site_messages').add({title:t, body:b, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-                fetch('/.netlify/functions/push-notification', {method:'POST', body:JSON.stringify({title:t, body:b})});
-                alert("Enviado!"); fetchMessages();
-            });
-
-            // Login Init
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } 
-                catch(e) { alert("Erro: " + e.message); }
-            });
-            btnLogout.addEventListener('click', () => { auth.signOut(); window.location.reload(); });
-            auth.onAuthStateChanged(user => {
-                if (user) { loginSection.style.display = 'none'; adminPanel.style.display = 'block'; fetchProducts(); fetchMessages(); }
-                else { loginSection.style.display = 'block'; adminPanel.style.display = 'none'; }
+                if(!t) return alert("Título obrigatório");
+                if(!confirm("Enviar notificação para todos?")) return;
+                try {
+                    await fetch('/.netlify/functions/push-notification', {method:'POST', body:JSON.stringify({title:t, body:b})});
+                    await db.collection('site_messages').add({title:t, body:b, createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+                    showStatus("Notificação Enviada!", "success");
+                } catch(e) { showStatus("Erro push", "error"); }
             });
         });
     </script>
