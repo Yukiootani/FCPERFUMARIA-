@@ -2,140 +2,114 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Estoque Rápido | FC Perfumaria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Estoque | ClickVenda Pro</title>
     
     <link rel="apple-touch-icon" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
     <link rel="icon" type="image/png" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
 
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --primary-color: #1B263B; /* Azul Marinho */
-            --accent-color: #Cca43b;  /* Dourado */
-            --text-color: #333;
-            --bg-color: #FDFBF7;
-            --border-color: #e0e0e0;
-            --error-color: #dc3545;
+            --primary: #1B263B;
+            --gold: #Cca43b;
+            --bg: #f4f7f6;
+            --white: #ffffff;
         }
-        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; }
-        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding-bottom: 20px; }
         
-        h1 { color: var(--primary-color); text-align: center; border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-top: 0; font-size: 1.5em; }
-        h2 { font-size: 1em; text-align: center; color: #666; margin-top: -10px; font-weight: normal; }
+        /* BARRA DE NAVEGAÇÃO TIPO APP */
+        .app-bar {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .app-bar a { color: var(--white); font-size: 1.2em; text-decoration: none; display: flex; align-items: center; }
+        .app-bar h1 { margin: 0; font-size: 1.1em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* LOGIN */
-        #login-section { max-width: 400px; margin: 30px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
-        input { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        button:hover { opacity: 0.9; }
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
 
-        /* PAINEL DE ESTOQUE */
+        /* STATUS FLUTUANTE */
+        #status-float { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 2000; padding: 10px 20px; border-radius: 30px; color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: none; }
+        .st-success { background: #10b981; }
+        .st-load { background: #3b82f6; }
+
+        /* FILTROS */
+        .filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 15px; }
+        .filter-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.8em; white-space: nowrap; }
+        .filter-btn.active { background: var(--primary); color: white; }
+
+        /* CARD DE PRODUTO */
+        .stock-card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-header { display: flex; gap: 15px; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .card-header img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; }
+        .prod-info h3 { margin: 0; font-size: 1em; color: var(--primary); }
+        .prod-info span { font-size: 0.8em; color: #666; background: #eee; padding: 2px 6px; border-radius: 4px; }
+        .prod-total { margin-left: auto; text-align: right; }
+        .prod-total div { font-size: 1.2em; font-weight: 700; color: var(--primary); }
+        .prod-total label { font-size: 0.6em; text-transform: uppercase; color: #999; }
+
+        /* LINHA DE VARIANTE */
+        .variant-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #eee; }
+        .variant-row:last-child { border: none; margin: 0; padding: 0; }
+        
+        .variant-title { font-weight: 700; font-size: 0.9em; color: var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .update-btn { background: var(--gold); color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.7em; font-weight: bold; cursor: pointer; }
+        
+        .volumes-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .vol-item { background: #f9fafb; border: 1px solid #e5e7eb; padding: 5px 10px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+        .vol-item label { font-size: 0.7em; color: #666; margin-bottom: 3px; }
+        .qty-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #ccc; background: white; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 1em; }
+        .qty-val { font-weight: 700; font-size: 1em; color: var(--primary); }
+
+        #login-section { margin-top: 50px; padding: 20px; background: white; border-radius: 10px; }
         #stock-panel { display: none; }
-        
-        /* Filtros */
-        #filter-controls { display: flex; gap: 5px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .filter-btn { flex: 1; background: #fff; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px; border-radius: 20px; font-size: 0.85em; white-space: nowrap; }
-        .filter-btn.active { background: var(--primary-color); color: #fff; }
-
-        /* Tabela */
-        #stock-table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { border: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
-        th { background: var(--primary-color); color: #fff; font-size: 0.9em; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        
-        img.thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
-
-        /* Estilo das Linhas de Variantes (Igual 3 Marias) */
-        .variant-row { 
-            border-bottom: 1px dashed #ccc; 
-            padding: 8px 0; 
-            display: flex; 
-            flex-wrap: wrap; 
-            align-items: center; 
-            gap: 15px; 
-        }
-        .variant-row:last-child { border-bottom: none; }
-        
-        .variant-label { 
-            font-weight: bold; 
-            color: var(--primary-color); 
-            min-width: 80px; 
-            font-size: 0.9em;
-        }
-
-        .size-group { display: flex; align-items: center; gap: 5px; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #eee; }
-        .size-label { font-size: 0.75em; color: #666; font-weight: bold; }
-        
-        .qty-control { display: flex; align-items: center; }
-        .qty-btn { 
-            width: 28px; height: 28px; padding: 0; margin: 0; 
-            background: #eee; color: #333; border: 1px solid #ccc; 
-            border-radius: 50%; font-size: 1.2em; line-height: 1;
-        }
-        .qty-display { 
-            min-width: 25px; text-align: center; font-weight: bold; font-size: 1.1em; color: var(--primary-color); 
-        }
-
-        .update-btn { 
-            background-color: var(--accent-color); 
-            color: #fff; 
-            width: auto; 
-            padding: 6px 12px; 
-            font-size: 0.8em; 
-            margin-left: auto; /* Empurra pra direita */
-        }
-
-        .total-display { font-size: 1.2em; font-weight: bold; text-align: center; padding-top: 15px; }
-
-        /* Status */
-        #status { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 20px; color: #fff; font-weight: bold; z-index: 9999; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .st-success { background: #28a745; }
-        .st-error { background: #dc3545; }
-        .st-loading { background: #007bff; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        button.login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
-    <div id="status"></div>
+    <div class="app-bar">
+        <a href="manager.html"><i class="fas fa-arrow-left"></i></a>
+        <h1>Estoque Rápido</h1>
+    </div>
+
+    <div id="status-float"></div>
 
     <div class="container">
-        <h1>Controle de Estoque</h1>
-        <h2>FC Perfumaria</h2>
-
+        
         <section id="login-section">
-            <h3 style="text-align:center; color:#333;">Acesso Restrito</h3>
             <form id="loginForm">
+                <h3 style="text-align:center; color:var(--primary)">Acesso Restrito</h3>
                 <input type="email" id="email" placeholder="Email" required>
                 <input type="password" id="senha" placeholder="Senha" required>
-                <button type="submit">ENTRAR</button>
+                <button type="submit" class="login-btn">ENTRAR</button>
             </form>
         </section>
 
         <section id="stock-panel">
-            <div id="filter-controls">
-                <button class="filter-btn active" data-filter="todos">Todos</button>
-                <button class="filter-btn" data-filter="pronta-entrega">Pronta Entrega</button>
-                <button class="filter-btn" data-filter="sob-encomenda">Sob Encomenda</button>
+            <div class="filters">
+                <button class="filter-btn active" data-f="todos">Todos</button>
+                <button class="filter-btn" data-f="pronta-entrega">Pronta Entrega</button>
+                <button class="filter-btn" data-f="sob-encomenda">Sob Encomenda</button>
             </div>
 
-            <div id="stock-table-container">
-                <table id="stock-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 60px;">Foto</th>
-                            <th style="width: 150px;">Produto</th>
-                            <th>Variações (Linha e Volume)</th>
-                            <th style="width: 60px;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stock-list"></tbody>
-                </table>
-            </div>
-            
-            <button id="btnLogout" style="background:#555; margin-top:20px;">Sair</button>
+            <div id="stock-list">
+                </div>
         </section>
+
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -143,193 +117,127 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 
     <script>
-        // CONFIGURAÇÃO FC PERFUMARIA
         const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // ELEMENTOS
-        const loginSection = document.getElementById('login-section');
-        const stockPanel = document.getElementById('stock-panel');
         const stockList = document.getElementById('stock-list');
-        const statusDiv = document.getElementById('status');
+        const statusDiv = document.getElementById('status-float');
         let currentFilter = 'todos';
 
-        // --- SISTEMA DE LOGIN ---
+        function showStatus(msg, type) {
+            statusDiv.textContent = msg; statusDiv.className = type==='success'?'st-success':'st-load';
+            statusDiv.style.display = 'block'; setTimeout(()=>statusDiv.style.display='none', 2500);
+        }
+
         auth.onAuthStateChanged(user => {
-            if (user) {
-                loginSection.style.display = 'none';
-                stockPanel.style.display = 'block';
-                carregarEstoque();
-            } else {
-                loginSection.style.display = 'block';
-                stockPanel.style.display = 'none';
-            }
+            if(user) { document.getElementById('login-section').style.display='none'; document.getElementById('stock-panel').style.display='block'; loadStock(); }
+            else { document.getElementById('login-section').style.display='block'; document.getElementById('stock-panel').style.display='none'; }
         });
+        document.getElementById('loginForm').addEventListener('submit', async(e)=>{ e.preventDefault(); try{await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('senha').value);}catch(e){alert("Erro");} });
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('senha').value;
-            try { await auth.signInWithEmailAndPassword(email, pass); } 
-            catch(e) { alert("Erro: " + e.message); }
-        });
-
-        document.getElementById('btnLogout').addEventListener('click', () => auth.signOut());
-
-        // --- STATUS FLUTUANTE ---
-        function showMsg(msg, type) {
-            statusDiv.textContent = msg;
-            statusDiv.className = 'st-' + type;
-            statusDiv.style.display = 'block';
-            setTimeout(() => statusDiv.style.display = 'none', 3000);
-        }
-
-        // --- CARREGAR ESTOQUE ---
-        async function carregarEstoque() {
-            stockList.innerHTML = '<tr><td colspan="4" style="text-align:center;">Carregando produtos...</td></tr>';
+        async function loadStock() {
+            stockList.innerHTML = '<p style="text-align:center">Carregando...</p>';
+            let q = db.collection('products').orderBy('name');
+            if(currentFilter!=='todos') q = q.where('source','==',currentFilter);
             
-            let query = db.collection('products').orderBy('name');
-            if(currentFilter === 'pronta-entrega') query = query.where('source', '==', 'pronta-entrega');
-            if(currentFilter === 'sob-encomenda') query = query.where('source', '==', 'sob-encomenda');
+            const snap = await q.get();
+            if(snap.empty) { stockList.innerHTML = '<p style="text-align:center">Vazio.</p>'; return; }
+            
+            let html = '';
+            snap.forEach(doc => {
+                const p = doc.data();
+                const variants = p.variantes || {};
+                let varsHtml = '';
 
-            try {
-                const snap = await query.get();
-                if(snap.empty) { stockList.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum produto.</td></tr>'; return; }
-
-                let html = '';
-                snap.forEach(doc => {
-                    const p = doc.data();
-                    html += renderProductRow(doc.id, p);
-                });
-                stockList.innerHTML = html;
-            } catch(e) { 
-                console.error(e);
-                stockList.innerHTML = '<tr><td colspan="4" style="color:red;">Erro ao carregar. Verifique sua conexão.</td></tr>';
-            }
-        }
-
-        // GERA O HTML DE CADA LINHA (Lógica Inteligente)
-        function renderProductRow(id, p) {
-            const variants = p.variantes || {};
-            let variantsHtml = '';
-
-            if(Object.keys(variants).length === 0) {
-                variantsHtml = '<span style="color:#999; font-style:italic;">Sem variações cadastradas.</span>';
-            } else {
-                // Loop: Versão (ex: Gold) -> Volumes (ex: 100ml)
-                for (const lineName in variants) {
-                    let volsHtml = '';
-                    const volumes = variants[lineName];
-                    
-                    for (const volName in volumes) {
-                        const qtd = volumes[volName];
-                        volsHtml += `
-                            <div class="size-group" data-vol="${volName}">
-                                <span class="size-label">${volName}</span>
-                                <div class="qty-control">
-                                    <button class="qty-btn" onclick="adjustQty(this, -1)">-</button>
-                                    <span class="qty-display">${qtd}</span>
-                                    <button class="qty-btn" onclick="adjustQty(this, 1)">+</button>
+                if(Object.keys(variants).length === 0) {
+                    varsHtml = '<small style="color:#999">Sem variações.</small>';
+                } else {
+                    for(let line in variants) {
+                        let volsHtml = '';
+                        for(let vol in variants[line]) {
+                            volsHtml += `
+                                <div class="vol-item" data-vol="${vol}">
+                                    <label>${vol}</label>
+                                    <div class="qty-controls">
+                                        <div class="qty-btn" onclick="adj(this,-1)">-</div>
+                                        <span class="qty-val">${variants[line][vol]}</span>
+                                        <div class="qty-btn" onclick="adj(this,1)">+</div>
+                                    </div>
                                 </div>
+                            `;
+                        }
+                        varsHtml += `
+                            <div class="variant-row" data-line="${line}">
+                                <div class="variant-title">
+                                    <span>${line}</span>
+                                    <button class="update-btn" onclick="saveLine('${doc.id}', '${line}', this)">Salvar</button>
+                                </div>
+                                <div class="volumes-grid">${volsHtml}</div>
                             </div>
                         `;
                     }
-
-                    variantsHtml += `
-                        <div class="variant-row" data-line="${lineName}">
-                            <div class="variant-label">${lineName}</div>
-                            ${volsHtml}
-                            <button class="update-btn" onclick="salvarLinha('${id}', '${lineName}', this)">Salvar</button>
-                        </div>
-                    `;
                 }
-            }
 
-            return `
-                <tr>
-                    <td><img src="${p.imageUrl}" class="thumb"></td>
-                    <td>
-                        <strong>${p.name}</strong><br>
-                        <small>${p.source}</small>
-                    </td>
-                    <td>${variantsHtml}</td>
-                    <td class="total-display" id="total-${id}">${p.estoqueTotal || 0}</td>
-                </tr>
-            `;
+                html += `
+                    <div class="stock-card">
+                        <div class="card-header">
+                            <img src="${p.imageUrl}">
+                            <div class="prod-info">
+                                <h3>${p.name}</h3>
+                                <span>${p.source==='pronta-entrega'?'Pronta Entrega':'Encomenda'}</span>
+                            </div>
+                            <div class="prod-total">
+                                <div id="total-${doc.id}">${p.estoqueTotal||0}</div>
+                                <label>Total</label>
+                            </div>
+                        </div>
+                        <div class="card-body">${varsHtml}</div>
+                    </div>
+                `;
+            });
+            stockList.innerHTML = html;
         }
 
-        // --- LÓGICA DE INTERAÇÃO ---
-        
-        // Botão +/- (Apenas visual, não salva ainda)
-        window.adjustQty = function(btn, delta) {
-            const display = btn.parentElement.querySelector('.qty-display');
-            let val = parseInt(display.textContent);
-            val += delta;
-            if(val < 0) val = 0;
-            display.textContent = val;
-        };
+        window.adj = function(btn, delta) {
+            const span = btn.parentElement.querySelector('.qty-val');
+            let v = parseInt(span.textContent) + delta;
+            if(v < 0) v = 0;
+            span.textContent = v;
+        }
 
-        // Botão Salvar (Envia para o Firebase)
-        window.salvarLinha = async function(docId, lineName, btn) {
-            const row = btn.parentElement;
-            const sizeGroups = row.querySelectorAll('.size-group');
-            let newVolumesData = {};
-
-            // 1. Coleta os dados visuais
-            sizeGroups.forEach(group => {
-                const vol = group.dataset.vol;
-                const qtd = parseInt(group.querySelector('.qty-display').textContent);
-                newVolumesData[vol] = qtd;
+        window.saveLine = async function(id, line, btn) {
+            const row = btn.closest('.variant-row');
+            let data = {};
+            row.querySelectorAll('.vol-item').forEach(d => {
+                data[d.dataset.vol] = parseInt(d.querySelector('.qty-val').textContent);
             });
-
-            btn.disabled = true;
-            btn.textContent = "...";
-            showMsg("Atualizando...", "loading");
-
+            
+            btn.textContent = '...';
             try {
-                // 2. Atualiza apenas aquela linha específica (ex: variantes.Gold)
-                const updatePath = `variantes.${lineName}`;
-                await db.collection('products').doc(docId).update({
-                    [updatePath]: newVolumesData
-                });
-
-                // 3. Recalcula o TOTAL GERAL do produto
-                const docSnap = await db.collection('products').doc(docId).get();
-                const allVariants = docSnap.data().variantes;
-                let grandTotal = 0;
+                await db.collection('products').doc(id).update({ [`variantes.${line}`]: data });
                 
-                for(let l in allVariants) {
-                    for(let v in allVariants[l]) {
-                        grandTotal += (parseInt(allVariants[l][v]) || 0);
-                    }
-                }
+                // Recalcula Total
+                const doc = await db.collection('products').doc(id).get();
+                let tot = 0; const vs = doc.data().variantes;
+                for(let l in vs) for(let v in vs[l]) tot += vs[l][v];
+                await db.collection('products').doc(id).update({ estoqueTotal: tot });
+                document.getElementById(`total-${id}`).textContent = tot;
 
-                await db.collection('products').doc(docId).update({ estoqueTotal: grandTotal });
-                document.getElementById(`total-${docId}`).textContent = grandTotal;
+                showStatus("Atualizado!", "success");
+            } catch(e) { showStatus("Erro", "load"); }
+            finally { btn.textContent = 'Salvar'; }
+        }
 
-                showMsg("Estoque Atualizado!", "success");
-
-            } catch(e) {
-                console.error(e);
-                showMsg("Erro ao salvar", "error");
-            } finally {
-                btn.disabled = false;
-                btn.textContent = "Salvar";
-            }
-        };
-
-        // Filtros
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
                 e.target.classList.add('active');
-                currentFilter = e.target.dataset.filter;
-                carregarEstoque();
+                currentFilter = e.target.dataset.f;
+                loadStock();
             });
         });
-
     </script>
 </body>
 </html>
