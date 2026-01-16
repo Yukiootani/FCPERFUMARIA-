@@ -3,22 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin FC Perfumaria (Completo)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <title>Admin FC Perfumaria (Gestão Completa)</title>
     <style>
-        /* --- CSS GERAL --- */
+        /* --- CSS IDÊNTICO AO 3 MARIAS --- */
         :root {
-            --primary-color: #1B263B; /* Azul Marinho */
-            --accent-color: #Cca43b;  /* Dourado */
+            --primary-color: #1B263B; /* Azul Marinho (Identidade FC) */
+            --accent-color: #Cca43b;  /* Dourado (Identidade FC) */
             --text-color: #333;
-            --bg-color: #f4f4f4;
-            --border-color: #ddd;
+            --bg-color: #FDFBF7;
+            --border-color: #e0e0e0;
             --error-color: #dc3545;
-            --success-color: #28a745;
         }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-        h1, h2, h3 { color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-top: 0; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+        }
+        h1, h2, h3 { 
+            color: var(--primary-color); 
+            text-align: center; 
+            border-bottom: 2px solid var(--accent-color); 
+            padding-bottom: 10px; 
+        }
         
         /* BOTÃO DE ESTOQUE NO TOPO */
         .stock-shortcut-btn {
@@ -28,82 +44,163 @@
         }
         .stock-shortcut-btn:hover { background-color: #dcb34a; transform: translateY(-2px); }
 
-        form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; padding: 20px; background: #fafafa; border-radius: 5px; border: 1px solid #eee; }
-        label { font-weight: bold; margin-bottom: -10px; color: var(--primary-color); }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-family: inherit; }
-        textarea { min-height: 80px; }
-        button { background-color: var(--primary-color); color: white; padding: 12px; border: none; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.9; }
+        form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: #fdf7f9; /* Mantendo levemente rosado ou mudar para #f4f4f4 */
+            background-color: #f8f8f8;
+            border-radius: 5px; 
+        }
+        label { 
+            font-weight: bold; 
+            margin-bottom: -10px; 
+            color: var(--primary-color);
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        textarea { min-height: 100px; }
+        button {
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 4px; 
+            font-size: 1em; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
         
-        /* Status */
-        #status, #loginStatus { text-align: center; font-weight: bold; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; }
-        .success { background-color: #d4edda; color: var(--success-color); }
+        /* Status e Avisos */
+        #status, #loginStatus { 
+            text-align: center; 
+            font-weight: bold; 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin-bottom: 15px; 
+            display: none; 
+        }
+        .success { background-color: #d4edda; color: #155724; }
         .error { background-color: #f8d7da; color: var(--error-color); }
         .loading { background-color: #cce5ff; color: #004085; }
         
         /* Tabelas */
-        .table-container { overflow-x: auto; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; vertical-align: middle; }
-        th { background-color: var(--primary-color); color: #fff; font-size: 0.9em; }
-        td { font-size: 0.9em; }
-        img.thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
-        .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 10px; width: auto; }
-        .edit-btn { background-color: var(--accent-color); color: #fff; font-size: 0.8em; padding: 5px 10px; width: auto; margin-right: 5px; }
+        #products-table-container, #messages-table-container, .table-container { 
+            overflow-x: auto; 
+            margin-bottom: 30px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            border: 1px solid var(--border-color); 
+            padding: 8px; 
+            text-align: left; 
+        }
+        th { background-color: var(--primary-color); color: #fff; }
+        img.thumb { 
+            width: 50px; 
+            height: 50px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+        }
+        .delete-btn { background-color: var(--error-color); font-size: 0.8em; padding: 5px 8px; width: auto; }
+        .edit-btn { background-color: var(--accent-color); color: #333; font-size: 0.8em; padding: 5px 8px; width: auto; }
         
-        /* Painel Push */
-        #push-panel { background-color: #fff3cd; border: 1px solid #ffeeba; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        /* Painel de Notificação (Amarelo) */
+        #push-panel { 
+            background-color: #fff3cd; 
+            border: 1px solid #ffeeba; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 30px; 
+        }
         #push-panel h3 { color: #856404; border-bottom-color: #856404; }
-        
-        /* Variantes (Adaptado para Perfumes) */
-        #variants-container { border: 1px solid var(--border-color); padding: 15px; border-radius: 4px; background: #fff; }
-        .variant-entry { border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
-        .variant-entry:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        
-        .variant-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
-        .variant-header select { flex: 1; font-weight: bold; }
-        .variant-custom-input { display: none; flex: 1; }
-        
-        .variant-stock-grid { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .stock-input-group { display: flex; flex-direction: column; align-items: center; width: 60px; }
-        .stock-input-group label { font-size: 0.8em; margin-bottom: 2px; color: #666; }
-        .stock-input-group input { text-align: center; padding: 5px; }
 
-        /* Login */
+        /* Variantes (Adaptado para Perfumes) */
+        #variants-container { 
+            border: 1px solid var(--border-color); 
+            padding: 10px; 
+            border-radius: 4px; 
+            background: #fff; 
+        }
+        .variant-entry { 
+            border-bottom: 1px dashed var(--border-color); 
+            padding-bottom: 10px; 
+            margin-bottom: 10px; 
+        }
+        .variant-entry:last-child { border-bottom: none; }
+        .variant-row { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        .variant-size-stock-group { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            margin-top: 10px; 
+        }
+        .variant-size-stock-group div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .variant-size-stock-group label { font-size: 0.8em; margin-bottom: 2px; color: #666; }
+        .variant-size-stock-group input { width: 60px; padding: 5px; text-align: center; }
+        
+        /* Login/Geral */
         #login-section { border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; }
         #admin-panel { display: none; } 
-        #btnLogout { background-color: #555; margin-top: 20px; width: auto; float: right; }
+        #btnLogout { background-color: #777; margin-top: 20px; }
+        #logo-preview { max-width: 250px; display: block; margin: 0 auto; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Painel Admin (Completo)</h1>
+        <h1>Painel Admin FC Perfumaria</h1>
         
         <section id="login-section">
-            <h3>Login Restrito</h3>
+            <h3>Login de Admin</h3>
             <form id="loginForm">
-                <label>Email:</label><input type="email" id="login-email" required>
-                <label>Senha:</label><input type="password" id="login-password" required>
-                <button type="submit">Entrar</button>
+                <label>Email:</label>
+                <input type="email" id="login-email" required>
+                
+                <label>Senha:</label>
+                <input type="password" id="login-password" required>
+                
+                <button type="submit" id="btnLogin">Entrar</button>
             </form>
-            <div id="loginStatus"></div>
+            <div id="loginStatus" class="status"></div>
         </section>
 
         <section id="admin-panel">
             
-            <a href="estoque.html" target="_blank" class="stock-shortcut-btn">📦 Gerenciar Estoque Rápido</a>
+            <a href="estoque.html" target="_blank" class="stock-shortcut-btn">📦 ABRIR CONTROLE DE ESTOQUE RÁPIDO</a>
 
             <div id="status"></div>
 
             <div id="push-panel">
-                <h3>📢 Notificações Push</h3>
-                <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Chegou Malbec!">
-                <label>Mensagem:</label><textarea id="push-body" style="min-height: 60px;" placeholder="Texto da mensagem..."></textarea>
-                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">Enviar Notificação</button>
+                <h3>📢 Enviar Notificação</h3>
+                <label>Título:</label>
+                <input type="text" id="push-title" placeholder="Ex: Chegou Malbec!">
+                <label>Mensagem:</label>
+                <textarea id="push-body" style="min-height: 60px;" placeholder="Texto..."></textarea>
+                <button id="btn-send-push" style="background-color: #856404; margin-top: 10px;">🚀 Enviar</button>
                 
-                <h4 style="margin-top: 20px;">Histórico</h4>
-                <div class="table-container">
+                <h4 style="margin-top: 20px;">Histórico de Mensagens</h4>
+                <div id="messages-table-container">
                     <table id="messages-table">
                         <thead><tr><th>Data</th><th>Título</th><th>Mensagem</th><th>Ação</th></tr></thead>
                         <tbody id="messages-list"></tbody>
@@ -114,74 +211,82 @@
             <hr>
 
             <form id="product-form">
-                <h3 id="form-title">Adicionar / Editar Produto</h3>
+                <h3 id="form-title">Adicionar Novo Produto</h3>
                 <input type="hidden" id="productId"> 
                 
-                <label>Nome do Perfume/Kit:</label>
+                <label>Nome do Produto:</label>
                 <input type="text" id="name" required placeholder="Ex: Malbec Gold">
 
-                <div style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label>Preço (¥):</label>
-                        <input type="number" id="price" required>
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Categoria:</label>
-                        <select id="secao" required>
-                            <option value="">Escolha...</option>
-                            <option value="masculino">Masculino</option>
-                            <option value="feminino">Feminino</option>
-                            <option value="unissex">Unissex</option>
-                            <option value="infantil">Infantil</option>
-                            <option value="kits">Kits</option>
-                        </select>
-                    </div>
-                </div>
+                <label>Preço (¥):</label>
+                <input type="number" id="price" required>
+                
+                <label>Seção:</label>
+                <select id="secao" required>
+                    <option value="">Escolha...</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                    <option value="unissex">Unissex</option>
+                    <option value="infantil">Infantil</option>
+                    <option value="kits">Kits</option>
+                </select>
 
                 <label>Descrição:</label>
-                <textarea id="description" rows="3"></textarea>
+                <textarea id="description" rows="4"></textarea>
                 
-                <label>Estoque e Versões:</label>
-                <div id="variants-container"></div>
-                <button type="button" id="add-variant-btn" style="background:#666; font-size:0.9em;">+ Adicionar Versão (Ex: Tradicional, Gold...)</button>
+                <label style="color: #b76e86; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;">
+                    ESTOQUE DETALHADO (Versões e Volumes)
+                </label>
+                <div id="variants-container">
+                    </div>
+                <button type="button" id="add-variant-btn" style="margin-top:5px; background-color: #666;">+ Adicionar Versão (Ex: Gold, Tradicional)</button>
 
                 <label>Disponibilidade:</label>
                 <select id="source" required>
-                    <option value="pronta-entrega">Pronta Entrega (Estoque Local)</option>
-                    <option value="sob-encomenda">Sob Encomenda (Do Brasil)</option>
+                    <option value="pronta-entrega">Pronta Entrega</option>
+                    <option value="sob-encomenda">Sob Encomenda</option>
                 </select>
                 
-                <label>Destaque:</label>
+                <label>Selo:</label>
                 <select id="isFeatured">
                     <option value="nenhum">Nenhum</option>
-                    <option value="novo">Lançamento</option>
-                    <option value="destaque">Mais Vendido</option>
+                    <option value="novo">Novidade</option>
+                    <option value="destaque">Destaque</option>
                 </select>
                 
-                <label>Foto Principal:</label>
-                <input type="file" id="imageUrl" accept="image/*">
+                <label>Capa (Upload):</label>
+                <input type="file" id="imageUrl" accept="image/png, image/jpeg">
                 
-                <label>Vídeo (Opcional):</label>
-                <input type="file" id="videoUrl" accept="video/*">
+                <label>Vídeo (Upload):</label>
+                <input type="file" id="videoUrl" accept="video/mp4, video/webm">
                 
-                <label>Galeria (Outras Fotos):</label>
-                <input type="file" id="galeria" multiple accept="image/*">
+                <label>Galeria (Múltipla):</label>
+                <input type="file" id="galeria" multiple accept="image/png, image/jpeg">
                 
                 <button type="submit" id="save-btn" style="margin-top:15px;">Salvar Produto</button>
-                <button type="button" id="cancel-edit-btn" style="display:none; background:#999; margin-top:10px;">Cancelar</button>
+                <button type="button" id="cancel-edit-btn" style="display:none; background:#777; margin-top:10px;">Cancelar Edição</button>
             </form>
-
+            
             <hr>
 
-            <h3>Lista de Produtos</h3>
-            <div class="table-container">
+            <h2>Produtos Cadastrados</h2>
+            <div id="products-table-container">
                 <table id="products-table">
-                    <thead><tr><th>Foto</th><th>Nome</th><th>Preço</th><th>Estoque Total</th><th>Tipo</th><th>Ações</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Seção</th>
+                            <th>Preço</th>
+                            <th>Total</th>
+                            <th>Disp.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
                     <tbody id="products-list"></tbody>
                 </table>
             </div>
             
-            <button id="btnLogout">Sair</button>
+            <button id="btnLogout" style="margin-top:30px;">Sair (Logout)</button>
         </section>
     </div>
 
@@ -191,258 +296,242 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> 
 
     <script>
-        // CONFIGURAÇÃO FC PERFUMARIA
+        // 🚨 CONFIGURAÇÃO FC PERFUMARIA
         const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(); const storage = firebase.storage(); const auth = firebase.auth(); 
+        const db = firebase.firestore(); 
+        const storage = firebase.storage(); 
+        const auth = firebase.auth(); 
 
         async function uploadFile(file, path) {
             const ref = storage.ref(path); await ref.put(file); return await ref.getDownloadURL();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const loginForm=document.getElementById('loginForm');
-            const adminPanel=document.getElementById('admin-panel');
-            const loginSection=document.getElementById('login-section');
-            const statusDiv=document.getElementById('status');
+            const loginForm = document.getElementById('loginForm');
+            const loginSection = document.getElementById('login-section');
+            const adminPanel = document.getElementById('admin-panel');
+            const btnLogout = document.getElementById('btnLogout');
+            const loginStatusDiv = document.getElementById('loginStatus');
+            const statusDiv = document.getElementById('status');
             const variantsContainer = document.getElementById('variants-container');
-            
-            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
 
-            // Opções de "Versões" para Perfumes
-            const perfumeLines = ["Tradicional", "Gold", "Black", "Club", "Play", "Sport", "Absoluto", "Noir", "Rose", "Lily", "Kit Completo", "Refil", "Creme", "Body Splash"];
+            // --- LÓGICA TIPO 3 MARIAS ---
             
-            // Opções de Volumes (Tamanhos)
-            const volumeOptions = ["100ml", "75ml", "50ml", "30ml", "10ml", "200ml", "250g", "Unico"];
-
-            // 1. GESTÃO DE VARIANTES (ADAPTADA)
+            // Sugestões de Versões
+            const perfumeVersions = ["Tradicional", "Gold", "Black", "Club", "Sport", "Rose", "Lily", "Kit"];
+            
             document.getElementById('add-variant-btn').addEventListener('click', () => createVariantEntry());
 
-            function createVariantEntry(lineName='', stocks={}) {
-                const div = document.createElement('div'); div.className='variant-entry';
+            function createVariantEntry(name='', stocks={}) {
+                const id = Date.now() + Math.random();
+                const div = document.createElement('div'); 
+                div.className = 'variant-entry'; 
                 
-                // Select de Linha
-                let opts = perfumeLines.map(v => `<option value="${v}">${v}</option>`).join('');
-                let isCustom = lineName && !perfumeLines.includes(lineName);
-                
-                // Inputs de Volume
-                let stockInputs = volumeOptions.map(vol => `
-                    <div class="stock-input-group">
-                        <label>${vol}</label>
-                        <input type="number" data-vol="${vol}" value="${stocks[vol]||0}" min="0">
-                    </div>
-                `).join('');
+                // Dropdown de versões (tipo "Cores" no 3 Marias)
+                let opts = perfumeVersions.map(x => `<option value="${x}">${x}</option>`).join('');
+                let isCustom = name && !perfumeVersions.includes(name);
 
                 div.innerHTML = `
-                    <div class="variant-header">
-                        <label>Versão:</label>
-                        <select class="line-select">
-                            <option value="">Selecione...</option>
+                    <div class="variant-row">
+                        <select class="variant-name-select" style="flex:1; font-weight:bold;">
+                            <option value="">Selecione a Versão...</option>
                             ${opts}
                             <option value="custom">Outra (Digitar)</option>
                         </select>
-                        <input type="text" class="variant-custom-input" placeholder="Digite o nome da versão" value="${isCustom ? lineName : ''}">
-                        <button type="button" class="delete-btn" onclick="this.parentElement.parentElement.remove()" style="margin-left:auto;">Remover</button>
+                        <input class="variant-name-custom" style="display:${isCustom?'block':'none'}; flex:1;" value="${isCustom?name:''}" placeholder="Digite o nome da versão">
+                        <button type="button" class="delete-btn" onclick="this.parentElement.parentElement.remove()">X</button>
                     </div>
-                    <div class="variant-stock-grid">
-                        ${stockInputs}
+                    <div class="variant-size-stock-group">
+                        <div><label>100ml</label><input type="number" data-s="100ml" value="${stocks['100ml']||0}"></div>
+                        <div><label>75ml</label><input type="number" data-s="75ml" value="${stocks['75ml']||0}"></div>
+                        <div><label>50ml</label><input type="number" data-s="50ml" value="${stocks['50ml']||0}"></div>
+                        <div><label>30ml</label><input type="number" data-s="30ml" value="${stocks['30ml']||0}"></div>
+                        <div><label>10ml</label><input type="number" data-s="10ml" value="${stocks['10ml']||0}"></div>
                     </div>
                 `;
                 
                 variantsContainer.appendChild(div);
                 
-                const sel = div.querySelector('.line-select');
-                const customInp = div.querySelector('.variant-custom-input');
-                sel.value = isCustom ? 'custom' : lineName;
-                if(isCustom) customInp.style.display = 'block';
-
-                sel.addEventListener('change', () => {
-                    customInp.style.display = sel.value === 'custom' ? 'block' : 'none';
-                });
+                const sel = div.querySelector('select');
+                const cust = div.querySelector('.variant-name-custom');
+                sel.value = isCustom ? 'custom' : (name||'');
+                sel.addEventListener('change', function(){ cust.style.display = this.value==='custom'?'block':'none'; });
             }
 
-            function getVariantsData() {
+            function getVariants() {
                 let v = {};
-                variantsContainer.querySelectorAll('.variant-entry').forEach(div => {
-                    const sel = div.querySelector('.line-select').value;
-                    const custom = div.querySelector('.variant-custom-input').value;
-                    const lineName = sel === 'custom' ? custom : sel;
+                variantsContainer.querySelectorAll('.variant-entry').forEach(e => {
+                    let sel = e.querySelector('select').value;
+                    let cust = e.querySelector('.variant-name-custom').value;
+                    let finalName = sel === 'custom' ? cust : sel;
                     
-                    if(lineName) {
-                        let stocks = {};
-                        div.querySelectorAll('input[type="number"]').forEach(inp => {
-                            const val = parseInt(inp.value);
-                            if(val > 0) stocks[inp.dataset.vol] = val; // Só salva se tiver estoque > 0 ou se quiser salvar 0
-                            if(inp.value === "0") stocks[inp.dataset.vol] = 0;
+                    if(finalName) {
+                        let st = {};
+                        e.querySelectorAll('input[type=number]').forEach(i => {
+                            let val = parseInt(i.value) || 0;
+                            if(val > 0 || i.value === "0") st[i.dataset.s] = val; // Salva se tiver valor
                         });
-                        v[lineName] = stocks;
+                        v[finalName] = st;
                     }
                 });
                 return v;
             }
 
-            function calcTotalStock(v) {
+            function calcTotal(v) {
                 let t = 0;
-                for(let line in v) for(let vol in v[line]) t += v[line][vol];
+                for(let name in v) for(let vol in v[name]) t += v[name][vol];
                 return t;
             }
 
-            // 2. SALVAR PRODUTO
-            document.getElementById('product-form').addEventListener('submit', async (e) => {
+            function setVariants(v) {
+                variantsContainer.innerHTML = '';
+                if(v) for(let name in v) createVariantEntry(name, v[name]);
+            }
+
+            // --- CARREGAR PRODUTOS ---
+            const productsList = document.getElementById('products-list');
+            const productForm = document.getElementById('product-form');
+
+            async function fetchProducts() {
+                try {
+                    productsList.innerHTML = '<tr><td colspan="7">Carregando...</td></tr>';
+                    const snap = await db.collection("products").orderBy("createdAt", "desc").get();
+                    let html = '';
+                    snap.forEach(doc => {
+                        let p = doc.data();
+                        html += `
+                            <tr>
+                                <td><img src="${p.imageUrl||''}" class="thumb"></td>
+                                <td>${p.name}</td>
+                                <td>${p.secao||'-'}</td>
+                                <td>¥${p.price}</td>
+                                <td>${p.estoqueTotal||0}</td>
+                                <td>${p.source}</td>
+                                <td>
+                                    <button class="edit-btn" data-id="${doc.id}">Editar</button> 
+                                    <button class="delete-btn" data-id="${doc.id}">X</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    productsList.innerHTML = html || '<tr><td colspan="7">Vazio</td></tr>';
+                } catch(e) { showStatus(statusDiv, e.message, 'error'); }
+            }
+
+            // --- SALVAR PRODUTO ---
+            productForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const btn = document.getElementById('save-btn'); btn.disabled = true; btn.textContent = "Salvando...";
+                const saveBtn = document.getElementById('save-btn'); saveBtn.disabled = true;
+                
+                showStatus(statusDiv, "Salvando...", "loading");
+                const id = document.getElementById('productId').value || `prod_${Date.now()}`;
                 
                 try {
-                    const id = document.getElementById('productId').value || `prod_${Date.now()}`;
-                    const imgFile = document.getElementById('imageUrl').files[0];
-                    const vidFile = document.getElementById('videoUrl').files[0];
-                    
                     let img = oldImageUrl;
-                    if(imgFile) img = await uploadFile(imgFile, `products/${id}/capa`);
-                    
                     let vid = oldVideoUrl;
-                    if(vidFile) vid = await uploadFile(vidFile, `products/${id}/video`);
-                    
-                    const variants = getVariantsData();
-                    const total = calcTotalStock(variants);
-                    
-                    const data = {
+                    let gal = oldGaleria;
+
+                    const fImg = document.getElementById('imageUrl').files[0];
+                    const fVid = document.getElementById('videoUrl').files[0];
+                    const fGal = document.getElementById('galeria').files;
+
+                    if(fImg) img = await uploadFile(fImg, `products/${id}/capa`);
+                    if(fVid) vid = await uploadFile(fVid, `products/${id}/video`);
+                    if(fGal.length > 0) { gal = []; for(let f of fGal) gal.push(await uploadFile(f, `products/${id}/gal_${f.name}`)); }
+
+                    let v = getVariants();
+                    let data = {
                         name: document.getElementById('name').value,
                         price: parseFloat(document.getElementById('price').value),
                         secao: document.getElementById('secao').value,
                         description: document.getElementById('description').value,
+                        variantes: v,
+                        estoqueTotal: calcTotal(v),
                         source: document.getElementById('source').value,
                         isFeatured: document.getElementById('isFeatured').value,
-                        variantes: variants,
-                        estoqueTotal: total,
-                        imageUrl: img,
-                        videoUrl: vid
+                        imageUrl: img, videoUrl: vid, galeria: gal
                     };
 
-                    if(document.getElementById('productId').value) {
-                        await db.collection("products").doc(id).update(data);
-                    } else {
-                        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                        await db.collection("products").doc(id).set(data);
-                    }
+                    if(document.getElementById('productId').value) await db.collection("products").doc(id).update(data);
+                    else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("products").doc(id).set(data); }
+
+                    cancelEditMode(); fetchProducts(); showStatus(statusDiv, "Salvo!", "success");
+                } catch(err) { showStatus(statusDiv, err.message, 'error'); } 
+                finally { saveBtn.disabled = false; }
+            });
+
+            // EDITAR / EXCLUIR
+            let oldImageUrl='', oldVideoUrl='', oldGaleria=[];
+            productsList.addEventListener('click', async (e) => {
+                if(e.target.classList.contains('delete-btn') && confirm("Excluir?")) {
+                    await db.collection("products").doc(e.target.dataset.id).delete(); fetchProducts();
+                }
+                if(e.target.classList.contains('edit-btn')) {
+                    let d = await db.collection("products").doc(e.target.dataset.id).get(); let p = d.data();
+                    document.getElementById('productId').value = d.id;
+                    document.getElementById('name').value = p.name;
+                    document.getElementById('price').value = p.price;
+                    document.getElementById('secao').value = p.secao;
+                    document.getElementById('description').value = p.description;
+                    setVariants(p.variantes);
+                    document.getElementById('source').value = p.source;
+                    document.getElementById('isFeatured').value = p.isFeatured;
+                    oldImageUrl = p.imageUrl; oldVideoUrl = p.videoUrl; oldGaleria = p.galeria||[];
                     
-                    alert("Produto Salvo!");
-                    cancelEdit();
-                    fetchProducts();
-                    
-                } catch(err) { alert("Erro: " + err.message); } 
-                finally { btn.disabled = false; btn.textContent = "Salvar Produto"; }
-            });
-
-            // 3. LISTAR PRODUTOS
-            async function fetchProducts() {
-                const list = document.getElementById('products-list'); list.innerHTML = '<tr><td colspan="6">Carregando...</td></tr>';
-                const snap = await db.collection("products").orderBy("createdAt", "desc").get();
-                let html = '';
-                snap.forEach(doc => {
-                    const p = doc.data();
-                    html += `
-                        <tr>
-                            <td><img src="${p.imageUrl}" class="thumb"></td>
-                            <td>${p.name}</td>
-                            <td>¥${p.price}</td>
-                            <td>${p.estoqueTotal || 0}</td>
-                            <td>${p.source}</td>
-                            <td>
-                                <button class="edit-btn" onclick="editProduct('${doc.id}')">Editar</button>
-                                <button class="delete-btn" onclick="deleteProduct('${doc.id}')">X</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                list.innerHTML = html;
-            }
-
-            // 4. EDITAR / EXCLUIR
-            window.editProduct = async (id) => {
-                const doc = await db.collection("products").doc(id).get();
-                const p = doc.data();
-                
-                document.getElementById('productId').value = id;
-                document.getElementById('name').value = p.name;
-                document.getElementById('price').value = p.price;
-                document.getElementById('secao').value = p.secao;
-                document.getElementById('description').value = p.description;
-                document.getElementById('source').value = p.source;
-                document.getElementById('isFeatured').value = p.isFeatured;
-                
-                oldImageUrl = p.imageUrl;
-                oldVideoUrl = p.videoUrl;
-                
-                variantsContainer.innerHTML = '';
-                if(p.variantes) {
-                    for(let line in p.variantes) createVariantEntry(line, p.variantes[line]);
-                }
-                
-                document.getElementById('form-title').textContent = "Editando Produto";
-                document.getElementById('save-btn').textContent = "Atualizar";
-                document.getElementById('cancel-edit-btn').style.display = 'block';
-                window.scrollTo(0, 500);
-            }
-            
-            window.deleteProduct = async (id) => {
-                if(confirm("Tem certeza que deseja apagar?")) {
-                    await db.collection("products").doc(id).delete();
-                    fetchProducts();
-                }
-            }
-
-            function cancelEdit() {
-                document.getElementById('product-form').reset();
-                document.getElementById('productId').value = '';
-                variantsContainer.innerHTML = '';
-                oldImageUrl = ''; oldVideoUrl = '';
-                document.getElementById('form-title').textContent = "Adicionar Produto";
-                document.getElementById('save-btn').textContent = "Salvar Produto";
-                document.getElementById('cancel-edit-btn').style.display = 'none';
-            }
-            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
-
-            // 5. LOGIN E GERAL
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const em = document.getElementById('login-email').value;
-                const pw = document.getElementById('login-password').value;
-                try { await auth.signInWithEmailAndPassword(em, pw); } 
-                catch(e) { alert("Erro: " + e.message); }
-            });
-            
-            document.getElementById('btnLogout').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
-
-            auth.onAuthStateChanged(user => {
-                if(user) {
-                    loginSection.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    fetchProducts();
-                    fetchMessages();
+                    document.getElementById('form-title').textContent = "Editando"; 
+                    document.getElementById('save-btn').textContent = "Atualizar"; 
+                    document.getElementById('cancel-edit-btn').style.display="block"; 
+                    window.scrollTo(0,0);
                 }
             });
+
+            document.getElementById('cancel-edit-btn').addEventListener('click', cancelEditMode);
+            function cancelEditMode() {
+                document.getElementById('productId').value = ''; productForm.reset();
+                variantsContainer.innerHTML = ''; oldImageUrl = ''; oldVideoUrl = ''; oldGaleria = [];
+                document.getElementById('form-title').textContent = "Adicionar Novo"; 
+                document.getElementById('save-btn').textContent = "Salvar Produto"; 
+                document.getElementById('cancel-edit-btn').style.display = "none";
+            }
+
+            // PUSH / LOGIN / STATUS
+            function showStatus(div, msg, type) {
+                div.textContent = msg; div.className = 'status ' + type; div.style.display = 'block';
+                setTimeout(() => div.style.display = 'none', 4000);
+            }
             
-            // 6. PUSH (Simplificado)
+            // Push
+            const msgList = document.getElementById('messages-list');
             async function fetchMessages() {
-                const l = document.getElementById('messages-list'); l.innerHTML = '';
+                msgList.innerHTML = '';
                 const s = await db.collection('site_messages').orderBy('createdAt','desc').limit(5).get();
                 s.forEach(d => {
-                    const m = d.data();
-                    l.innerHTML += `<tr><td>${m.createdAt?m.createdAt.toDate().toLocaleDateString():'-'}</td><td>${m.title}</td><td>${m.body}</td><td><button class="delete-btn" onclick="delMsg('${d.id}')">X</button></td></tr>`;
+                   const m=d.data(); 
+                   msgList.innerHTML += `<tr><td>${m.createdAt?m.createdAt.toDate().toLocaleDateString():'-'}</td><td>${m.title}</td><td>${m.body}</td><td><button class="delete-btn" onclick="delMsg('${d.id}')">X</button></td></tr>`;
                 });
             }
             window.delMsg = async(id)=>{ await db.collection('site_messages').doc(id).delete(); fetchMessages(); };
             
             document.getElementById('btn-send-push').addEventListener('click', async()=>{
                 const t=document.getElementById('push-title').value; const b=document.getElementById('push-body').value;
-                if(!t||!b) return alert("Preencha tudo");
-                if(!confirm("Enviar Push?")) return;
-                try {
-                    await db.collection('site_messages').add({title:t, body:b, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
-                    fetch('/.netlify/functions/push-notification', {method:'POST', body:JSON.stringify({title:t, body:b})});
-                    alert("Enviado e Salvo!"); fetchMessages();
-                } catch(e){alert(e.message)}
+                if(!t||!b) return alert("Preencha");
+                if(!confirm("Enviar?")) return;
+                await db.collection('site_messages').add({title:t, body:b, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+                fetch('/.netlify/functions/push-notification', {method:'POST', body:JSON.stringify({title:t, body:b})});
+                alert("Enviado!"); fetchMessages();
+            });
+
+            // Login Init
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try { await auth.signInWithEmailAndPassword(document.getElementById('login-email').value, document.getElementById('login-password').value); } 
+                catch(e) { alert("Erro: " + e.message); }
+            });
+            btnLogout.addEventListener('click', () => { auth.signOut(); window.location.reload(); });
+            auth.onAuthStateChanged(user => {
+                if (user) { loginSection.style.display = 'none'; adminPanel.style.display = 'block'; fetchProducts(); fetchMessages(); }
+                else { loginSection.style.display = 'block'; adminPanel.style.display = 'none'; }
             });
         });
     </script>
