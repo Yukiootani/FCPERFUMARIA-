@@ -3,238 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin FC Perfumaria</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Montserrat', sans-serif; background: #f4f4f4; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #1B263B; border-bottom: 2px solid #Cca43b; padding-bottom: 10px; margin-top: 0; }
-        
-        /* BOTÃO DE ESTOQUE NOVO */
-        .stock-shortcut-btn {
-            display: block;
-            background-color: #Cca43b; /* Dourado */
-            color: #1B263B; /* Azul Escuro */
-            text-align: center;
-            text-decoration: none;
-            padding: 12px;
-            font-weight: bold;
-            border-radius: 5px;
-            margin-bottom: 25px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            transition: 0.2s;
-        }
-        .stock-shortcut-btn:hover { background-color: #dcb34a; transform: translateY(-2px); }
-        
-        label { display: block; margin-top: 15px; font-weight: bold; color: #333; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        
-        button { margin-top: 20px; padding: 15px; width: 100%; background: #1B263B; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        button:hover { background: #2c3e50; }
-        
-        .status { padding: 10px; margin-top: 10px; border-radius: 4px; display: none; text-align: center; font-weight: bold; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .loading { background: #cce5ff; color: #004085; }
+    <title>Controle de Estoque Rápido | FC Perfumaria</title>
+    
+    <link rel="apple-touch-icon" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
+    <link rel="icon" type="image/png" href="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png">
 
-        /* Área de Notificação */
-        .push-box { background: #fff3cd; padding: 20px; border: 1px solid #ffeeba; border-radius: 8px; margin-bottom: 30px; }
+    <style>
+        :root {
+            --primary-color: #1B263B; /* Azul Marinho */
+            --accent-color: #Cca43b;  /* Dourado */
+            --text-color: #333;
+            --bg-color: #FDFBF7;
+            --border-color: #e0e0e0;
+            --error-color: #dc3545;
+        }
+        body { font-family: sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; }
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
+        h1 { color: var(--primary-color); text-align: center; border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; margin-top: 0; font-size: 1.5em; }
+        h2 { font-size: 1em; text-align: center; color: #666; margin-top: -10px; font-weight: normal; }
+
+        /* LOGIN */
+        #login-section { max-width: 400px; margin: 30px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+        input { width: 100%; padding: 10px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        button:hover { opacity: 0.9; }
+
+        /* PAINEL DE ESTOQUE */
+        #stock-panel { display: none; }
+        
+        /* Filtros */
+        #filter-controls { display: flex; gap: 5px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .filter-btn { flex: 1; background: #fff; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px; border-radius: 20px; font-size: 0.85em; white-space: nowrap; }
+        .filter-btn.active { background: var(--primary-color); color: #fff; }
+
         /* Tabela */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
-        th { background: #eee; }
-        .del-btn { background: #dc3545; color: white; padding: 5px 10px; font-size: 0.8em; width: auto; margin: 0; }
+        #stock-table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid #eee; padding: 8px; text-align: left; vertical-align: top; }
+        th { background: var(--primary-color); color: #fff; font-size: 0.9em; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        img.thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+
+        /* Estilo das Linhas de Variantes (Igual 3 Marias) */
+        .variant-row { 
+            border-bottom: 1px dashed #ccc; 
+            padding: 8px 0; 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        .variant-row:last-child { border-bottom: none; }
+        
+        .variant-label { 
+            font-weight: bold; 
+            color: var(--primary-color); 
+            min-width: 80px; 
+            font-size: 0.9em;
+        }
+
+        .size-group { display: flex; align-items: center; gap: 5px; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #eee; }
+        .size-label { font-size: 0.75em; color: #666; font-weight: bold; }
+        
+        .qty-control { display: flex; align-items: center; }
+        .qty-btn { 
+            width: 28px; height: 28px; padding: 0; margin: 0; 
+            background: #eee; color: #333; border: 1px solid #ccc; 
+            border-radius: 50%; font-size: 1.2em; line-height: 1;
+        }
+        .qty-display { 
+            min-width: 25px; text-align: center; font-weight: bold; font-size: 1.1em; color: var(--primary-color); 
+        }
+
+        .update-btn { 
+            background-color: var(--accent-color); 
+            color: #fff; 
+            width: auto; 
+            padding: 6px 12px; 
+            font-size: 0.8em; 
+            margin-left: auto; /* Empurra pra direita */
+        }
+
+        .total-display { font-size: 1.2em; font-weight: bold; text-align: center; padding-top: 15px; }
+
+        /* Status */
+        #status { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 20px; color: #fff; font-weight: bold; z-index: 9999; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .st-success { background: #28a745; }
+        .st-error { background: #dc3545; }
+        .st-loading { background: #007bff; }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Painel Admin</h1>
+    <div id="status"></div>
 
-    <div id="login-area">
-        <label>Email:</label><input type="email" id="email">
-        <label>Senha:</label><input type="password" id="senha">
-        <button onclick="fazerLogin()">ENTRAR</button>
-    </div>
+    <div class="container">
+        <h1>Controle de Estoque</h1>
+        <h2>FC Perfumaria</h2>
 
-    <div id="admin-area" style="display: none;">
-        
-        <a href="estoque.html" class="stock-shortcut-btn">📦 IR PARA ESTOQUE RÁPIDO</a>
+        <section id="login-section">
+            <h3 style="text-align:center; color:#333;">Acesso Restrito</h3>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="senha" placeholder="Senha" required>
+                <button type="submit">ENTRAR</button>
+            </form>
+        </section>
 
-        <div id="status-msg" class="status"></div>
+        <section id="stock-panel">
+            <div id="filter-controls">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="pronta-entrega">Pronta Entrega</button>
+                <button class="filter-btn" data-filter="sob-encomenda">Sob Encomenda</button>
+            </div>
 
-        <div class="push-box">
-            <h3 style="margin-top:0; color:#856404;">📢 Enviar Notificação Push</h3>
-            <label>Título:</label><input type="text" id="push-title" placeholder="Ex: Promoção!">
-            <label>Mensagem:</label><textarea id="push-body" rows="2" placeholder="Ex: Tudo com 10% OFF"></textarea>
-            <button onclick="enviarPush()">ENVIAR AGORA</button>
-
-            <h4>Histórico de Mensagens</h4>
-            <div style="overflow-x:auto;">
-                <table id="msg-table">
-                    <thead><tr><th>Data</th><th>Título</th><th>Msg</th><th>Apagar</th></tr></thead>
-                    <tbody id="msg-list"></tbody>
+            <div id="stock-table-container">
+                <table id="stock-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Foto</th>
+                            <th style="width: 150px;">Produto</th>
+                            <th>Variações (Linha e Volume)</th>
+                            <th style="width: 60px;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-list"></tbody>
                 </table>
             </div>
-        </div>
-
-        <hr>
-
-        <h3>📦 Cadastrar Produto</h3>
-        <label>Nome:</label><input type="text" id="prod-name">
-        <label>Preço (¥):</label><input type="number" id="prod-price">
-        <label>Categoria:</label>
-        <select id="prod-secao">
-            <option value="feminino">Feminino</option>
-            <option value="masculino">Masculino</option>
-            <option value="unissex">Unissex</option>
-            <option value="kits">Kits</option>
-        </select>
-        <label>Foto:</label><input type="file" id="prod-img">
-        <button onclick="salvarProduto()">SALVAR PRODUTO</button>
-        
-        <h3>Lista de Produtos</h3>
-        <div style="overflow-x:auto;">
-            <table id="prod-table">
-                <thead><tr><th>Nome</th><th>Preço</th><th>Ação</th></tr></thead>
-                <tbody id="prod-list"></tbody>
-            </table>
-        </div>
-        
-        <button onclick="logout()" style="background:#555; margin-top:40px;">SAIR</button>
-    </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
-<script>
-    const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    // LOGIN
-    function fazerLogin() {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('senha').value;
-        auth.signInWithEmailAndPassword(e, p).catch(err => alert("Erro: " + err.message));
-    }
-    function logout() { auth.signOut(); window.location.reload(); }
-
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('login-area').style.display = 'none';
-            document.getElementById('admin-area').style.display = 'block';
-            carregarTudo();
-        }
-    });
-
-    function showStatus(msg, type) {
-        const el = document.getElementById('status-msg');
-        el.textContent = msg;
-        el.className = 'status ' + type;
-        el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 4000);
-    }
-
-    function carregarTudo() {
-        carregarMensagens();
-        carregarProdutos();
-    }
-
-    // --- NOTIFICAÇÕES ---
-    async function carregarMensagens() {
-        const list = document.getElementById('msg-list');
-        list.innerHTML = '';
-        const snap = await db.collection('site_messages').orderBy('createdAt', 'desc').limit(5).get();
-        snap.forEach(doc => {
-            const m = doc.data();
-            const dt = m.createdAt ? m.createdAt.toDate().toLocaleDateString() : '-';
-            list.innerHTML += `<tr><td>${dt}</td><td>${m.title}</td><td>${m.body}</td><td><button class="del-btn" onclick="apagarMsg('${doc.id}')">X</button></td></tr>`;
-        });
-    }
-
-    async function apagarMsg(id) {
-        if(confirm("Apagar?")) { await db.collection('site_messages').doc(id).delete(); carregarMensagens(); }
-    }
-
-    async function enviarPush() {
-        const title = document.getElementById('push-title').value;
-        const body = document.getElementById('push-body').value;
-        if(!title || !body) return alert("Preencha tudo");
-
-        showStatus("Enviando...", "loading");
-
-        try {
-            // 1. CHAMA O SERVIDOR (NETLIFY)
-            const response = await fetch('/.netlify/functions/push-notification', {
-                method: 'POST',
-                body: JSON.stringify({ title, body })
-            });
             
-            const res = await response.json();
+            <button id="btnLogout" style="background:#555; margin-top:20px;">Sair</button>
+        </section>
+    </div>
 
-            // 2. SALVA NO HISTÓRICO (Isso faz aparecer na tabela)
-            await db.collection('site_messages').add({
-                title, body, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        // CONFIGURAÇÃO FC PERFUMARIA
+        const firebaseConfig = { apiKey: "AIzaSyDxyqFLm08rqlaemlyYI9gQfrjvddPelJs", authDomain: "fc-perfumaria-309fb.firebaseapp.com", projectId: "fc-perfumaria-309fb", storageBucket: "fc-perfumaria-309fb.firebasestorage.app", messagingSenderId: "311935363734", appId: "1:311935363734:web:a85cf6ccd93c67d594f0b7" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // ELEMENTOS
+        const loginSection = document.getElementById('login-section');
+        const stockPanel = document.getElementById('stock-panel');
+        const stockList = document.getElementById('stock-list');
+        const statusDiv = document.getElementById('status');
+        let currentFilter = 'todos';
+
+        // --- SISTEMA DE LOGIN ---
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loginSection.style.display = 'none';
+                stockPanel.style.display = 'block';
+                carregarEstoque();
+            } else {
+                loginSection.style.display = 'block';
+                stockPanel.style.display = 'none';
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('senha').value;
+            try { await auth.signInWithEmailAndPassword(email, pass); } 
+            catch(e) { alert("Erro: " + e.message); }
+        });
+
+        document.getElementById('btnLogout').addEventListener('click', () => auth.signOut());
+
+        // --- STATUS FLUTUANTE ---
+        function showMsg(msg, type) {
+            statusDiv.textContent = msg;
+            statusDiv.className = 'st-' + type;
+            statusDiv.style.display = 'block';
+            setTimeout(() => statusDiv.style.display = 'none', 3000);
+        }
+
+        // --- CARREGAR ESTOQUE ---
+        async function carregarEstoque() {
+            stockList.innerHTML = '<tr><td colspan="4" style="text-align:center;">Carregando produtos...</td></tr>';
+            
+            let query = db.collection('products').orderBy('name');
+            if(currentFilter === 'pronta-entrega') query = query.where('source', '==', 'pronta-entrega');
+            if(currentFilter === 'sob-encomenda') query = query.where('source', '==', 'sob-encomenda');
+
+            try {
+                const snap = await query.get();
+                if(snap.empty) { stockList.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum produto.</td></tr>'; return; }
+
+                let html = '';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    html += renderProductRow(doc.id, p);
+                });
+                stockList.innerHTML = html;
+            } catch(e) { 
+                console.error(e);
+                stockList.innerHTML = '<tr><td colspan="4" style="color:red;">Erro ao carregar. Verifique sua conexão.</td></tr>';
+            }
+        }
+
+        // GERA O HTML DE CADA LINHA (Lógica Inteligente)
+        function renderProductRow(id, p) {
+            const variants = p.variantes || {};
+            let variantsHtml = '';
+
+            if(Object.keys(variants).length === 0) {
+                variantsHtml = '<span style="color:#999; font-style:italic;">Sem variações cadastradas.</span>';
+            } else {
+                // Loop: Versão (ex: Gold) -> Volumes (ex: 100ml)
+                for (const lineName in variants) {
+                    let volsHtml = '';
+                    const volumes = variants[lineName];
+                    
+                    for (const volName in volumes) {
+                        const qtd = volumes[volName];
+                        volsHtml += `
+                            <div class="size-group" data-vol="${volName}">
+                                <span class="size-label">${volName}</span>
+                                <div class="qty-control">
+                                    <button class="qty-btn" onclick="adjustQty(this, -1)">-</button>
+                                    <span class="qty-display">${qtd}</span>
+                                    <button class="qty-btn" onclick="adjustQty(this, 1)">+</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    variantsHtml += `
+                        <div class="variant-row" data-line="${lineName}">
+                            <div class="variant-label">${lineName}</div>
+                            ${volsHtml}
+                            <button class="update-btn" onclick="salvarLinha('${id}', '${lineName}', this)">Salvar</button>
+                        </div>
+                    `;
+                }
+            }
+
+            return `
+                <tr>
+                    <td><img src="${p.imageUrl}" class="thumb"></td>
+                    <td>
+                        <strong>${p.name}</strong><br>
+                        <small>${p.source}</small>
+                    </td>
+                    <td>${variantsHtml}</td>
+                    <td class="total-display" id="total-${id}">${p.estoqueTotal || 0}</td>
+                </tr>
+            `;
+        }
+
+        // --- LÓGICA DE INTERAÇÃO ---
+        
+        // Botão +/- (Apenas visual, não salva ainda)
+        window.adjustQty = function(btn, delta) {
+            const display = btn.parentElement.querySelector('.qty-display');
+            let val = parseInt(display.textContent);
+            val += delta;
+            if(val < 0) val = 0;
+            display.textContent = val;
+        };
+
+        // Botão Salvar (Envia para o Firebase)
+        window.salvarLinha = async function(docId, lineName, btn) {
+            const row = btn.parentElement;
+            const sizeGroups = row.querySelectorAll('.size-group');
+            let newVolumesData = {};
+
+            // 1. Coleta os dados visuais
+            sizeGroups.forEach(group => {
+                const vol = group.dataset.vol;
+                const qtd = parseInt(group.querySelector('.qty-display').textContent);
+                newVolumesData[vol] = qtd;
             });
 
-            if(response.ok) {
-                showStatus(`Sucesso! Enviado para ${res.enviados} celulares.`, "success");
-            } else {
-                showStatus(`Erro no envio: ${res.error}`, "error");
+            btn.disabled = true;
+            btn.textContent = "...";
+            showMsg("Atualizando...", "loading");
+
+            try {
+                // 2. Atualiza apenas aquela linha específica (ex: variantes.Gold)
+                const updatePath = `variantes.${lineName}`;
+                await db.collection('products').doc(docId).update({
+                    [updatePath]: newVolumesData
+                });
+
+                // 3. Recalcula o TOTAL GERAL do produto
+                const docSnap = await db.collection('products').doc(docId).get();
+                const allVariants = docSnap.data().variantes;
+                let grandTotal = 0;
+                
+                for(let l in allVariants) {
+                    for(let v in allVariants[l]) {
+                        grandTotal += (parseInt(allVariants[l][v]) || 0);
+                    }
+                }
+
+                await db.collection('products').doc(docId).update({ estoqueTotal: grandTotal });
+                document.getElementById(`total-${docId}`).textContent = grandTotal;
+
+                showMsg("Estoque Atualizado!", "success");
+
+            } catch(e) {
+                console.error(e);
+                showMsg("Erro ao salvar", "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Salvar";
             }
-            carregarMensagens();
+        };
 
-        } catch (err) {
-            showStatus("Erro técnico: " + err.message, "error");
-        }
-    }
-
-    // --- PRODUTOS ---
-    async function carregarProdutos() {
-        const list = document.getElementById('prod-list');
-        list.innerHTML = '';
-        const snap = await db.collection('products').orderBy('createdAt', 'desc').limit(10).get();
-        snap.forEach(doc => {
-            const p = doc.data();
-            list.innerHTML += `<tr><td>${p.name}</td><td>¥${p.price}</td><td><button class="del-btn" onclick="apagarProd('${doc.id}')">X</button></td></tr>`;
+        // Filtros
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                carregarEstoque();
+            });
         });
-    }
-    
-    async function salvarProduto() {
-        const name = document.getElementById('prod-name').value;
-        const price = parseFloat(document.getElementById('prod-price').value);
-        const secao = document.getElementById('prod-secao').value;
-        const file = document.getElementById('prod-img').files[0];
-        
-        if(!name || !price || !file) return alert("Preencha tudo e escolha foto.");
-        
-        showStatus("Salvando foto...", "loading");
-        const ref = storage.ref(`products/${Date.now()}`);
-        await ref.put(file);
-        const url = await ref.getDownloadURL();
-        
-        await db.collection('products').add({
-            name, price, secao, imageUrl: url,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            source: 'pronta-entrega', isFeatured: 'novo', estoqueTotal: 10,
-            variantes: {} // Simplificado para teste
-        });
-        
-        showStatus("Produto Salvo!", "success");
-        carregarProdutos();
-    }
-    
-    async function apagarProd(id) {
-        if(confirm("Apagar?")) { await db.collection('products').doc(id).delete(); carregarProdutos(); }
-    }
-</script>
 
+    </script>
 </body>
 </html>
