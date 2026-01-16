@@ -14,30 +14,65 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILO GERAL --- */
+        /* --- ESTILO BLINDADO --- */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; padding-bottom: 100px; width: 100%; overflow-x: hidden; }
+        html, body { width: 100%; max-width: 100%; overflow-x: hidden; position: relative; font-family: 'Montserrat', sans-serif; background-color: #FDFBF7; color: #333; }
+        body { padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
         :root { --bg-color: #FDFBF7; --primary-color: #1B263B; --accent-color: #Cca43b; --text-color: #333; --whatsapp-green: #25D366; }
         
+        /* HEADER */
         header { background-color: #fff; padding: 1rem; border-bottom: 1px solid #e0e0e0; padding-top: max(1rem, env(safe-area-inset-top)); }
         header a { color: var(--primary-color); text-decoration: none; font-weight: 600; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
         
-        main { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        main { width: 100%; max-width: 1000px; margin: 20px auto; padding: 0 15px; overflow: hidden; }
         
-        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; }
-        .media-area { flex: 1 1 100%; } 
-        .info-area { flex: 1 1 100%; }
+        /* LAYOUT */
+        #product-details { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px; width: 100%; }
+        .media-area { flex: 1 1 100%; width: 100%; } 
+        .info-area { flex: 1 1 100%; width: 100%; }
         @media (min-width: 768px) { .media-area { flex: 1 1 45%; } .info-area { flex: 1 1 50%; } }
         
-        /* MÍDIA */
-        #main-media-display { position: relative; width: 100%; padding-top: 100%; margin-bottom: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        #main-media-display img, #main-media-display video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+        /* MÍDIA PRINCIPAL */
+        #main-media-display { 
+            position: relative; width: 100%; padding-top: 100%; /* Quadrado */
+            margin-bottom: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        #main-media-display img, #main-media-display video { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 5px; 
+        }
         
-        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; }
-        .thumb-container { width: 60px; height: 60px; flex-shrink: 0; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; background: #fff; transition: 0.3s; position: relative; overflow: hidden; }
+        /* CARROSSEL DE FOTOS */
+        #thumbnails { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 15px; width: 100%; }
+        .thumb-container { 
+            width: 60px; height: 60px; flex-shrink: 0; border-radius: 4px; 
+            cursor: pointer; border: 1px solid #ddd; background: #fff; transition: 0.3s; position: relative; overflow: hidden;
+        }
         .thumb-container.active { border: 2px solid var(--accent-color); }
         .thumb-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
-        .video-trigger-bar { width: 100%; background-color: #fff; border: 1px dashed var(--accent-color); color: var(--primary-color); padding: 12px; text-align: center; font-weight: bold; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; margin-bottom: 20px; }
+        
+        /* BARRA DE VÍDEO (SEPARADA) */
+        .video-trigger-bar {
+            width: 100%;
+            background-color: #fff;
+            border: 1px dashed var(--accent-color);
+            color: var(--primary-color);
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .video-trigger-bar:active { background-color: #f9f9f9; transform: scale(0.98); }
         .video-trigger-bar i { color: var(--accent-color); font-size: 1.2em; }
 
         /* INFO */
@@ -61,25 +96,23 @@
         .description-box { margin-top: 30px; line-height: 1.6; color: #555; font-size: 0.95em; border-top: 1px solid #eee; padding-top: 20px; }
         .description-box h3 { font-family: 'Playfair Display'; color: var(--primary-color); margin-bottom: 10px; }
 
-        /* REVIEWS */
+        /* AVALIAÇÕES */
         #reviews-section { margin-top: 40px; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
         .review-item { border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 15px; }
         .review-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--primary-color); margin-bottom: 5px; font-size: 0.9em; }
         .stars { color: var(--accent-color); letter-spacing: 2px; }
         .review-text { font-style: italic; color: #666; }
 
-        /* --- RELACIONADOS (NOVO) --- */
+        /* RELACIONADOS */
         #related-section { margin-top: 50px; border-top: 1px solid #ddd; padding-top: 30px; display: none; }
         .related-title { font-family: 'Playfair Display'; font-size: 1.4em; color: var(--primary-color); text-align: center; margin-bottom: 20px; }
-        
         #related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        /* Reuso estilo do card da home para consistência */
         .rel-card { background: #fff; border: 1px solid #eee; border-radius: 6px; overflow: hidden; text-decoration: none; color: #333; display: flex; flex-direction: column; }
         .rel-img-box { width: 100%; padding-top: 120%; position: relative; background: #f9f9f9; }
         .rel-img-box img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .rel-info { padding: 10px; text-align: center; }
         .rel-name { font-family: 'Playfair Display'; font-size: 0.9em; color: var(--primary-color); margin-bottom: 5px; }
-        .rel-price { font-weight: bold; font-size: 0.9em; }
+        .rel-price { font-weight: bold; font-size: 0.9em; color: var(--accent-color); }
 
         #cart-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-color: var(--whatsapp-green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); cursor: pointer; z-index: 1000; text-decoration: none; transition: transform 0.2s; }
         #cart-count { position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; display: none; }
@@ -123,10 +156,11 @@
             try {
                 const doc = await db.collection("products").doc(currentProductId).get();
                 if (!doc.exists) { loadingDiv.innerHTML = "Produto não encontrado."; return; }
+                
                 productData = doc.data();
                 renderProduct();
                 fetchReviews();
-                fetchRelated(); // Chama os relacionados
+                fetchRelated();
             } catch (e) { loadingDiv.innerHTML = "Erro ao carregar."; }
         }
 
@@ -139,17 +173,26 @@
                 ? '<span class="status-badge status-pronta-entrega">Pronta Entrega</span>' 
                 : '<span class="status-badge status-sob-encomenda">Sob Encomenda</span>';
 
+            // Mídia Principal
             let mediaHtml = `<div id="main-media-display"><img id="main-display-content" src="${p.imageUrl}"></div>`;
             
+            // Galeria de Fotos
             let thumbsHtml = '';
             thumbsHtml += `<div class="thumb-container active" onclick="showImage('${p.imageUrl}', this)"><img src="${p.imageUrl}"></div>`;
             if(p.galeria && p.galeria.length > 0) {
-                p.galeria.forEach(url => { thumbsHtml += `<div class="thumb-container" onclick="showImage('${url}', this)"><img src="${url}"></div>`; });
+                p.galeria.forEach(url => {
+                    thumbsHtml += `<div class="thumb-container" onclick="showImage('${url}', this)"><img src="${url}"></div>`;
+                });
             }
             mediaHtml += `<div id="thumbnails">${thumbsHtml}</div>`;
 
+            // Botão Vídeo
             if (p.videoUrl && p.videoUrl.trim() !== '') {
-                mediaHtml += `<div class="video-trigger-bar" onclick="showVideo('${p.videoUrl}')"><i class="fas fa-play-circle"></i> ASSISTIR VÍDEO DO PRODUTO</div>`;
+                mediaHtml += `
+                    <div class="video-trigger-bar" onclick="showVideo('${p.videoUrl}')">
+                        <i class="fas fa-play-circle"></i> ASSISTIR VÍDEO DE DEMONSTRAÇÃO
+                    </div>
+                `;
             }
 
             let variantsHtml = '';
@@ -182,7 +225,7 @@
 
                     <div id="related-section">
                         <div class="related-title">Você também pode gostar</div>
-                        <div id="related-grid">Carregando...</div>
+                        <div id="related-grid"></div>
                     </div>
                 </div>
             `;
@@ -193,44 +236,19 @@
             if(hasVariants) setupVariantLogic(); else setupSimpleCartLogic();
         }
 
-        // --- LÓGICA DE RELACIONADOS ---
         async function fetchRelated() {
             try {
-                // Busca 4 produtos da mesma categoria
-                const snap = await db.collection("products")
-                    .where("secao", "==", productData.secao)
-                    .limit(5) // Pega 5 para garantir que sobra 4 se excluir o atual
-                    .get();
-
+                const snap = await db.collection("products").where("secao", "==", productData.secao).limit(5).get();
                 if(snap.empty) return;
-
-                let html = '';
-                let count = 0;
-
+                let html = ''; let count = 0;
                 snap.forEach(d => {
-                    if(d.id === currentProductId) return; // Pula o produto atual
-                    if(count >= 4) return; // Limita a 4
-
-                    const p = d.data();
-                    const pf = (p.price||0).toLocaleString('ja-JP');
-                    
-                    html += `
-                        <a href="detalhes.html?id=${d.id}" class="rel-card">
-                            <div class="rel-img-box"><img src="${p.imageUrl}"></div>
-                            <div class="rel-info">
-                                <div class="rel-name">${p.name}</div>
-                                <div class="rel-price">¥${pf}</div>
-                            </div>
-                        </a>
-                    `;
+                    if(d.id === currentProductId) return; if(count >= 4) return;
+                    const p = d.data(); const pf = (p.price||0).toLocaleString('ja-JP');
+                    html += `<a href="detalhes.html?id=${d.id}" class="rel-card"><div class="rel-img-box"><img src="${p.imageUrl}"></div><div class="rel-info"><div class="rel-name">${p.name}</div><div class="rel-price">¥${pf}</div></div></a>`;
                     count++;
                 });
-
-                if (count > 0) {
-                    document.getElementById('related-grid').innerHTML = html;
-                    document.getElementById('related-section').style.display = 'block';
-                }
-            } catch(e) { console.log("Erro Relacionados:", e); }
+                if (count > 0) { document.getElementById('related-grid').innerHTML = html; document.getElementById('related-section').style.display = 'block'; }
+            } catch(e) {}
         }
 
         window.showImage = function(src, el) {
@@ -239,11 +257,7 @@
         }
 
         window.showVideo = function(videoUrl) {
-            document.getElementById('main-media-display').innerHTML = `
-                <video id="main-display-content" controls autoplay playsinline style="width:100%; height:100%; object-fit:contain; background:#000;">
-                    <source src="${videoUrl}" type="video/mp4">
-                </video>
-            `;
+            document.getElementById('main-media-display').innerHTML = `<video id="main-display-content" controls autoplay playsinline style="width:100%; height:100%; object-fit:contain; background:#000;"><source src="${videoUrl}" type="video/mp4"></video>`;
             document.querySelectorAll('.thumb-container').forEach(t => t.classList.remove('active'));
         }
 
@@ -252,12 +266,14 @@
             el.classList.add('active');
         }
 
+        // --- LÓGICA INTELIGENTE DE ESTOQUE ---
         function setupVariantLogic() {
             const lineBtns = document.querySelectorAll('.line-selector');
             const volContainer = document.getElementById('vol-container');
             const volGroup = document.getElementById('vol-group');
             const buyBtn = document.getElementById('add-to-cart-btn');
             const labelLine = document.getElementById('selected-line-label');
+            
             lineBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     lineBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active');
@@ -266,35 +282,80 @@
                     buyBtn.disabled = true; buyBtn.textContent = "Selecione o Tamanho";
                 });
             });
+
             function renderVolumes(line) {
                 const stockData = productData.variantes[line]; volContainer.innerHTML = '';
                 Object.keys(stockData).forEach(volKey => {
-                    const qty = stockData[volKey]; const isSoldOut = qty <= 0;
-                    const btn = document.createElement('button'); btn.className = `variant-btn vol-selector ${isSoldOut ? 'disabled' : ''}`; btn.textContent = volKey + (isSoldOut ? ' (Esgotado)' : '');
-                    if(!isSoldOut) { btn.onclick = () => selectVolume(btn, volKey, qty); }
+                    const qty = stockData[volKey];
+                    // REGRA DE OURO: Se for "pronta-entrega" E estoque zero, bloqueia. Se for "sob-encomenda", libera sempre.
+                    const isSoldOut = (qty <= 0 && productData.source === 'pronta-entrega');
+                    
+                    const btn = document.createElement('button'); 
+                    btn.className = `variant-btn vol-selector ${isSoldOut ? 'disabled' : ''}`; 
+                    btn.textContent = volKey + (isSoldOut ? ' (Esgotado)' : '');
+                    
+                    if(!isSoldOut) { 
+                        btn.onclick = () => selectVolume(btn, volKey, qty); 
+                    }
                     volContainer.appendChild(btn);
                 });
             }
+
             function selectVolume(btn, vol, qty) {
                 document.querySelectorAll('.vol-selector').forEach(b => b.classList.remove('active')); btn.classList.add('active');
                 selectedVol = vol; buyBtn.disabled = false; buyBtn.innerHTML = `ADICIONAR AO CARRINHO <i class="fas fa-shopping-bag"></i>`;
                 const newBtn = buyBtn.cloneNode(true); buyBtn.parentNode.replaceChild(newBtn, buyBtn); newBtn.addEventListener('click', () => addToCart(qty));
             }
         }
+
         function setupSimpleCartLogic() {
-            const btn = document.getElementById('add-to-cart-btn'); const maxStock = productData.estoqueTotal || 999;
-            btn.addEventListener('click', () => addToCart(maxStock));
+            const btn = document.getElementById('add-to-cart-btn'); 
+            const maxStock = productData.estoqueTotal || 0;
+            // Se for simples (sem variantes), aplica a mesma regra: Se "sob-encomenda", ignora o zero.
+            const isSoldOut = (maxStock <= 0 && productData.source === 'pronta-entrega');
+
+            if(isSoldOut) {
+                btn.disabled = true;
+                btn.textContent = "Produto Esgotado";
+                btn.style.backgroundColor = "#ccc";
+            } else {
+                btn.addEventListener('click', () => addToCart(maxStock));
+            }
         }
-        function addToCart(maxStock) {
+
+        function addToCart(stockQty) {
             const cart = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}};
             const variantId = selectedLine ? `${currentProductId}_${selectedLine}_${selectedVol}` : `${currentProductId}_padrao`;
+            
+            // Se for "sob-encomenda", definimos estoque como Infinito (999) para o carrinho não bloquear
+            const effectiveStock = productData.source === 'sob-encomenda' ? 999 : stockQty;
+
             const currentQty = cart.items[variantId] ? cart.items[variantId].quantity : 0;
-            if(currentQty >= maxStock) { alert("Estoque máximo atingido."); return; }
-            if(!cart.items[variantId]) { cart.items[variantId] = { id: currentProductId, name: productData.name, price: productData.price, image: productData.imageUrl, color: selectedLine || '', size: selectedVol || '', quantity: 0 }; }
-            cart.items[variantId].quantity++; localStorage.setItem('whatsappCart', JSON.stringify(cart)); updateCartIcon();
-            const btn = document.querySelector('.buy-button'); const originalText = btn.innerHTML; btn.innerHTML = "ADICIONADO! ✓"; btn.style.backgroundColor = "#25D366";
+            
+            if(currentQty >= effectiveStock) { alert("Estoque máximo atingido."); return; }
+            
+            if(!cart.items[variantId]) { 
+                cart.items[variantId] = { 
+                    id: currentProductId, 
+                    name: productData.name, 
+                    price: productData.price, 
+                    image: productData.imageUrl, 
+                    color: selectedLine || '', 
+                    size: selectedVol || '', 
+                    quantity: 0 
+                }; 
+            }
+            cart.items[variantId].quantity++; 
+            localStorage.setItem('whatsappCart', JSON.stringify(cart)); 
+            updateCartIcon();
+            
+            const btn = document.querySelector('.buy-button'); 
+            const originalText = btn.innerHTML; 
+            btn.innerHTML = "ADICIONADO! ✓"; 
+            btn.style.backgroundColor = "#25D366";
             setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ""; }, 2000);
         }
+
         function updateCartIcon(){ const c = JSON.parse(localStorage.getItem('whatsappCart')) || {items:{}}; let q = 0; Object.values(c.items).forEach(i => q += i.quantity); const badge = document.getElementById('cart-count'); if(q > 0) { badge.textContent = q; badge.style.display = 'flex'; } else badge.style.display = 'none'; }
         
         async function fetchReviews() {
@@ -305,4 +366,4 @@
         }
     </script>
 </body>
-</html>r
+</html>
