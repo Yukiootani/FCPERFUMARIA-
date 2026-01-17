@@ -37,7 +37,7 @@
             flex-direction: column;
         }
 
-        /* --- TELA DE LOGIN (NOVO DESIGN) --- */
+        /* --- TELA DE LOGIN --- */
         #login-screen {
             flex-grow: 1;
             display: flex;
@@ -51,112 +51,69 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .app-logo {
-            width: 100px;
-            height: 100px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(204, 164, 59, 0.4); /* Brilho Dourado */
-            margin-bottom: 25px;
-            border: 2px solid var(--gold);
+            width: 100px; height: 100px; border-radius: 20px;
+            box-shadow: 0 0 20px rgba(204, 164, 59, 0.4);
+            margin-bottom: 25px; border: 2px solid var(--gold);
         }
 
         .login-box {
-            background: var(--white);
-            padding: 30px 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: var(--shadow);
-            text-align: center;
+            background: var(--white); padding: 30px 25px; border-radius: 16px;
+            width: 100%; max-width: 380px; box-shadow: var(--shadow); text-align: center;
         }
 
-        .login-box h2 {
-            margin: 0 0 5px 0;
-            color: var(--bg-color);
-            font-size: 1.5em;
-            font-weight: 700;
-        }
+        .login-box h2 { margin: 0 0 5px 0; color: var(--bg-color); font-size: 1.5em; font-weight: 700; }
+        .login-box p { margin: 0 0 25px 0; color: var(--text-grey); font-size: 0.9em; }
 
-        .login-box p {
-            margin: 0 0 25px 0;
-            color: var(--text-grey);
-            font-size: 0.9em;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-        
-        .input-group label {
-            display: block;
-            font-size: 0.8em;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 5px;
-            margin-left: 2px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-        .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-        }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 0.8em; font-weight: 600; color: var(--text-dark); margin-bottom: 5px; margin-left: 2px; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
 
         .login-box input {
-            width: 100%;
-            padding: 14px 14px 14px 45px; /* Espaço para o ícone */
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 1em;
-            background: #f9fafb;
-            color: var(--text-dark);
-            outline: none;
-            transition: 0.3s;
+            width: 100%; padding: 14px 14px 14px 45px; border: 1px solid #e5e7eb; border-radius: 10px;
+            font-size: 1em; background: #f9fafb; color: var(--text-dark); outline: none; transition: 0.3s;
         }
-        .login-box input:focus {
-            border-color: var(--gold);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(204, 164, 59, 0.1);
-        }
+        .login-box input:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(204, 164, 59, 0.1); }
 
         .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
-            color: var(--white);
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1em;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(204, 164, 59, 0.3);
-            transition: 0.2s;
+            width: 100%; padding: 15px; background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
+            color: var(--white); border: none; border-radius: 10px; font-weight: 700; font-size: 1em;
+            cursor: pointer; margin-top: 10px; box-shadow: 0 4px 10px rgba(204, 164, 59, 0.3); transition: 0.2s;
         }
         .login-btn:active { transform: scale(0.98); opacity: 0.9; }
+        .forgot-pass { display: block; margin-top: 20px; color: var(--text-grey); font-size: 0.85em; text-decoration: none; }
 
-        .forgot-pass {
-            display: block;
-            margin-top: 20px;
-            color: var(--text-grey);
-            font-size: 0.85em;
-            text-decoration: none;
-        }
-        .forgot-pass:hover { color: var(--gold); text-decoration: underline; }
-
-        /* --- DASHBOARD (Design que você aprovou) --- */
+        /* --- DASHBOARD --- */
         #dashboard-screen { display: none; flex-direction: column; padding: 25px; min-height: 100vh; }
 
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; margin-top: 10px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; margin-top: 10px; }
         .user-info h2 { margin: 0; font-size: 1.8em; font-weight: 700; }
         .user-info p { margin: 5px 0 0 0; color: var(--gold); font-size: 0.95em; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
         .profile-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.1); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4em; color: var(--white); box-shadow: 0 0 15px rgba(204, 164, 59, 0.3); }
 
+        /* BOTÃO DE COMPARTILHAR (NOVO) */
+        .share-btn-card {
+            background: linear-gradient(135deg, #Cca43b 0%, #b8860b 100%);
+            color: white;
+            padding: 18px 22px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(204, 164, 59, 0.4);
+            transition: transform 0.2s;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .share-btn-card:active { transform: scale(0.97); }
+        .share-icon { font-size: 1.8em; margin-right: 15px; }
+        .share-text h3 { margin: 0; font-size: 1.1em; font-weight: 700; }
+        .share-text p { margin: 2px 0 0 0; font-size: 0.85em; opacity: 0.9; }
+        .share-arrow { margin-left: auto; font-size: 1.2em; opacity: 0.8; }
+
+        /* GRID */
         .dashboard-grid { display: grid; gap: 18px; margin-bottom: 30px; }
         .dash-card { background: var(--card-bg); border-radius: 12px; padding: 22px; text-decoration: none; color: var(--text-dark); display: flex; align-items: center; transition: transform 0.2s; position: relative; overflow: hidden; box-shadow: var(--shadow); border-left: 5px solid transparent; }
         .dash-card:active { transform: scale(0.97); background: #f3f4f6; }
@@ -174,26 +131,32 @@
         .card-info p { margin: 0; font-size: 0.85em; color: var(--text-grey); line-height: 1.4; font-weight: 500; }
         .arrow-right { margin-left: auto; color: #d1d5db; font-size: 1.2em; }
 
+        /* NOTEPAD */
         .notepad-section { background: var(--card-bg); border-radius: 12px; padding: 20px; flex-grow: 1; display: flex; flex-direction: column; box-shadow: var(--shadow); margin-bottom: 20px; }
         .notepad-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .notepad-header h3 { margin: 0; font-size: 1em; color: var(--bg-color); text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         #notepad-area { width: 100%; height: 100%; min-height: 120px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; color: var(--text-dark); font-family: 'Montserrat', sans-serif; font-size: 0.95em; line-height: 1.6; resize: none; outline: none; padding: 15px; }
-        #notepad-area:focus { border-color: var(--gold); background: #fff; }
 
         footer { margin-top: 10px; text-align: center; }
         .support-btn { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 12px 25px; border-radius: 30px; text-decoration: none; color: var(--white); font-size: 0.9em; font-weight: 600; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
-        .support-btn:hover { background: var(--gold); color: var(--bg-color); border-color: var(--gold); }
         .version { display: block; margin-top: 15px; font-size: 0.75em; color: rgba(255,255,255,0.4); }
 
-        /* MENSAGEM DE ERRO */
-        #login-msg {
-            background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px;
-            font-size: 0.85em; font-weight: 600; margin-bottom: 15px; display: none; border: 1px solid #fecaca;
+        #login-msg { background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 8px; font-size: 0.85em; font-weight: 600; margin-bottom: 15px; display: none; border: 1px solid #fecaca; }
+
+        /* TOAST DE CÓPIA */
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 50px; padding: 16px;
+            position: fixed; z-index: 9999; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 15px;
         }
+        #toast.show { visibility: visible; -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
 
     </style>
 </head>
 <body>
+
+    <div id="toast">Link da Loja Copiado!</div>
 
     <div id="login-screen">
         <img src="663adacb-9398-45a8-9e83-f0dcf0e1f4ef.png" class="app-logo" alt="Logo">
@@ -201,7 +164,6 @@
         <div class="login-box">
             <h2>Bem-vindo</h2>
             <p>Faça login para gerenciar sua loja</p>
-            
             <p id="login-msg"></p>
 
             <form id="loginForm">
@@ -228,7 +190,6 @@
                 Esqueceu a senha? <b>Fale com o Suporte</b>
             </a>
         </div>
-        
         <p style="margin-top: 30px; font-size: 0.8em; opacity: 0.6;">ClickVenda Pro &copy; 2025</p>
     </div>
 
@@ -243,31 +204,31 @@
             </div>
         </header>
 
+        <div class="share-btn-card" onclick="shareStore()">
+            <div class="share-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="share-text">
+                <h3>Divulgar Minha Loja</h3>
+                <p>Enviar link para clientes (WhatsApp...)</p>
+            </div>
+            <div class="share-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
         <div class="dashboard-grid">
             <a href="admin.html" class="dash-card card-admin">
                 <div class="card-icon icon-admin-bg"><i class="fa-solid fa-sliders"></i></div>
-                <div class="card-info">
-                    <h3>Administração</h3>
-                    <p>Cadastros e Notificações</p>
-                </div>
+                <div class="card-info"><h3>Administração</h3><p>Cadastros e Notificações</p></div>
                 <i class="fa-solid fa-chevron-right arrow-right"></i>
             </a>
 
             <a href="estoque.html" class="dash-card card-stock">
                 <div class="card-icon icon-stock-bg"><i class="fa-solid fa-boxes-stacked"></i></div>
-                <div class="card-info">
-                    <h3>Estoque Rápido</h3>
-                    <p>Controle de Vendas Diário</p>
-                </div>
+                <div class="card-info"><h3>Estoque Rápido</h3><p>Controle de Vendas Diário</p></div>
                 <i class="fa-solid fa-chevron-right arrow-right"></i>
             </a>
 
             <a href="index.html" class="dash-card card-shop">
                 <div class="card-icon icon-shop-bg"><i class="fa-solid fa-store"></i></div>
-                <div class="card-info">
-                    <h3>Minha Loja</h3>
-                    <p>Visualizar Site Online</p>
-                </div>
+                <div class="card-info"><h3>Minha Loja</h3><p>Visualizar Site Online</p></div>
                 <i class="fa-solid fa-chevron-right arrow-right"></i>
             </a>
         </div>
@@ -277,7 +238,7 @@
                 <h3><i class="fa-solid fa-pen-to-square" style="color:var(--gold)"></i> Notas Pessoais</h3>
                 <span style="font-size: 0.75em; color: var(--success); font-weight:bold;" id="save-status"></span>
             </div>
-            <textarea id="notepad-area" placeholder="Escreva aqui lembretes, lista de compras ou tarefas... (Salvo automaticamente no seu celular)"></textarea>
+            <textarea id="notepad-area" placeholder="Escreva aqui lembretes... (Salvo automaticamente)"></textarea>
         </div>
 
         <footer>
@@ -287,7 +248,7 @@
             <a href="https://wa.me/818074558624" class="support-btn">
                 <i class="fa-brands fa-whatsapp" style="font-size: 1.2em;"></i> Suporte Técnico
             </a>
-            <span class="version">ClickVenda Pro • v2.4 (SaaS)</span>
+            <span class="version">ClickVenda Pro • v2.5 (SaaS)</span>
         </footer>
     </div>
 
@@ -301,47 +262,27 @@
         const loginScreen = document.getElementById('login-screen');
         const dashScreen = document.getElementById('dashboard-screen');
 
-        // VERIFICAR LOGIN
         auth.onAuthStateChanged(user => {
-            if (user) {
-                loginScreen.style.display = 'none';
-                dashScreen.style.display = 'flex';
-            } else {
-                loginScreen.style.display = 'flex';
-                dashScreen.style.display = 'none';
-            }
+            if (user) { loginScreen.style.display = 'none'; dashScreen.style.display = 'flex'; } 
+            else { loginScreen.style.display = 'flex'; dashScreen.style.display = 'none'; }
         });
 
-        // FAZER LOGIN
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('senha').value;
-            const msg = document.getElementById('login-msg');
             const btn = document.querySelector('.login-btn');
-            
-            btn.textContent = "Verificando...";
-            btn.disabled = true;
-
+            btn.textContent = "Verificando..."; btn.disabled = true;
             try {
-                await auth.signInWithEmailAndPassword(email, pass);
-                // O onAuthStateChanged vai cuidar da troca de tela
+                await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('senha').value);
             } catch (error) {
-                msg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Senha ou E-mail incorretos.';
+                const msg = document.getElementById('login-msg');
+                msg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Dados incorretos.';
                 msg.style.display = 'block';
-                btn.textContent = "ACESSAR SISTEMA";
-                btn.disabled = false;
+                btn.textContent = "ACESSAR SISTEMA"; btn.disabled = false;
             }
         });
 
-        // LOGOUT
-        window.doLogout = () => {
-            if(confirm("Deseja sair do sistema?")) {
-                auth.signOut();
-            }
-        };
+        window.doLogout = () => { if(confirm("Deseja sair?")) auth.signOut(); };
 
-        // SAUDAÇÃO & BLOCO DE NOTAS
         const h = new Date().getHours();
         document.getElementById('greeting').textContent = h<12?'Bom dia!':h<18?'Boa tarde!':'Boa noite!';
         
@@ -353,6 +294,33 @@
             st.textContent='Salvando...'; st.style.color='#ccc'; clearTimeout(t);
             t=setTimeout(()=>{ localStorage.setItem('notes', note.value); st.textContent='Salvo ✓'; st.style.color='#10b981'; }, 500);
         });
+
+        // --- FUNÇÃO DE COMPARTILHAR LOJA (WEB SHARE API) ---
+        async function shareStore() {
+            const shareData = {
+                title: 'FC Perfumaria',
+                text: 'Confira os melhores perfumes importados no Japão!',
+                url: 'https://fcperfumaria.netlify.app'
+            };
+
+            // Se o navegador suportar o compartilhamento nativo (Celular)
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Cancelado pelo usuário');
+                }
+            } else {
+                // Se for PC, copia o link para a área de transferência
+                navigator.clipboard.writeText(shareData.url).then(function() {
+                    const x = document.getElementById("toast");
+                    x.className = "show";
+                    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+                }, function(err) {
+                    alert("Não foi possível copiar o link.");
+                });
+            }
+        }
     </script>
 </body>
 </html>
